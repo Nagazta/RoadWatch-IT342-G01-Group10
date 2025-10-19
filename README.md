@@ -58,5 +58,4 @@ Mitchel Gabrielle Saniel — Frontend Developer -mitchelgabrielle.saniel@cit.edu
 
 Joseph Kyle Sumucad — Backend Developer - josephkyle.sumucad@cit.edu - @kylesumucad18
 
-Joseph Ericson Tiu - Mobile Developer - josephericson.tiu@cit.edu - 
-
+Joseph Ericson Tiu - Mobile Developer - josephericson.tiu@cit.edu - @Dynamicxs
