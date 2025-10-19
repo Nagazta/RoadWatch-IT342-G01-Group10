@@ -52,10 +52,10 @@ Backend API: http://localhost:8080
 
 ## Team Members
 
-Kyle Sepulveda — Lead Developer - kyle.sepulveda@cit.edu - @Nagazta
+Kyle Sepulveda — Lead Developer - kyle.sepulveda@cit.edu - [@Nagazta](https://github.com/Nagazta)
 
-Mitchel Gabrielle Saniel — Frontend Developer -mitchelgabrielle.saniel@cit.edu - @mortymier
+Mitchel Gabrielle Saniel — Frontend Developer -mitchelgabrielle.saniel@cit.edu - [@mortymier](https://github.com/mortymier)
 
-Joseph Kyle Sumucad — Backend Developer - josephkyle.sumucad@cit.edu - @kylesumucad18
+Joseph Kyle Sumucad — Backend Developer - josephkyle.sumucad@cit.edu - [@kylesumucad18](https://github.com/kylesumucad18)
 
-Joseph Ericson Tiu - Mobile Developer - josephericson.tiu@cit.edu - @Dynamicxs
+Joseph Ericson Tiu - Mobile Developer - josephericson.tiu@cit.edu - [@Dynamicxs](https://github.com/Dynamicxs)
