@@ -1,0 +1,106 @@
+.reports-by-status {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.chart-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #00695c;
+  margin: 0 0 20px 0;
+}
+
+.chart-container {
+  height: 350px;
+  position: relative;
+  margin-bottom: 24px;
+}
+
+.doughnut-wrapper {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.doughnut-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+}
+
+.doughnut-total {
+  font-size: 48px;
+  font-weight: 700;
+  color: #00695c;
+  line-height: 1;
+}
+
+.doughnut-label {
+  font-size: 14px;
+  color: #666666;
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.custom-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-text {
+  font-size: 14px;
+  color: #333333;
+  font-weight: 500;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .reports-by-status {
+    padding: 20px;
+  }
+
+  .chart-container {
+    height: 300px;
+  }
+
+  .doughnut-total {
+    font-size: 36px;
+  }
+
+  .doughnut-label {
+    font-size: 12px;
+  }
+
+  .custom-legend {
+    gap: 10px;
+  }
+
+  .legend-text {
+    font-size: 13px;
+  }
+}

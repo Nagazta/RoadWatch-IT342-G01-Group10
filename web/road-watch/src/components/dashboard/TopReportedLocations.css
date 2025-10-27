@@ -1,0 +1,174 @@
+.top-reported-locations {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.map-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.chart-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #00695c;
+  margin: 0;
+}
+
+.map-legend {
+  display: flex;
+  gap: 12px;
+}
+
+.legend-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 16px;
+  background-color: #fff3e0;
+  color: #d32f2f;
+}
+
+.legend-badge::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #d32f2f;
+}
+
+.legend-badge.high {
+  background-color: #ffebee;
+  color: #d32f2f;
+}
+
+.legend-badge.high::before {
+  background-color: #d32f2f;
+}
+
+.map-container {
+  height: 400px;
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.map-overlay {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #00695c;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  pointer-events: none;
+}
+
+/* Custom marker styles */
+.custom-marker {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Popup styles */
+.custom-popup h4 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #00695c;
+}
+
+.custom-popup .report-count {
+  margin: 4px 0;
+  font-size: 14px;
+  color: #333333;
+}
+
+.custom-popup .report-count strong {
+  color: #00695c;
+  font-weight: 700;
+}
+
+.custom-popup .priority-label {
+  margin: 4px 0 0 0;
+  font-size: 13px;
+  color: #666666;
+}
+
+.custom-popup .priority-high {
+  color: #d32f2f;
+  font-weight: 700;
+}
+
+.custom-popup .priority-medium {
+  color: #fbc02d;
+  font-weight: 700;
+}
+
+.custom-popup .priority-low {
+  color: #2e7d32;
+  font-weight: 700;
+}
+
+/* Leaflet popup customization */
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+}
+
+.leaflet-popup-content {
+  margin: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+.leaflet-popup-tip {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .top-reported-locations {
+    padding: 20px;
+  }
+
+  .map-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .map-container {
+    height: 350px;
+  }
+
+  .map-overlay {
+    font-size: 12px;
+    padding: 6px 12px;
+    top: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .map-container {
+    height: 300px;
+  }
+
+  .map-overlay {
+    font-size: 11px;
+    padding: 5px 10px;
+    max-width: 80%;
+    text-align: center;
+  }
+}
