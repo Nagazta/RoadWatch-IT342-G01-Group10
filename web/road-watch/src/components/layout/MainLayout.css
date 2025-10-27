@@ -1,0 +1,61 @@
+.main-layout {
+  display: grid;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+/* Main Content Wrapper (Header + Content) */
+.main-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* Content Area */
+.content-area {
+  flex: 1;
+  overflow-y: auto;
+  background-color: #f5f5f5;
+}
+
+/* Smooth scrolling */
+.content-area {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar for content area */
+.content-area::-webkit-scrollbar {
+  width: 8px;
+}
+
+.content-area::-webkit-scrollbar-track {
+  background: #e0e0e0;
+}
+
+.content-area::-webkit-scrollbar-thumb {
+  background: #00695c;
+  border-radius: 4px;
+}
+
+.content-area::-webkit-scrollbar-thumb:hover {
+  background: #00796b;
+}
+
+/* Print styles */
+@media print {
+  .main-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .content-area {
+    overflow: visible;
+  }
+}
+
+/* Reduced motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .content-area {
+    scroll-behavior: auto;
+  }
+}
