@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import UserFilters from '../../components/users/UserFilters';
 import UsersTable from '../../components/users/UsersTable';
 import ReportsPagination from '../../components/reports/ReportsPagination';
-import './UserManagement.css';
+import '../admin/styles/UserManagement.css';
 
 const UserManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');

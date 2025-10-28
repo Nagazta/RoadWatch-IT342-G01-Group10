@@ -2,7 +2,7 @@ import AdminDashboardStats from '../../components/dashboard/AdminDashboardStats'
 import ReportsByStatus from '../../components/dashboard/ReportsByStatus';
 import ReportsOverTime from '../../components/dashboard/ReportsOverTime';
 import TopReportedLocations from '../../components/dashboard/TopReportedLocations';
-import './Dashboard.css';
+import '../admin/styles/Dashboard.css';
 
 const Dashboard = () => {
   return (

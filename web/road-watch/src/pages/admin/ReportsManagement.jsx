@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import ReportsFilters from '../../components/reports/ReportsFilter';
 import ReportsTable from '../../components/reports/ReportsTable';
 import ReportsPagination from '../../components/reports/ReportsPagination';
-import './ReportsManagement.css';
+import '../admin/styles/ReportsManagement.css';
 
 const ReportsManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
