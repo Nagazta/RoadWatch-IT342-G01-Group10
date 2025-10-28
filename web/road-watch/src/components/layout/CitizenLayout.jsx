@@ -15,11 +15,12 @@ const CitizenLayout = ({ children, activeMenuItem, pageTitle }) =>
 
     return (
         <>
-            <MainLayout 
+            <MainLayout
                 sidebar={ <Sidebar role="citizen" activeItem={activeMenuItem} onNavigate={handleNavigate} /> } 
                 header={ <Header pageTitle={pageTitle} userName="Citizen User" userRole="Citizen" notificationCount={1}/> }
-            />
-            {children}
+            >
+                {children}
+            </MainLayout>
         </>
     );
 };
