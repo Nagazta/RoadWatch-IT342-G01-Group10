@@ -1,7 +1,7 @@
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import './TopReportedLocations.css';
+import '../dashboard/styles/TopReportedLocations.css';
 
 const createCustomIcon = (priority) => {
   const colors = {

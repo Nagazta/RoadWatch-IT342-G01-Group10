@@ -5,7 +5,7 @@ import {
   Tooltip,
   Legend
 } from 'chart.js';
-import './ReportsByStatus.css';
+import '../dashboard/styles/ReportsByStatus.css';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 

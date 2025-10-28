@@ -6,7 +6,7 @@ import {
   CheckCircleIcon,
   CalendarIcon
 } from '../common/Icons';
-import './DashboardStats.css';
+import '../dashboard/styles/DashboardStats.css';
 
 const AdminDashboardStats = () => {
   const statsData = [
