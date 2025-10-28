@@ -7,6 +7,7 @@ import ReportsManagement from './pages/admin/ReportsManagement';
 import UserManagement from './pages/admin/UserManagement';
 import AuditLogs from './pages/admin/AuditLogs';
 import SystemSettings from './pages/admin/SystemSettings';
+import FeedbackSupport from './pages/admin/FeedbackSupport';
 
 //INSPECTOR PAGES
 //Put your inspector imports here
@@ -74,8 +75,7 @@ function App() {
           element={
             <AdminLayout activeMenuItem="support" pageTitle="Feedback & Support">
               <div style={{ padding: '24px', marginLeft: '250px' }}>
-                <h1>Feedback & Support</h1>
-                <p>Feedback & support page coming soon...</p>
+                <FeedbackSupport />
               </div>
             </AdminLayout>
           }

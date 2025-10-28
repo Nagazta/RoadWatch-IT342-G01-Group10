@@ -1,0 +1,23 @@
+.feedback-view-btn {
+  background-color: transparent;
+  color: #00695c;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.feedback-view-btn:hover {
+  background-color: #e0f2f1;
+}
+
+.feedback-view-btn svg {
+  width: 16px;
+  height: 16px;
+}

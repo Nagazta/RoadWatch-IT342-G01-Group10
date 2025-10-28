@@ -1,0 +1,33 @@
+.feedback-category-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.category-bug {
+  background-color: #ffcdd2;
+  color: #c62828;
+}
+
+.category-suggestion {
+  background-color: #bbdefb;
+  color: #1565c0;
+}
+
+.category-inquiry {
+  background-color: #e1bee7;
+  color: #6a1b9a;
+}
+
+.category-complaint {
+  background-color: #ffccbc;
+  color: #d84315;
+}
+
+.category-other {
+  background-color: #e0e0e0;
+  color: #616161;
+}
