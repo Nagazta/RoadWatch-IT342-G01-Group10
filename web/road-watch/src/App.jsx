@@ -1,7 +1,15 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+
+//ADMIN PAGES
 import AdminLayout from './components/layout/AdminLayout';
 import AdminDashboard from './pages/admin/Dashboard';
 import ReportsManagement from './pages/admin/ReportsManagement';
+import UserManagement from './pages/admin/UserManagement';
+
+//INSPECTOR PAGES
+//Put your inspector imports here
+//CITIZEN PAGES
+//Put your citizen imports here
 
 function App() {
   return (
@@ -34,8 +42,7 @@ function App() {
           element={
             <AdminLayout activeMenuItem="users" pageTitle="User Management">
               <div style={{ padding: '24px', marginLeft: '250px' }}>
-                <h1>User Management</h1>
-                <p>User management page coming soon...</p>
+                <UserManagement />
               </div>
             </AdminLayout>
           }

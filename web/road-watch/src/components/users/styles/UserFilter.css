@@ -1,0 +1,32 @@
+.user-filters-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.user-filters-left {
+  display: flex;
+  gap: 12px;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.user-filters-right {
+  display: flex;
+  gap: 12px;
+}
+
+@media (max-width: 1024px) {
+  .user-filters-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .user-filters-left,
+  .user-filters-right {
+    width: 100%;
+  }
+}
