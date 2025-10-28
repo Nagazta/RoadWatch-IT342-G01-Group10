@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import UserFilters from '../../components/users/UserFilters';
 import UsersTable from '../../components/users/UsersTable';
 import ReportsPagination from '../../components/reports/ReportsPagination';
+import UserDetailsModal from '../../components/modal/UserDetailsModal';
 import '../admin/styles/UserManagement.css';
 
 const UserManagement = () => {
@@ -9,6 +10,10 @@ const UserManagement = () => {
   const [selectedRole, setSelectedRole] = useState('All Roles');
   const [selectedStatus, setSelectedStatus] = useState('All Statuses');
   const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [modalMode, setModalMode] = useState('view');
 
   // Mock data
   const users = [
@@ -23,11 +28,17 @@ const UserManagement = () => {
   ];
 
   const handleView = (userId) => {
-    console.log('View user:', userId);
+    const user = users.find(u => u.id === userId);
+    setSelectedUser(user);
+    setModalMode('view');
+    setIsModalOpen(true);
   };
 
   const handleEdit = (userId) => {
-    console.log('Edit user:', userId);
+    const user = users.find(u => u.id === userId);
+    setSelectedUser(user);
+    setModalMode('edit');
+    setIsModalOpen(true);
   };
 
   const handleSuspend = (userId) => {
@@ -48,6 +59,13 @@ const UserManagement = () => {
 
   const handleExportUsers = () => {
     console.log('Export users');
+  };
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedUser(null);
+  };
+    const handleSaveUser = (updatedUser) => {
+    console.log('Save user:', updatedUser);
   };
 
   return (
@@ -78,6 +96,13 @@ const UserManagement = () => {
         onRowsPerPageChange={setRowsPerPage}
         currentPage={1}
         totalPages={1}
+      />
+      <UserDetailsModal
+        user={selectedUser}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onSave={handleSaveUser}
+        mode={modalMode}
       />
     </div>
   );
