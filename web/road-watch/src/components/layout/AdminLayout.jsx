@@ -12,15 +12,13 @@ const AdminLayout = ({ children, activeMenuItem, pageTitle }) => {
     }
   };
 
-
   return (
     <MainLayout
       sidebar={
         <Sidebar
           role="admin"
           activeItem={activeMenuItem}
-          onNavigate={handleNavigate} 
-             
+          onNavigate={handleNavigate}      
         />
       }
       header={

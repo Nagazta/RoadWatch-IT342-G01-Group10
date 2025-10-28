@@ -1,0 +1,29 @@
+.table-row {
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s ease;
+  padding: 25px 0;
+}
+
+.table-row:hover {
+  background-color: #f8f9fa;
+}
+
+.table-row td {
+  padding: 16px;
+  font-size: 14px;
+  color: #333333;
+}
+
+.report-id {
+  font-weight: 600;
+  color: #00695c;
+}
+
+.report-title {
+  font-weight: 500;
+  max-width: 300px;
+}
+
+.actions-cell {
+  padding: 16px !important;
+}
