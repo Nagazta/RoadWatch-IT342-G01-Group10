@@ -1,3 +1,4 @@
+import React, { useState } from 'react'; 
 import {
   DashboardIcon,
   ReportsIcon,
@@ -10,8 +11,11 @@ import {
   AssignmentIcon
 } from './Icons';
 import './Sidebar.css';
+import LogoutModal from '../modal/LogoutModal';
 
 const Sidebar = ({ activeItem = 'dashboard', onNavigate, role = 'admin' }) => {
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
   const roleBasedNav = {
     admin: [
       { id: 'dashboard', label: 'Dashboard', icon: <DashboardIcon />, path: '/admin/dashboard' },
@@ -36,48 +40,65 @@ const Sidebar = ({ activeItem = 'dashboard', onNavigate, role = 'admin' }) => {
     if (onNavigate) onNavigate(item);
   };
 
-  const handleLogout = () => {
-    console.log('Logout clicked');
-    // TODO: Clear auth and redirect to login
+  const handleLogoutClick = () => {
+    setShowLogoutModal(true);
+  };
+
+  const handleConfirmLogout = () => {
+    console.log('Logging out...');
+    setShowLogoutModal(false);
+  };
+
+  const handleCloseLogout = () => {
+    setShowLogoutModal(false);
   };
 
   return (
-    <aside className="sidebar">
-      {/* Logo Section */}
-      <div className="sidebar-header">
-        <div className="sidebar-logo">
-          <RoadWatchLogoIcon />
+    <>
+      <aside className="sidebar">
+        {/* Logo Section */}
+        <div className="sidebar-header">
+          <div className="sidebar-logo">
+            <RoadWatchLogoIcon />
+          </div>
+          <h1 className="sidebar-title">RoadWatch</h1>
+          <p className="sidebar-subtitle">{role.charAt(0).toUpperCase() + role.slice(1)} Panel</p>
         </div>
-        <h1 className="sidebar-title">RoadWatch</h1>
-        <p className="sidebar-subtitle">{role.charAt(0).toUpperCase() + role.slice(1)} Panel</p>
-      </div>
 
-      {/* Nav Menu */}
-      <nav className="sidebar-nav" role="navigation">
-        <ul className="nav-list">
-          {navItems.map((item) => (
-            <li key={item.id} className="nav-item">
-              <button
-                className={`nav-link ${activeItem === item.id ? 'active' : ''}`}
-                onClick={() => handleNavClick(item)}
-                aria-current={activeItem === item.id ? 'page' : undefined}
-              >
-                <span className="nav-icon">{item.icon}</span>
-                <span className="nav-label">{item.label}</span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      </nav>
+        {/* Nav Menu */}
+        <nav className="sidebar-nav" role="navigation">
+          <ul className="nav-list">
+            {navItems.map((item) => (
+              <li key={item.id} className="nav-item">
+                <button
+                  className={`nav-link ${activeItem === item.id ? 'active' : ''}`}
+                  onClick={() => handleNavClick(item)}
+                  aria-current={activeItem === item.id ? 'page' : undefined}
+                >
+                  <span className="nav-icon">{item.icon}</span>
+                  <span className="nav-label">{item.label}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </nav>
 
-      {/* Logout */}
-      <div className="sidebar-footer">
-        <button className="logout-btn" onClick={handleLogout}>
-          <span className="logout-icon"><LogoutIcon /></span>
-          LOGOUT
-        </button>
-      </div>
-    </aside>
+        {/* Logout */}
+        <div className="sidebar-footer">
+          <button className="logout-btn" onClick={handleLogoutClick}>
+            <span className="logout-icon"><LogoutIcon /></span>
+            LOGOUT
+          </button>
+        </div>
+      </aside>
+
+      {/* Logout Modal */}
+      <LogoutModal
+        isOpen={showLogoutModal}
+        onClose={handleCloseLogout}
+        onConfirm={handleConfirmLogout}
+      />
+    </>
   );
 };
 
