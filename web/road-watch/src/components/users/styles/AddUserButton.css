@@ -1,0 +1,23 @@
+.add-user-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  background-color: #00695c;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.add-user-btn:hover {
+  background-color: #00796b;
+}
+
+.add-user-btn svg {
+  width: 18px;
+  height: 18px;
+}
