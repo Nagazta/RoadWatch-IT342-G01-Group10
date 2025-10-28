@@ -6,8 +6,10 @@ const StatCard = ({ icon, value, label, bgColor }) => {
       <div className="stat-card-icon" style={{ backgroundColor: bgColor }}>
         {icon}
       </div>
-      <div className="stat-card-value">{value}</div>
-      <div className="stat-card-label">{label}</div>
+      <div className="stat-card-content">
+        <h2 className="stat-card-value">{value}</h2>
+        <p className="stat-card-label">{label}</p>
+      </div>
     </div>
   );
 };
