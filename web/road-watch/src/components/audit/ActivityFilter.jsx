@@ -1,4 +1,3 @@
-// src/components/audit/ActivityFilter.jsx
 import React from 'react';
 import '../reports/styles/FilterDropdown.css';
 

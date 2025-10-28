@@ -1,4 +1,3 @@
-// src/components/audit/AuditLogsFilters.jsx
 import React from 'react';
 import SearchBar from '../reports/SearchBar';
 import ActivityFilter from './ActivityFilter';
