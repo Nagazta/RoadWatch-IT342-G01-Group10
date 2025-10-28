@@ -8,7 +8,8 @@ import {
   SupportIcon,
   LogoutIcon,
   RoadWatchLogoIcon,
-  AssignmentIcon
+  AssignmentIcon,
+  PlusIcon
 } from './Icons';
 import './Sidebar.css';
 import LogoutModal from '../modal/LogoutModal';
@@ -30,7 +31,11 @@ const Sidebar = ({ activeItem = 'dashboard', onNavigate, role = 'admin' }) => {
     
     ],
     citizen: [
-     
+      { id: 'dashboard', label: 'Dashboard', icon: <DashboardIcon />, path: '/citizen/dashboard' },
+      { id: 'reports', label: 'My Reports', icon: <ReportsIcon />, path: '/citizen/dashboard' },
+      { id: 'submit', label: 'Submit Report', icon: <PlusIcon />, path: '/citizen/dashboard' },
+      { id: 'settings', label: 'Settings', icon: <SettingsIcon />, path: '/citizen/dashboard' },
+      { id: 'support', label: 'Feedback & Support', icon: <SupportIcon />, path: '/citizen/dashboard'}
     ]
   };
 
