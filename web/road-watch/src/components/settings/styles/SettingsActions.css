@@ -1,0 +1,51 @@
+.settings-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.reset-btn {
+  padding: 12px 24px;
+  border: 1px solid #d32f2f;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #d32f2f;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.reset-btn:hover {
+  background-color: #d32f2f;
+  color: #ffffff;
+}
+
+.save-btn {
+  padding: 12px 32px;
+  border: none;
+  border-radius: 8px;
+  background-color: #00695c;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.save-btn:hover {
+  background-color: #00796b;
+}
+
+@media (max-width: 768px) {
+  .settings-actions {
+    flex-direction: column-reverse;
+  }
+
+  .reset-btn,
+  .save-btn {
+    width: 100%;
+  }
+}

@@ -1,0 +1,26 @@
+.system-settings-container {
+  background-color: #f5f5f5;
+  min-height: calc(100vh - 70px);
+}
+
+.settings-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+@media (max-width: 1024px) {
+  .system-settings-container {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .system-settings-container {
+    padding: 16px;
+  }
+
+  .settings-content {
+    gap: 16px;
+  }
+}
