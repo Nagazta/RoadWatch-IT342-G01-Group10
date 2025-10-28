@@ -1,0 +1,62 @@
+.available-inspector-card {
+  padding: 20px;
+  background: linear-gradient(135deg, #b2dfdb 0%, #80cbc4 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.3s ease;
+}
+
+.available-inspector-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 105, 92, 0.2);
+}
+
+.available-inspector-icon {
+  width: 48px;
+  height: 48px;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #00695c;
+  flex-shrink: 0;
+}
+
+.available-inspector-icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.available-inspector-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.available-inspector-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #00695c;
+  margin: 0;
+}
+
+.available-inspector-status {
+  font-size: 13px;
+  color: #00695c;
+  margin: 0;
+  opacity: 0.8;
+}
+
+.available-badge {
+  padding: 6px 16px;
+  background-color: #ffffff;
+  color: #2e7d32;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 2px solid #2e7d32;
+}

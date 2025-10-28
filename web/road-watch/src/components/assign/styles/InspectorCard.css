@@ -1,0 +1,59 @@
+.inspector-card {
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+  background-color: #ffffff;
+}
+
+.inspector-card:hover {
+  border-color: #00695c;
+  box-shadow: 0 2px 8px rgba(0, 105, 92, 0.1);
+}
+
+.inspector-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.inspector-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333333;
+  margin: 0;
+}
+
+.inspector-assignments {
+  font-size: 13px;
+  color: #999999;
+  margin: 0;
+}
+
+.inspector-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.status-text {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.status-text.status-busy {
+  color: #f57f17;
+}
+
+.status-text.status-available {
+  color: #2e7d32;
+}

@@ -1,0 +1,35 @@
+.assign-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.assign-action-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.assign-btn {
+  background-color: #00695c;
+  color: #ffffff;
+}
+
+.assign-btn:hover {
+  background-color: #00796b;
+}
+
+.reassign-btn {
+  background-color: #00695c;
+  color: #ffffff;
+}
+
+.reassign-btn:hover {
+  background-color: #00796b;
+}
