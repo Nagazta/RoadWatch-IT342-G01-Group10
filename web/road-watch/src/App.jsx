@@ -8,6 +8,7 @@ import UserManagement from './pages/admin/UserManagement';
 import AuditLogs from './pages/admin/AuditLogs';
 import SystemSettings from './pages/admin/SystemSettings';
 import FeedbackSupport from './pages/admin/FeedbackSupport';
+import AssignInspector from './pages/admin/AssignInspector';
 
 //INSPECTOR PAGES
 //Put your inspector imports here
@@ -85,8 +86,7 @@ function App() {
           element={
             <AdminLayout activeMenuItem="assign_inspector" pageTitle="Assign Inspectors">
               <div style={{ padding: '24px', marginLeft: '250px' }}>
-                <h1>Assign Inspectors</h1>
-                <p>Assign inspectors page coming soon...</p>
+                <AssignInspector />
               </div>
             </AdminLayout>
           }
