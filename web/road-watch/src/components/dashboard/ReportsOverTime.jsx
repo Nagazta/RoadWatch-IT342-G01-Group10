@@ -8,7 +8,7 @@ import {
   Tooltip,
   Legend
 } from 'chart.js';
-import './ReportsOverTime.css';
+import '../dashboard/styles/ReportsOverTime.css';
 
 ChartJS.register(
   CategoryScale,

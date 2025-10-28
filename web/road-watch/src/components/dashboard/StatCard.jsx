@@ -1,4 +1,4 @@
-import './StatCard.css';
+import '../dashboard/styles/StatCard.css';
 
 const StatCard = ({ icon, value, label, bgColor }) => {
   return (
