@@ -1,8 +1,10 @@
+// src/pages/admin/UserManagement.jsx
 import React, { useState } from 'react';
 import UserFilters from '../../components/users/UserFilters';
 import UsersTable from '../../components/users/UsersTable';
 import ReportsPagination from '../../components/reports/ReportsPagination';
 import UserDetailsModal from '../../components/modal/UserDetailsModal';
+import ConfirmationModal from '../../components/modal/ConfirmationModal';
 import '../admin/styles/UserManagement.css';
 
 const UserManagement = () => {
@@ -10,10 +12,19 @@ const UserManagement = () => {
   const [selectedRole, setSelectedRole] = useState('All Roles');
   const [selectedStatus, setSelectedStatus] = useState('All Statuses');
   const [rowsPerPage, setRowsPerPage] = useState(10);
-
+  
+  // User Details Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [modalMode, setModalMode] = useState('view');
+
+  // Confirmation Modal states
+  const [confirmationModal, setConfirmationModal] = useState({
+    isOpen: false,
+    type: '', // 'suspend', 'activate', 'revoke'
+    userId: null,
+    userName: ''
+  });
 
   // Mock data
   const users = [
@@ -42,15 +53,71 @@ const UserManagement = () => {
   };
 
   const handleSuspend = (userId) => {
-    console.log('Suspend user:', userId);
+    const user = users.find(u => u.id === userId);
+    setConfirmationModal({
+      isOpen: true,
+      type: 'suspend',
+      userId: userId,
+      userName: user.fullName
+    });
   };
 
   const handleActivate = (userId) => {
-    console.log('Activate user:', userId);
+    const user = users.find(u => u.id === userId);
+    setConfirmationModal({
+      isOpen: true,
+      type: 'activate',
+      userId: userId,
+      userName: user.fullName
+    });
   };
 
   const handleRevoke = (userId) => {
-    console.log('Revoke user:', userId);
+    const user = users.find(u => u.id === userId);
+    setConfirmationModal({
+      isOpen: true,
+      type: 'revoke',
+      userId: userId,
+      userName: user.fullName
+    });
+  };
+
+  const handleConfirmAction = () => {
+    const { type, userId } = confirmationModal;
+    
+    switch (type) {
+      case 'suspend':
+        console.log('Suspending user:', userId);
+        // Add your suspend logic here
+        break;
+      case 'activate':
+        console.log('Activating user:', userId);
+        // Add your activate logic here
+        break;
+      case 'revoke':
+        console.log('Revoking user:', userId);
+        // Add your revoke logic here
+        break;
+      default:
+        break;
+    }
+
+    // Close confirmation modal
+    setConfirmationModal({
+      isOpen: false,
+      type: '',
+      userId: null,
+      userName: ''
+    });
+  };
+
+  const handleCloseConfirmation = () => {
+    setConfirmationModal({
+      isOpen: false,
+      type: '',
+      userId: null,
+      userName: ''
+    });
   };
 
   const handleAddUser = () => {
@@ -60,13 +127,55 @@ const UserManagement = () => {
   const handleExportUsers = () => {
     console.log('Export users');
   };
+
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedUser(null);
   };
-    const handleSaveUser = (updatedUser) => {
+
+  const handleSaveUser = (updatedUser) => {
     console.log('Save user:', updatedUser);
+    setIsModalOpen(false);
+    setSelectedUser(null);
   };
+
+  // Get modal content based on type
+  const getConfirmationContent = () => {
+    const { type, userName } = confirmationModal;
+    
+    switch (type) {
+      case 'suspend':
+        return {
+          title: 'Suspend User?',
+          message: `Are you sure you want to suspend ${userName}? This action can be reversed later.`,
+          confirmText: 'Suspend User',
+          type: 'warning'
+        };
+      case 'activate':
+        return {
+          title: 'Activate User?',
+          message: `Are you sure you want to activate ${userName}? This will restore their access to the system.`,
+          confirmText: 'Activate User',
+          type: 'warning'
+        };
+      case 'revoke':
+        return {
+          title: 'Revoke Access?',
+          message: `Are you sure you want to revoke access for ${userName}? This will suspend their administrative privileges.`,
+          confirmText: 'Revoke Access',
+          type: 'warning'
+        };
+      default:
+        return {
+          title: '',
+          message: '',
+          confirmText: '',
+          type: 'warning'
+        };
+    }
+  };
+
+  const confirmationContent = getConfirmationContent();
 
   return (
     <div className="user-management-container">
@@ -97,12 +206,25 @@ const UserManagement = () => {
         currentPage={1}
         totalPages={1}
       />
+
+      {/* User Details Modal */}
       <UserDetailsModal
         user={selectedUser}
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         onSave={handleSaveUser}
         mode={modalMode}
+      />
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={confirmationModal.isOpen}
+        onClose={handleCloseConfirmation}
+        onConfirm={handleConfirmAction}
+        title={confirmationContent.title}
+        message={confirmationContent.message}
+        confirmText={confirmationContent.confirmText}
+        type={confirmationContent.type}
       />
     </div>
   );
