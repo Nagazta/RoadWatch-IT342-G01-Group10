@@ -1,4 +1,3 @@
-// src/pages/admin/ReportsManagement.jsx
 import React, { useState } from 'react';
 import ReportsFilters from '../../components/reports/ReportsFilter';
 import ReportsTable from '../../components/reports/ReportsTable';

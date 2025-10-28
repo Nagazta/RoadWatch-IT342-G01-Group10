@@ -1,4 +1,3 @@
-// src/components/audit/AuditLogsTable.jsx
 import React from 'react';
 import AuditLogsTableHeader from '../audit/AuditLogsTableHeader';
 import AuditLogTableRow from '../audit/AuditLogTableRow';

@@ -1,4 +1,3 @@
-// src/components/audit/AuditLogStatusBadge.jsx
 import React from 'react';
 import '../audit/styles/AuditLogStatusBadge.css';
 
