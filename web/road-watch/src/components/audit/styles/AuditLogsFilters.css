@@ -1,0 +1,33 @@
+/* src/components/audit/AuditLogsFilters.css */
+.audit-logs-filters-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.audit-logs-filters-left {
+  display: flex;
+  gap: 12px;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.audit-logs-filters-right {
+  display: flex;
+  gap: 12px;
+}
+
+@media (max-width: 1024px) {
+  .audit-logs-filters-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .audit-logs-filters-left,
+  .audit-logs-filters-right {
+    width: 100%;
+  }
+}

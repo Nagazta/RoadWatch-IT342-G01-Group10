@@ -2,7 +2,7 @@ import React from 'react';
 import { SearchIcon } from '../common/Icons';
 import '../reports/styles/SearchBar.css';
 
-const SearchBar = ({ value, onChange }) => {
+const SearchBar = ({ value, onChange, placeholder = "Search by keyword or report ID..." }) => {
   return (
     <div className="search-container">
       <div className="search-icon-wrapper">
@@ -11,7 +11,7 @@ const SearchBar = ({ value, onChange }) => {
       <input
         type="text"
         className="search-input-field"
-        placeholder="Search by keyword or report ID..."
+        placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
       />
