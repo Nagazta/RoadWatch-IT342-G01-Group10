@@ -1,15 +1,29 @@
+// src/components/common/StatCard.jsx
+import React from 'react';
 import '../dashboard/styles/StatCard.css';
 
-const StatCard = ({ icon, value, label, bgColor }) => {
+const StatCard = ({ icon, value, label, iconColor, variant = 'horizontal' }) => {
   return (
-    <div className="stat-card">
-      <div className="stat-card-icon" style={{ backgroundColor: bgColor }}>
-        {icon}
-      </div>
-      <div className="stat-card-content">
-        <h2 className="stat-card-value">{value}</h2>
-        <p className="stat-card-label">{label}</p>
-      </div>
+    <div className={`common-stat-card ${variant}`}>
+      {variant === 'horizontal' ? (
+        <>
+          <div className="common-stat-icon" style={{ color: iconColor }}>
+            {icon}
+          </div>
+          <div className="common-stat-content">
+            <h3 className="common-stat-value">{value}</h3>
+            <p className="common-stat-label">{label}</p>
+          </div>
+        </>
+      ) : (
+        <>
+          <div className="common-stat-icon" style={{ color: iconColor }}>
+            {icon}
+          </div>
+          <h3 className="common-stat-value">{value}</h3>
+          <p className="common-stat-label">{label}</p>
+        </>
+      )}
     </div>
   );
 };

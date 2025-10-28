@@ -1,0 +1,16 @@
+.feedback-support-container {
+  background-color: #f5f5f5;
+  min-height: calc(100vh - 70px);
+}
+
+@media (max-width: 1024px) {
+  .feedback-support-container {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .feedback-support-container {
+    padding: 16px;
+  }
+}

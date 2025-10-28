@@ -1,85 +1,92 @@
-.stat-card {
+/* src/components/common/StatCard.css */
+.common-stat-card {
   background-color: #ffffff;
   border-radius: 12px;
   padding: 24px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
-  display: flex;
-  flex-direction: row; /* Changed from column to row */
-  align-items: center; /* Changed from flex-start to center */
-  gap: 16px; /* Increased gap for horizontal spacing */
 }
 
-.stat-card:hover {
+.common-stat-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 
-.stat-card-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 8px;
+/* Horizontal variant (for Dashboard) */
+.common-stat-card.horizontal {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Vertical variant (for Feedback) */
+.common-stat-card.vertical {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+}
+
+.common-stat-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #00695c;
-  transition: transform 0.3s ease;
-  flex-shrink: 0; /* Prevent icon from shrinking */
+  flex-shrink: 0;
 }
 
-.stat-card:hover .stat-card-icon {
-  transform: scale(1.05);
+.common-stat-card.horizontal .common-stat-icon {
+  width: 48px;
+  height: 48px;
 }
 
-.stat-card-icon svg {
+.common-stat-card.horizontal .common-stat-icon svg {
   width: 24px;
   height: 24px;
 }
 
-.stat-card-content {
+.common-stat-card.vertical .common-stat-icon {
+  width: 48px;
+  height: 48px;
+}
+
+.common-stat-card.vertical .common-stat-icon svg {
+  width: 32px;
+  height: 32px;
+}
+
+.common-stat-content {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.stat-card-value {
+.common-stat-value {
   font-size: 32px;
   font-weight: 700;
   color: #00695c;
+  margin: 0;
   line-height: 1;
-  margin: 0; /* Remove default margin */
 }
 
-.stat-card-label {
+.common-stat-label {
   font-size: 14px;
   color: #666666;
+  margin: 0;
   font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin: 0; /* Remove default margin */
 }
 
-/* Responsive design */
 @media (max-width: 768px) {
-  .stat-card {
+  .common-stat-card {
     padding: 20px;
   }
 
-  .stat-card-icon {
-    width: 40px;
-    height: 40px;
-  }
-
-  .stat-card-icon svg {
-    width: 20px;
-    height: 20px;
-  }
-
-  .stat-card-value {
+  .common-stat-value {
     font-size: 28px;
   }
 
-  .stat-card-label {
-    font-size: 12px;
+  .common-stat-label {
+    font-size: 13px;
   }
 }

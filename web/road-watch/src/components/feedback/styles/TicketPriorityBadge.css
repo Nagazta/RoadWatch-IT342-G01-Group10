@@ -1,0 +1,23 @@
+.ticket-priority-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.ticket-priority-high {
+  background-color: #ffcdd2;
+  color: #c62828;
+}
+
+.ticket-priority-medium {
+  background-color: #fff9c4;
+  color: #f57f17;
+}
+
+.ticket-priority-low {
+  background-color: #e0e0e0;
+  color: #616161;
+}
