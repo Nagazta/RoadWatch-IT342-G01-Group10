@@ -1,0 +1,155 @@
+.settings-section {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.settings-section-header {
+  margin-bottom: 24px;
+}
+
+.settings-section-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333333;
+  margin: 0 0 4px 0;
+}
+
+.settings-section-subtitle {
+  font-size: 14px;
+  color: #999999;
+  margin: 0;
+}
+
+.account-settings-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.avatar-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.avatar-display {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: #b2dfdb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #00695c;
+}
+
+.avatar-display svg {
+  width: 48px;
+  height: 48px;
+}
+
+.change-avatar-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #666666;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.change-avatar-btn:hover {
+  border-color: #00695c;
+  color: #00695c;
+  background-color: #f5f5f5;
+}
+
+.change-avatar-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.account-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333333;
+}
+
+.form-input {
+  padding: 12px 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #333333;
+  background-color: #f5f5f5;
+  transition: border-color 0.2s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #00695c;
+  background-color: #ffffff;
+}
+
+.form-input:disabled {
+  background-color: #f5f5f5;
+  color: #999999;
+  cursor: not-allowed;
+}
+
+.form-hint {
+  font-size: 12px;
+  color: #999999;
+  margin-top: -4px;
+}
+
+.account-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.change-password-btn {
+  padding: 12px 24px;
+  border: 1px solid #00695c;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #00695c;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.change-password-btn:hover {
+  background-color: #00695c;
+  color: #ffffff;
+}
+
+@media (max-width: 768px) {
+  .settings-section {
+    padding: 24px;
+  }
+
+  .account-info-grid {
+    grid-template-columns: 1fr;
+  }
+}
