@@ -1,0 +1,24 @@
+/* src/components/audit/AuditLogStatusBadge.css */
+.audit-status-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.audit-status-success {
+  background-color: #c8e6c9;
+  color: #2e7d32;
+}
+
+.audit-status-failed {
+  background-color: #ffcdd2;
+  color: #c62828;
+}
+
+.audit-status-system {
+  background-color: #e0e0e0;
+  color: #616161;
+}

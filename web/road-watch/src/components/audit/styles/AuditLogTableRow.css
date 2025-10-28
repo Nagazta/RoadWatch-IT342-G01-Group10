@@ -1,0 +1,31 @@
+.audit-user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.audit-user-name {
+  font-weight: 500;
+  color: #333333;
+}
+
+.audit-user-role {
+  font-size: 12px;
+  color: #999999;
+}
+
+.audit-action {
+  font-weight: 500;
+  color: #00695c;
+}
+
+.audit-description {
+  max-width: 400px;
+  line-height: 1.4;
+}
+
+.audit-datetime {
+  white-space: nowrap;
+  font-size: 13px;
+  color: #666666;
+}

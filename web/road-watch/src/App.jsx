@@ -5,6 +5,7 @@ import AdminLayout from './components/layout/AdminLayout';
 import AdminDashboard from './pages/admin/Dashboard';
 import ReportsManagement from './pages/admin/ReportsManagement';
 import UserManagement from './pages/admin/UserManagement';
+import AuditLogs from './pages/admin/AuditLogs';
 
 //INSPECTOR PAGES
 //Put your inspector imports here
@@ -52,8 +53,7 @@ function App() {
           element={
             <AdminLayout activeMenuItem="audit" pageTitle="Audit Logs">
               <div style={{ padding: '24px', marginLeft: '250px' }}>
-                <h1>Audit Logs</h1>
-                <p>Audit logs page coming soon...</p>
+                <AuditLogs />
               </div>
             </AdminLayout>
           }
