@@ -80,6 +80,17 @@ function App() {
             </AdminLayout>
           }
         />
+        <Route
+          path="admin/assign-inspectors"
+          element={
+            <AdminLayout activeMenuItem="assign_inspector" pageTitle="Assign Inspectors">
+              <div style={{ padding: '24px', marginLeft: '250px' }}>
+                <h1>Assign Inspectors</h1>
+                <p>Assign inspectors page coming soon...</p>
+              </div>
+            </AdminLayout>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

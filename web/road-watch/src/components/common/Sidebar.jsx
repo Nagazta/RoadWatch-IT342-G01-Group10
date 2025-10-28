@@ -6,7 +6,8 @@ import {
   SettingsIcon,
   SupportIcon,
   LogoutIcon,
-  RoadWatchLogoIcon
+  RoadWatchLogoIcon,
+  AssignmentIcon
 } from './Icons';
 import './Sidebar.css';
 
@@ -18,7 +19,8 @@ const Sidebar = ({ activeItem = 'dashboard', onNavigate, role = 'admin' }) => {
       { id: 'users', label: 'User Management', icon: <UsersIcon />, path: '/admin/users' },
       { id: 'audit', label: 'Audit Logs', icon: <AuditIcon />, path: '/admin/audit' },
       { id: 'settings', label: 'System Settings', icon: <SettingsIcon />, path: '/admin/settings' },
-      { id: 'support', label: 'Feedback & Support', icon: <SupportIcon />, path: '/admin/support' }
+      { id: 'support', label: 'Feedback & Support', icon: <SupportIcon />, path: '/admin/support' },
+      { id: 'assign_inspector', label: 'Assign Inspectors', icon: <AssignmentIcon />, path: '/admin/assign-inspectors' }
     ],
     inspector: [
     
