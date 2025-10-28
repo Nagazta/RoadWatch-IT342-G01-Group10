@@ -1,5 +1,6 @@
+// Update src/components/modals/ConfirmationModal.jsx
 import React from 'react';
-import { XIcon, AlertIcon, LogoutIconAlt } from '../common/Icons';
+import { XIcon, AlertIcon, LogoutIconAlt, TrashIcon } from '../common/Icons';
 import '../modal/styles/ConfirmationModal.css';
 
 const ConfirmationModal = ({ 
@@ -10,13 +11,14 @@ const ConfirmationModal = ({
   message, 
   confirmText, 
   cancelText = 'Cancel',
-  type = 'warning' // 'warning' or 'danger'
+  type = 'warning' // 'warning', 'danger', or 'delete'
 }) => {
   if (!isOpen) return null;
 
   const getIconColor = () => {
     switch (type) {
       case 'danger':
+      case 'delete':
         return '#d32f2f';
       case 'warning':
         return '#f57f17';
@@ -28,6 +30,9 @@ const ConfirmationModal = ({
   const getIcon = () => {
     if (title === 'Logout?') {
       return <LogoutIconAlt />;
+    }
+    if (type === 'delete' || title.includes('Delete')) {
+      return <TrashIcon />;
     }
     return <AlertIcon />;
   };
@@ -54,7 +59,10 @@ const ConfirmationModal = ({
           <button className="confirmation-btn cancel-btn" onClick={onClose}>
             {cancelText}
           </button>
-          <button className="confirmation-btn confirm-btn" onClick={onConfirm}>
+          <button 
+            className={`confirmation-btn confirm-btn ${type === 'delete' ? 'delete-btn' : ''}`}
+            onClick={onConfirm}
+          >
             {confirmText}
           </button>
         </div>
