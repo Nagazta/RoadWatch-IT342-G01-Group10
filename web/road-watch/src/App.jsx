@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import AdminLayout from './components/layout/AdminLayout';
 import AdminDashboard from './pages/admin/Dashboard';
+import ReportsManagement from './pages/admin/ReportsManagement';
 
 function App() {
   return (
@@ -23,8 +24,7 @@ function App() {
           element={
             <AdminLayout activeMenuItem="reports" pageTitle="Reports Management">
               <div style={{ padding: '24px', marginLeft: '250px' }}>
-                <h1>Reports Management</h1>
-                <p>Reports management page coming soon...</p>
+                <ReportsManagement />
               </div>
             </AdminLayout>
           }

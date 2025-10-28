@@ -1,0 +1,26 @@
+/* src/components/reports/DateRangeButton.css */
+.date-range-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #333333;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.date-range-btn:hover {
+  border-color: #00695c;
+  background-color: #f5f5f5;
+}
+
+.date-range-btn svg {
+  width: 20px;
+  height: 20px;
+  color: #666666;
+}
