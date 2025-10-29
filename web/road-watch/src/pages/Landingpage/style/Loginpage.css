@@ -1,0 +1,237 @@
+/* --- Login Page Specific Styles --- */
+.login-main-content {
+    display: grid;
+    /* Sidebar (1fr) | Form (1.5fr) */
+    grid-template-columns: 1fr 1.5fr;
+    min-height: calc(100vh - 80px - 200px);
+    background-color: var(--neutral-light-bg);
+}
+
+/* Left Sidebar Styling */
+.login-sidebar {
+    background-color: var(--primary-dark-teal);
+    color: var(--text-light);
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center; /* Center the content */
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+}
+
+.sidebar-content {
+    max-width: 350px;
+}
+
+.sidebar-content h3 {
+    font-size: 50px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.sidebar-content p {
+    font-size: 20px;
+    opacity: 0.8;
+    margin-bottom: 30px;
+}
+
+/* This is the new white box */
+.sidebar-features-box {
+    background-color: #ffffff;
+    color: var(--text-dark); /* Dark text on white bg */
+    border-radius: 8px;
+    padding: 25px;
+    text-align: left;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center; /* Center item vertically */
+    margin-bottom: 20px;
+    font-size: 16px;
+    font-weight: 500;
+}
+.feature-item:last-child {
+    margin-bottom: 0;
+}
+
+/* Right Form Area Styling */
+.login-form-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    background-color: var(--neutral-light-bg);
+}
+
+/* --- ALL STYLES BELOW ARE SIMPLIFIED --- */
+
+.auth-card {
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 450px;
+    text-align: center;
+}
+
+.auth-card h2 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--primary-dark-teal);
+}
+
+.auth-subtitle {
+    font-size: 16px;
+    color: var(--text-secondary);
+    margin-bottom: 30px;
+}
+
+.input-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.password-input-wrapper {
+    position: relative;
+}
+
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    font-size: 14px;
+}
+
+.checkbox-container {
+    display: block;
+    position: relative;
+    padding-left: 25px;
+    cursor: pointer;
+    user-select: none;
+    color: var(--text-dark);
+}
+
+.checkbox-container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 18px;
+    width: 18px;
+    background-color: #eee;
+    border-radius: 3px;
+}
+
+.checkbox-container:hover input ~ .checkmark {
+    background-color: #ccc;
+}
+
+.checkbox-container input:checked ~ .checkmark {
+    background-color: var(--primary-teal);
+}
+
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg);
+}
+
+.checkbox-container input:checked ~ .checkmark:after {
+    display: block;
+}
+
+.forgot-password {
+    color: var(--primary-teal);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.auth-btn {
+    width: 100%;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin: 30px 0;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #eee;
+}
+.divider:not(:empty)::before {
+    margin-right: .5em;
+}
+.divider:not(:empty)::after {
+    margin-left: .5em;
+}
+
+.google-btn {
+    background-color: #ffffff;
+    color: var(--text-dark);
+    border: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px;
+}
+.google-btn:hover {
+    background-color: #f0f0f0;
+}
+
+.auth-switch {
+    margin-top: 25px;
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.auth-switch a {
+    color: var(--primary-teal);
+    font-weight: 600;
+    text-decoration: none;
+}

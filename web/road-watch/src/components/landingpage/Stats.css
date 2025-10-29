@@ -1,0 +1,27 @@
+/* --- 3. Stats Section --- */
+.stats-section {
+    background-color: var(--text-light);
+    padding: var(--section-padding);
+}
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    text-align: center;
+}
+.stat-item {
+    padding: 20px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+.stat-item h2 {
+    font-size: 42px;
+    color: var(--primary-teal);
+    margin-bottom: 10px;
+}
+.stat-item p {
+    font-size: 16px;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
