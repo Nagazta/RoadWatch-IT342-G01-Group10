@@ -1,0 +1,39 @@
+/* --- 1. Navbar Section --- */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    background-color: #005F56;
+    color: var(--text-light);
+}
+.navbar .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+.nav-logo {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-light);
+    text-decoration: none;
+}
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+}
+.nav-links a {
+    color: var(--text-light);
+    text-decoration: none;
+    font-weight: 500;
+}
+.nav-auth {
+    display: flex;
+    gap: 15px;
+}
+.nav-auth .btn-secondary {
+    border: none;
+    color: var(--text-light);
+}

@@ -9,6 +9,9 @@ import AuditLogs from './pages/admin/AuditLogs';
 import SystemSettings from './pages/admin/SystemSettings';
 import FeedbackSupport from './pages/admin/FeedbackSupport';
 import AssignInspector from './pages/admin/AssignInspector';
+import Mainpage from './pages/Landingpage/Mainpage';
+import Loginpage from './pages/Landingpage/Loginpage';
+import Registrationpage from './pages/Landingpage/Registrationpage';
 
 //INSPECTOR PAGES
 //Put your inspector imports here
@@ -20,7 +23,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* Redirect root to admin dashboard */}
-        <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
+        <Route path="/" element={<Navigate to="Landingpage/Mainpage" replace />} />
 
         {/* Admin routes */}
         <Route
@@ -31,7 +34,34 @@ function App() {
             </AdminLayout>
           }
         />
-        <Route
+          <Route
+              path="Landingpage/Mainpage"
+              element={
+                  <Mainpage activeMenuItem="Mainpage" pageTitle="Mainpage Overview">
+                      <Mainpage />
+                  </Mainpage>
+              }
+          />
+
+          <Route
+              path="Landingpage/Loginpage"
+              element={
+                  <Loginpage activeMenuItem="Loginpage" pageTitle="Loginpage Overview">
+                      <Loginpage />
+                  </Loginpage>
+              }
+          />
+
+          <Route
+              path="Landingpage/Registrationpage"
+              element={
+                  <Registrationpage activeMenuItem="Registrationpage" pageTitle="Registrationpage Overview">
+                      <Registrationpage />
+                  </Registrationpage>
+              }
+          />
+
+          <Route
           path="admin/reports"
           element={
             <AdminLayout activeMenuItem="reports" pageTitle="Reports Management">

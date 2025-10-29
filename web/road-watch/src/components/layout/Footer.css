@@ -1,0 +1,47 @@
+/* --- 7. Footer Section --- */
+.footer-section {
+    background-color: #005F56;
+    color: #ccc;
+    padding: 60px 20px 20px;
+}
+.footer-top {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 40px;
+}
+.footer-about .footer-logo {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-light);
+    margin-bottom: 15px;
+}
+.footer-about p {
+    max-width: 300px;
+}
+.footer-links h4 {
+    font-size: 18px;
+    color: var(--text-light);
+    margin-bottom: 20px;
+}
+.footer-links ul {
+    list-style: none;
+}
+.footer-links li {
+    margin-bottom: 12px;
+}
+.footer-links a {
+    color: #ccc;
+    text-decoration: none;
+}
+.footer-links a:hover {
+    color: var(--text-light);
+    text-decoration: underline;
+}
+.footer-bottom {
+    border-top: 1px solid #444;
+    padding-top: 20px;
+    text-align: center;
+    font-size: 14px;
+    color: #888;
+}

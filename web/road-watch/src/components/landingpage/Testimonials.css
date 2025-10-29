@@ -1,0 +1,29 @@
+/* --- 5. Testimonials Section --- */
+.testimonials-section {
+    background-color: var(--neutral-cream-bg);
+    padding: var(--section-padding);
+    text-align: center;
+}
+.testimonials-section h2 {
+    font-size: 36px;
+    margin-bottom: 40px;
+}
+.testimonial-card {
+    background-color: var(--text-light);
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+.testimonial-card blockquote {
+    font-size: 20px;
+    font-style: italic;
+    color: var(--text-dark);
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+.testimonial-author {
+    font-weight: 600;
+    color: var(--primary-teal);
+}
