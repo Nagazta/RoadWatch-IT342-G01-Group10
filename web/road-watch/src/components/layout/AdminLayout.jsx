@@ -26,6 +26,7 @@ const AdminLayout = ({ children, activeMenuItem, pageTitle }) => {
           pageTitle={pageTitle}
           userName="Admin User"
           userRole="Administrator"
+          userAvatar="AD"
           notificationCount={3}
         />
       }
