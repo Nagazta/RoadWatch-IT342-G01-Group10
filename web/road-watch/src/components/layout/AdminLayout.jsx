@@ -12,6 +12,26 @@ const AdminLayout = ({ children, activeMenuItem, pageTitle }) => {
     }
   };
 
+ const handleHeaderAction = (action) => {
+    switch (action) {
+      case 'profile':
+        navigate('/admin/profile');
+        break;
+      case 'settings':
+        navigate('/admin/settings');
+        break;
+      case 'help':
+        navigate('/admin/help');
+        break;
+      case 'logout':
+        localStorage.removeItem('token');
+        navigate('/login');
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <MainLayout
       sidebar={
@@ -28,6 +48,7 @@ const AdminLayout = ({ children, activeMenuItem, pageTitle }) => {
           userRole="Administrator"
           userAvatar="AD"
           notificationCount={3}
+          onProfileClick={handleHeaderAction}
         />
       }
     >
