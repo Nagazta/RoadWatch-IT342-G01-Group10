@@ -25,7 +25,8 @@ const Header = ({
   onSearchChange,
   onNotificationClick,
   onProfileClick,
-  onLogout
+  onLogout,
+  showSearch = true
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
@@ -64,26 +65,15 @@ const Header = ({
   const handleDropdownItemClick = (action) => {
     setShowDropdown(false);
 
-    switch (action) {
-      case 'profile':
-        console.log('Profile clicked');
-        break;
-      case 'settings':
-        console.log('Settings clicked');
-        break;
-      case 'help':
-        console.log('Help clicked');
-        break;
-      case 'logout':
-        console.log('Logout clicked');
-        if (onLogout) {
-          onLogout();
-        }
-        break;
-      default:
-        break;
+    if (onProfileClick) {
+      onProfileClick(action); 
+    }
+
+    if (action === 'logout' && onLogout) {
+      onLogout();
     }
   };
+
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -113,21 +103,24 @@ const Header = ({
       </div>
 
       {/* Center Section - Search Bar */}
-      <div className="header-center">
-        <div className="header-search">
-          <div className="search-icon">
-            <SearchIcon />
+      {showSearch && (
+        <div className="header-center">
+          <div className="header-search">
+            <div className="search-icon">
+              <SearchIcon />
+            </div>
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Search reports..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+              aria-label="Search reports"
+            />
           </div>
-          <input
-            type="text"
-            className="search-input"
-            placeholder="Search reports..."
-            value={searchQuery}
-            onChange={handleSearchChange}
-            aria-label="Search reports"
-          />
         </div>
-      </div>
+      )}
+
 
       {/* Right Section - Notifications & User Profile */}
       <div className="header-right">
