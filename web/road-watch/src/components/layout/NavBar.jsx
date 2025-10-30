@@ -12,6 +12,7 @@ function NavBar() {
                 <ul className="nav-links">
                     <li><Link to="/features">Features</Link></li>
                     <li><Link to="/how-it-works">How It Works</Link></li>
+                    <li><Link to="/about-us">About Us</Link></li>
                     <li><Link to="/contact">Contact</Link></li>
                 </ul>
 

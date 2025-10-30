@@ -12,6 +12,13 @@ import AssignInspector from './pages/admin/AssignInspector';
 import Mainpage from './pages/Landingpage/Mainpage';
 import Loginpage from './pages/Landingpage/Loginpage';
 import Registrationpage from './pages/Landingpage/Registrationpage';
+import Featurespage from './pages/Features/Featurespage';
+import HowItWorkspage from './pages/HowItWorks/HowItWorkspage';
+import Contactpage from './pages/Contact/Contactpage';
+import FAQpage from './pages/Support/FAQpage';
+import PrivacyPolicy from './pages/Legal/PrivacyPolicy';
+import TermsOfService from './pages/Legal/TermsOfService';
+import AboutUspage from './pages/AboutUs/AboutUspage.jsx';
 
 //INSPECTOR PAGES
 //Put your inspector imports here
@@ -23,7 +30,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* Redirect root to admin dashboard */}
-        <Route path="/" element={<Navigate to="Landing" replace />} />
+        <Route path="/" element={<Navigate to="landing" replace />} />
           <Route
               path="Landing"
               element={
@@ -48,6 +55,62 @@ function App() {
                   <Registrationpage activeMenuItem="Registrationpage" pageTitle="Registrationpage Overview">
                       <Registrationpage />
                   </Registrationpage>
+              }
+          />
+
+          {/* Navbar Links */}
+          <Route path="/features" element={
+              <Featurespage activeMenuItem="Featurespage" pageTitle="Featurespage Overview">
+                  <Featurespage />
+              </Featurespage>
+              }
+          />
+          <Route
+              path="/how-it-works"
+              element={
+                  <HowItWorkspage activeMenuItem="HowItWorkspage" pageTitle="HowItWorkspage Overview">
+                      <HowItWorkspage />
+                  </HowItWorkspage>
+              }
+          />
+
+          <Route path="/about-us" element={<AboutUspage />} />
+
+          <Route
+              path="/contact"
+              element={
+                  <Contactpage activeMenuItem="Contactpage" pageTitle="Contactpage Overview">
+                      <Contactpage />
+                  </Contactpage>
+              }
+          />
+
+          {/* Footer Links */}
+          <Route path="/faq" element={<FAQpage />} />
+          <Route
+              path="/faq"
+              element={
+                  <FAQpage activeMenuItem="FAQpage" pageTitle="FAQpage Overview">
+                      <FAQpage />
+                  </FAQpage>
+              }
+          />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route
+              path="/privacy"
+              element={
+                  <PrivacyPolicy activeMenuItem="PrivacyPolicy" pageTitle="PrivacyPolicy Overview">
+                      <PrivacyPolicy />
+                  </PrivacyPolicy>
+              }
+          />
+          <Route path="/terms" element={<TermsOfService />} />
+          <Route
+              path="/terms"
+              element={
+                  <TermsOfService activeMenuItem="TermsOfService" pageTitle="TermsOfService Overview">
+                      <TermsOfService />
+                  </TermsOfService>
               }
           />
 
