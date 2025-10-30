@@ -23,19 +23,9 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* Redirect root to admin dashboard */}
-        <Route path="/" element={<Navigate to="Landingpage/Mainpage" replace />} />
-
-        {/* Admin routes */}
-        <Route
-          path="admin/dashboard"
-          element={
-            <AdminLayout activeMenuItem="dashboard" pageTitle="Dashboard Overview">
-              <AdminDashboard />
-            </AdminLayout>
-          }
-        />
+        <Route path="/" element={<Navigate to="Landing" replace />} />
           <Route
-              path="Landingpage/Mainpage"
+              path="Landing"
               element={
                   <Mainpage activeMenuItem="Mainpage" pageTitle="Mainpage Overview">
                       <Mainpage />
@@ -44,7 +34,7 @@ function App() {
           />
 
           <Route
-              path="Landingpage/Loginpage"
+              path="Landing/Login"
               element={
                   <Loginpage activeMenuItem="Loginpage" pageTitle="Loginpage Overview">
                       <Loginpage />
@@ -53,7 +43,7 @@ function App() {
           />
 
           <Route
-              path="Landingpage/Registrationpage"
+              path="Landing/Registration"
               element={
                   <Registrationpage activeMenuItem="Registrationpage" pageTitle="Registrationpage Overview">
                       <Registrationpage />
@@ -61,6 +51,15 @@ function App() {
               }
           />
 
+          {/* Admin routes */}
+          <Route
+            path="admin/dashboard"
+            element={
+              <AdminLayout activeMenuItem="dashboard" pageTitle="Dashboard Overview">
+                <AdminDashboard />
+              </AdminLayout>
+            }
+          />
           <Route
           path="admin/reports"
           element={

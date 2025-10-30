@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import './style/Loginpage.css'; // Make sure this import path is correct!
+import './style/Loginpage.css'; 
 
 import Navbar from '../../components/layout/NavBar';
 import Footer from '../../components/layout/Footer';
