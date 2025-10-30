@@ -5,6 +5,7 @@ import UsersTable from '../../components/users/UsersTable';
 import ReportsPagination from '../../components/reports/ReportsPagination';
 import UserDetailsModal from '../../components/modal/UserDetailsModal';
 import ConfirmationModal from '../../components/modal/ConfirmationModal';
+import AddUserModal from '../../components/modal/AddUserModal';
 import '../admin/styles/UserManagement.css';
 
 const UserManagement = () => {
@@ -17,6 +18,7 @@ const UserManagement = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [modalMode, setModalMode] = useState('view');
+  const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
 
   // Confirmation Modal states
   const [confirmationModal, setConfirmationModal] = useState({
@@ -121,7 +123,17 @@ const UserManagement = () => {
   };
 
   const handleAddUser = () => {
-    console.log('Add new user');
+  setIsAddUserModalOpen(true);
+  };
+  
+  const handleCloseAddUserModal = () => {
+  setIsAddUserModalOpen(false);
+  };
+
+  const handleSaveNewUser = (newUser) => {
+    console.log('New user:', newUser);
+    // Add your logic to save the new user
+    setIsAddUserModalOpen(false);
   };
 
   const handleExportUsers = () => {
@@ -225,6 +237,12 @@ const UserManagement = () => {
         message={confirmationContent.message}
         confirmText={confirmationContent.confirmText}
         type={confirmationContent.type}
+      />
+      {/* Add User Modal */}
+      <AddUserModal
+        isOpen={isAddUserModalOpen}
+        onClose={handleCloseAddUserModal}
+        onSave={handleSaveNewUser}
       />
     </div>
   );
