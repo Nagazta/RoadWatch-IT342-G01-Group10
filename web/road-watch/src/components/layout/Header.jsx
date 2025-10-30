@@ -17,11 +17,11 @@ import {
 import './Header.css';
 
 const Header = ({
-  pageTitle = 'Dashboard Overview',
-  notificationCount = 3,
-  userName = 'Admin User',
-  userRole = 'Administrator',
-  userAvatar = 'AD', // Can be initials or image URL
+  pageTitle,
+  notificationCount,
+  userName,
+  userRole,
+  userAvatar,
   onSearchChange,
   onNotificationClick,
   onProfileClick,
