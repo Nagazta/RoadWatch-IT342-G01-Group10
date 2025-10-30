@@ -1,0 +1,148 @@
+/* This CSS will be shared by all simple text pages */
+.text-page-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.text-page-content {
+    /* This flex-grow ensures the footer is pushed to the bottom */
+    flex-grow: 1;
+    background-color: #f9f9f9; /* A very light grey background */
+    padding: 60px 0;
+}
+
+/* This .container is from your global CSS, it just centers content */
+.text-page-content .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.text-page-content .page-header {
+    border-bottom: 2px solid #eee;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+}
+
+.text-page-content .page-header h1 {
+    font-size: 42px;
+    color: var(--primary-dark-teal);
+    margin-bottom: 10px;
+}
+
+.text-page-content .page-header p {
+    font-size: 18px;
+    color: var(--text-secondary);
+}
+
+.text-page-content h2 {
+    font-size: 28px;
+    color: var(--primary-teal);
+    margin-top: 40px;
+    margin-bottom: 20px;
+}
+
+.text-page-content p {
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--text-dark);
+    margin-bottom: 20px;
+}
+
+/* --- Specific styles for Contact Page --- */
+.contact-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 40px;
+}
+
+.contact-info p {
+    margin-bottom: 10px;
+}
+.contact-info strong {
+    color: var(--primary-dark-teal);
+}
+
+.contact-form .input-group {
+    margin-bottom: 20px;
+}
+.contact-form .input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+.contact-form .input-group input,
+.contact-form .input-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    font-family: var(--font-primary);
+}
+.contact-form .input-group textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+
+/* --- Specific styles for FAQ Page --- */
+.faq-item {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 20px;
+}
+.faq-item h3 {
+    font-size: 20px;
+    color: var(--text-dark);
+    margin-bottom: 10px;
+}
+
+/* --- Specific styles for Legal Pages --- */
+.legal-content .last-updated {
+    font-style: italic;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+}
+
+/* --- Specific styles for Team --- */
+.team-section {
+    text-align: center; /* This centers the "Meet the Team" text */
+}
+
+.team-grid {
+    display: grid; /* This is the key to horizontal layout */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Creates flexible columns */
+    gap: 1.5rem; /* Space between team members */
+    margin-top: 2rem;
+}
+
+.team-member {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1.5rem 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.team-member:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.team-member h4 {
+    font-size: 1.25rem;
+    margin: 0 0 0.25rem 0;
+    color: #333;
+}
+
+.team-member p {
+    font-size: 1rem;
+    color: #777;
+    margin: 0;
+}
