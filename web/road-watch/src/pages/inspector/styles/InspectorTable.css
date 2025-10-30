@@ -1,0 +1,166 @@
+.table-wrapper {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.reports-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.reports-table thead {
+  background: #f9f9f9;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.reports-table th {
+  padding: 16px;
+  text-align: left;
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+}
+
+.reports-table tbody tr {
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.2s;
+}
+
+.reports-table tbody tr:hover {
+  background: #fafafa;
+}
+
+.reports-table td {
+  padding: 16px;
+  color: #555;
+}
+
+.image-cell {
+  width: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Updated image badge styling with better sizing and typography */
+.image-badge {
+  width: 50px;
+  height: 50px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  transition: transform 0.2s;
+}
+
+.image-badge:hover {
+  transform: scale(1.05);
+}
+
+/* Improved title & category cell layout */
+.title-cell {
+  display: flex;
+  align-items: center;
+  min-width: 250px;
+}
+
+.title-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title-link {
+  font-weight: 600;
+  color: #1a7f7e;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.title-link:hover {
+  color: #0d5a59;
+  text-decoration: underline;
+}
+
+.title-cell .category {
+  font-size: 12px;
+  color: #999;
+  font-weight: 400;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-in-progress {
+  background: #cfe2ff;
+  color: #084298;
+}
+
+.status-completed {
+  background: #d1e7dd;
+  color: #0f5132;
+}
+
+.status-reported {
+  background: #f8d7da;
+  color: #842029;
+}
+
+.distance-cell {
+  font-weight: 600;
+  color: #1a7f7e;
+}
+
+.pagination-info {
+  margin-top: 20px;
+  padding: 12px 0;
+  text-align: left;
+  font-size: 14px;
+  color: #666;
+}
+
+@media (max-width: 1024px) {
+  .reports-table {
+    font-size: 13px;
+  }
+
+  .reports-table th,
+  .reports-table td {
+    padding: 12px;
+  }
+
+  .image-badge {
+    width: 40px;
+    height: 40px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 768px) {
+  .table-wrapper {
+    overflow-x: auto;
+  }
+
+  .reports-table {
+    min-width: 800px;
+  }
+}

@@ -9,12 +9,18 @@ import AuditLogs from './pages/admin/AuditLogs';
 import SystemSettings from './pages/admin/SystemSettings';
 import FeedbackSupport from './pages/admin/FeedbackSupport';
 import AssignInspector from './pages/admin/AssignInspector';
+
 import Mainpage from './pages/Landingpage/Mainpage';
 import Loginpage from './pages/Landingpage/Loginpage';
 import Registrationpage from './pages/Landingpage/Registrationpage';
 
 //INSPECTOR PAGES
 //Put your inspector imports here
+import InspectorDashboard from './pages/inspector/InspectorDashboard';
+import InspectorSearchReports from './pages/inspector/InspectorSearchReports';
+import InspectorAssignedReports from './pages/inspector/InspectorAssignedReports';
+import InspectorCreateReport from './pages/inspector/InspectorCreateReports';
+import InspectorSettings from './pages/inspector/InspectorSettings';
 //CITIZEN PAGES
 //Put your citizen imports here
 
@@ -60,6 +66,8 @@ function App() {
                   </Registrationpage>
               }
           />
+
+
 
           <Route
           path="admin/reports"
@@ -121,6 +129,51 @@ function App() {
             </AdminLayout>
           }
         />
+        {/* Inspector routes */}
+          <Route
+              path="i/d"
+              element={
+                  <InspectorDashboard activeMenuItem="dashboard" pageTitle="Mainpage Overview">
+                      <InspectorDashboard />
+                  </InspectorDashboard>
+              }
+          />
+          <Route
+              path="i/sr"
+              element={
+                  <InspectorSearchReports activeMenuItem="InspectorSearchReports" pageTitle="Mainpage Overview">
+                      <InspectorSearchReports />
+                  </InspectorSearchReports>
+              }
+          />
+          <Route
+              path="i/ar"
+              element={
+                  <InspectorAssignedReports activeMenuItem="InspectorAssignedReports" pageTitle="Mainpage Overview">
+                      <InspectorAssignedReports />
+                  </InspectorAssignedReports>
+              }
+          />
+          <Route
+              path="i/cr"
+              element={
+                  <InspectorCreateReport activeMenuItem="InspectorCreateReports" pageTitle="Mainpage Overview">
+                      <InspectorCreateReport />
+                  </InspectorCreateReport>
+              }
+          />
+          <Route
+              path="i/s"
+              element={
+                  <InspectorSettings activeMenuItem="InspectorSettings" pageTitle="Mainpage Overview">
+                      <InspectorSettings />
+                  </InspectorSettings>
+              }
+          />
+
+
+
+
       </Routes>
     </BrowserRouter>
   );

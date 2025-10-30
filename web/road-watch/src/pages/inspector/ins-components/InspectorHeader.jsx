@@ -1,5 +1,5 @@
-import { BellIcon, ChevronDownIcon, UserCircleIcon } from "./icons"
-import "../styles/header.css"
+import { BellIcon, ChevronDownIcon, UserCircleIcon } from "./InspectorIcons"
+import "../styles/InspectorHeader.css"
 
 export default function InspectorHeader() {
   return (
