@@ -10,6 +10,7 @@ import {
   RoadWatchLogoIcon,
   AssignmentIcon
 } from './Icons';
+import logo from '../../assets/images/logo.png';
 import './Sidebar.css';
 import LogoutModal from '../modal/LogoutModal';
 
@@ -59,7 +60,7 @@ const Sidebar = ({ activeItem = 'dashboard', onNavigate, role = 'admin' }) => {
         {/* Logo Section */}
         <div className="sidebar-header">
           <div className="sidebar-logo">
-            <RoadWatchLogoIcon />
+            <img src={logo} alt="RoadWatch Logo" className='sidebar-logo' />
           </div>
           <h1 className="sidebar-title">RoadWatch</h1>
           <p className="sidebar-subtitle">{role.charAt(0).toUpperCase() + role.slice(1)} Panel</p>
