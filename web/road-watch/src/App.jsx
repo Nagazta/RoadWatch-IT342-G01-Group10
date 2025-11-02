@@ -9,9 +9,13 @@ import AuditLogs from './pages/admin/AuditLogs';
 import SystemSettings from './pages/admin/SystemSettings';
 import FeedbackSupport from './pages/admin/FeedbackSupport';
 import AssignInspector from './pages/admin/AssignInspector';
+
+//LANDING PAGES
 import Mainpage from './pages/Landingpage/Mainpage';
 import Loginpage from './pages/Landingpage/Loginpage';
 import Registrationpage from './pages/Landingpage/Registrationpage';
+
+//OTHER PAGES
 import Featurespage from './pages/Features/Featurespage';
 import HowItWorkspage from './pages/HowItWorks/HowItWorkspage';
 import Contactpage from './pages/Contact/Contactpage';
@@ -20,111 +24,55 @@ import PrivacyPolicy from './pages/Legal/PrivacyPolicy';
 import TermsOfService from './pages/Legal/TermsOfService';
 import AboutUspage from './pages/AboutUs/AboutUspage.jsx';
 
+//AUTH CALLBACK
+import CallbackPage from './pages/auth/CallbackPage';
+
+//CITIZEN PAGES
+import CitizenDashboard from './pages/citizen/Dashboard'; // ⭐ ADD THIS
+
 //INSPECTOR PAGES
 //Put your inspector imports here
-//CITIZEN PAGES
-//Put your citizen imports here
 
-function App() {
+function App() { 
   return (
     <BrowserRouter>
       <Routes>
-        {/* Redirect root to admin dashboard */}
-        <Route path="/" element={<Navigate to="landing" replace />} />
-          <Route
-              path="Landing"
-              element={
-                  <Mainpage activeMenuItem="Mainpage" pageTitle="Mainpage Overview">
-                      <Mainpage />
-                  </Mainpage>
-              }
-          />
+        {/* Redirect root to landing page */}
+        <Route path="/" element={<Navigate to="/landing" replace />} />
 
-          <Route
-              path="Landing/Login"
-              element={
-                  <Loginpage activeMenuItem="Loginpage" pageTitle="Loginpage Overview">
-                      <Loginpage />
-                  </Loginpage>
-              }
-          />
+        {/* Landing Page */}
+        <Route path="/landing" element={<Mainpage />} />
 
-          <Route
-              path="Landing/Registration"
-              element={
-                  <Registrationpage activeMenuItem="Registrationpage" pageTitle="Registrationpage Overview">
-                      <Registrationpage />
-                  </Registrationpage>
-              }
-          />
+        {/* Auth Pages */}
+        <Route path="/login" element={<Loginpage />} />
+        <Route path="/register" element={<Registrationpage />} />
+        <Route path="/auth/callback" element={<CallbackPage />} />
 
-          {/* Navbar Links */}
-          <Route path="/features" element={
-              <Featurespage activeMenuItem="Featurespage" pageTitle="Featurespage Overview">
-                  <Featurespage />
-              </Featurespage>
-              }
-          />
-          <Route
-              path="/how-it-works"
-              element={
-                  <HowItWorkspage activeMenuItem="HowItWorkspage" pageTitle="HowItWorkspage Overview">
-                      <HowItWorkspage />
-                  </HowItWorkspage>
-              }
-          />
+        {/* Public Pages - Navbar Links */}
+        <Route path="/features" element={<Featurespage />} />
+        <Route path="/how-it-works" element={<HowItWorkspage />} />
+        <Route path="/about-us" element={<AboutUspage />} />
+        <Route path="/contact" element={<Contactpage />} />
 
-          <Route path="/about-us" element={<AboutUspage />} />
+        {/* Public Pages - Footer Links */}
+        <Route path="/faq" element={<FAQpage />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TermsOfService />} />
 
-          <Route
-              path="/contact"
-              element={
-                  <Contactpage activeMenuItem="Contactpage" pageTitle="Contactpage Overview">
-                      <Contactpage />
-                  </Contactpage>
-              }
-          />
+        {/* Citizen Routes ⭐ ADD THIS */}
+        <Route path="/dashboard" element={<CitizenDashboard />} />
 
-          {/* Footer Links */}
-          <Route path="/faq" element={<FAQpage />} />
-          <Route
-              path="/faq"
-              element={
-                  <FAQpage activeMenuItem="FAQpage" pageTitle="FAQpage Overview">
-                      <FAQpage />
-                  </FAQpage>
-              }
-          />
-          <Route path="/privacy" element={<PrivacyPolicy />} />
-          <Route
-              path="/privacy"
-              element={
-                  <PrivacyPolicy activeMenuItem="PrivacyPolicy" pageTitle="PrivacyPolicy Overview">
-                      <PrivacyPolicy />
-                  </PrivacyPolicy>
-              }
-          />
-          <Route path="/terms" element={<TermsOfService />} />
-          <Route
-              path="/terms"
-              element={
-                  <TermsOfService activeMenuItem="TermsOfService" pageTitle="TermsOfService Overview">
-                      <TermsOfService />
-                  </TermsOfService>
-              }
-          />
-
-          {/* Admin routes */}
-          <Route
-            path="admin/dashboard"
-            element={
-              <AdminLayout activeMenuItem="dashboard" pageTitle="Dashboard Overview">
-                <AdminDashboard />
-              </AdminLayout>
-            }
-          />
-          <Route
-          path="admin/reports"
+        {/* Admin Routes */}
+        <Route
+          path="/admin/dashboard"
+          element={
+            <AdminLayout activeMenuItem="dashboard" pageTitle="Dashboard Overview">
+              <AdminDashboard />
+            </AdminLayout>
+          }
+        />
+        <Route
+          path="/admin/reports"
           element={
             <AdminLayout activeMenuItem="reports" pageTitle="Reports Management">
               <div style={{ padding: '24px', marginLeft: '250px' }}>
@@ -134,7 +82,7 @@ function App() {
           }
         />
         <Route
-          path="admin/users"
+          path="/admin/users"
           element={
             <AdminLayout activeMenuItem="users" pageTitle="User Management">
               <div style={{ padding: '24px', marginLeft: '250px' }}>
@@ -144,7 +92,7 @@ function App() {
           }
         />
         <Route
-          path="admin/audit"
+          path="/admin/audit"
           element={
             <AdminLayout activeMenuItem="audit" pageTitle="Audit Logs">
               <div style={{ padding: '24px', marginLeft: '250px' }}>
@@ -154,7 +102,7 @@ function App() {
           }
         />
         <Route
-          path="admin/settings"
+          path="/admin/settings"
           element={
             <AdminLayout activeMenuItem="settings" pageTitle="System Settings">
               <div style={{ padding: '24px', marginLeft: '250px' }}>
@@ -164,7 +112,7 @@ function App() {
           }
         />
         <Route
-          path="admin/support"
+          path="/admin/support"
           element={
             <AdminLayout activeMenuItem="support" pageTitle="Feedback & Support">
               <div style={{ padding: '24px', marginLeft: '250px' }}>
@@ -174,7 +122,7 @@ function App() {
           }
         />
         <Route
-          path="admin/assign-inspectors"
+          path="/admin/assign-inspectors"
           element={
             <AdminLayout activeMenuItem="assign_inspector" pageTitle="Assign Inspectors">
               <div style={{ padding: '24px', marginLeft: '250px' }}>
@@ -183,6 +131,10 @@ function App() {
             </AdminLayout>
           }
         />
+
+        {/* Inspector Routes - Add your inspector routes here */}
+     
+        <Route path="*" element={<Navigate to="/landing" replace />} />
       </Routes>
     </BrowserRouter>
   );
