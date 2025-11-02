@@ -1,33 +1,52 @@
 package road.watch.it_342_g01.RoadWatch.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import road.watch.it_342_g01.RoadWatch.security.JwtAuthenticationFilter;
 
 import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Disable CSRF for API testing
+                .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Allow all requests for now (for testing)
-                        .anyRequest().permitAll()
+                        // Public endpoints - no authentication required
+                        .requestMatchers(
+                            "/auth/login",
+                            "/auth/google",
+                            "/users/add",           // Registration
+                            "/actuator/**"          // Health checks
+                        ).permitAll()
+                        
+                        // Admin-only endpoints
+                        .requestMatchers("/users/**").hasRole("ADMIN")
+                        
+                        // Authenticated endpoints - any logged-in user
+                        .requestMatchers("/api/**").authenticated()
+                        
+                        // All other requests require authentication
+                        .anyRequest().authenticated()
                 )
-                // IMPORTANT: Disable OAuth2 login for now
-                .oauth2Login(oauth2 -> oauth2.disable());
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
