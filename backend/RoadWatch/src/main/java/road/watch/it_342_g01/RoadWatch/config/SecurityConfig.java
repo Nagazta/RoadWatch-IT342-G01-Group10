@@ -19,13 +19,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf.disable()) // Disable CSRF for API testing
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Allow all requests for testing
+                        // Allow all requests for now (for testing)
                         .anyRequest().permitAll()
-                );
+                )
+                // IMPORTANT: Disable OAuth2 login for now
+                .oauth2Login(oauth2 -> oauth2.disable());
 
         return http.build();
     }
