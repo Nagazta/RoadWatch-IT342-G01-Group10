@@ -28,8 +28,7 @@ import AboutUspage from './pages/AboutUs/AboutUspage.jsx';
 import CallbackPage from './pages/auth/CallbackPage';
 
 //CITIZEN PAGES
-import CitizenDashboard from './pages/citizen/Dashboard'; // ⭐ ADD THIS
-
+// import CitizenDashboard from './pages/citizen/Dashboard'; 
 //INSPECTOR PAGES
 //Put your inspector imports here
 
@@ -60,7 +59,7 @@ function App() {
         <Route path="/terms" element={<TermsOfService />} />
 
         {/* Citizen Routes ⭐ ADD THIS */}
-        <Route path="/dashboard" element={<CitizenDashboard />} />
+        {/* <Route path="/dashboard" element={<CitizenDashboard />} /> */}
 
         {/* Admin Routes */}
         <Route
