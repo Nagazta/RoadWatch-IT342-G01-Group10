@@ -1,0 +1,30 @@
+.citizen-ds 
+{
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1vw;
+}
+
+/* Responsive breakpoints */
+@media (min-width: 1024px) {
+  .citizen-ds {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .citizen-ds {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 480px) and (max-width: 767px) {
+  .citizen-ds {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 479px) {
+  .citizen-ds {
+    grid-template-columns: 1fr;
+  }
+}
