@@ -28,7 +28,9 @@ import AboutUspage from './pages/AboutUs/AboutUspage.jsx';
 import CallbackPage from './pages/auth/CallbackPage';
 
 //CITIZEN PAGES
-// import CitizenDashboard from './pages/citizen/Dashboard'; 
+import CitizenLayout from './components/layout/CitizenLayout';
+import CitizenDashboard from './pages/citizen/CitizenDashboard';
+
 //INSPECTOR PAGES
 //Put your inspector imports here
 
@@ -59,7 +61,15 @@ function App() {
         <Route path="/terms" element={<TermsOfService />} />
 
         {/* Citizen Routes ⭐ ADD THIS */}
-        {/* <Route path="/dashboard" element={<CitizenDashboard />} /> */}
+        <Route
+          path="citizen/dashboard"
+          element=
+          {
+            <CitizenLayout activeMenuItem="dashboard" pageTitle="Citizen Dashboard">
+              <CitizenDashboard />
+            </CitizenLayout>
+          }
+        />
 
         {/* Admin Routes */}
         <Route
