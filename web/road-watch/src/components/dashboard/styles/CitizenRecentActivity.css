@@ -1,0 +1,44 @@
+.citizen-recent-activity
+{
+    padding: 2vw;
+    border-radius: 1vw;
+    background-color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.citizen-recent-activity h3
+{
+    color: #00695c;
+}
+
+.citizen-recent-activity h4
+{
+    color: lightseagreen;
+}
+
+.citizen-recent-activity li
+{
+    margin: 1vw auto;
+    padding: 1vw 2vw; 
+    border-radius: 0.5vw;
+    list-style-type: none;
+    background-color: #EEE;
+}
+
+.citizen-recent-activity li p:last-child
+{
+    color: gray;
+}
+
+.circle-icon 
+{
+    display: inline-block;
+    width: 1vw;
+    height: 1vw;
+}
+
+.circle-icon svg
+{
+    width: 80%;
+    height: 80%;
+}
