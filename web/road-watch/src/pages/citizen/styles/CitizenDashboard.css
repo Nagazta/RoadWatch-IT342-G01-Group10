@@ -1,0 +1,6 @@
+.location-activity
+{
+    display: grid;
+    grid-template-columns: 49% 49%;
+    gap: 1vw;
+}
