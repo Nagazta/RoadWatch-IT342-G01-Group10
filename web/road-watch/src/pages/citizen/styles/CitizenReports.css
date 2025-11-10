@@ -1,0 +1,178 @@
+.citizen-reports
+{
+    margin-left: 250px;
+    padding: 2vw;
+    min-height: 100vh;
+}
+
+.citizen-reports h3
+{
+    color: #005F56;
+}
+
+.citizen-search-report
+{
+    display: flex;
+    flex-direction: column;
+    margin-top: 2vw;
+    padding: 2vw;
+    border-radius: 1vw;
+    background-color: white;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    gap: 1vw;
+}
+
+.citizen-search-report .search-bar 
+{
+    display: flex;
+    gap: 1vw;
+}
+
+.citizen-search-report .search-bar input
+{
+    width: 90%;
+    padding: 1vw;
+    border: 1px solid black;
+    border-radius: 0.5vw;
+}
+
+.citizen-search-report .search-bar button
+{
+    width: 5%;
+    border: none;
+    border-radius: 0.5vw;
+    color: white;
+    background-color: #005F56;
+    cursor: pointer;
+}
+
+.citizen-search-report .filters
+{
+    display: flex;
+    gap: 1vw;
+}
+
+.citizen-search-report .filters select
+{
+    padding: 0.5vw;
+    border-radius: 0.5vw;
+    background-color: #EEE;
+    cursor: pointer;
+}
+
+.citizen-search-report .filters button
+{
+    margin-left: 1vw;
+    border: none;
+    background-color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.citizen-search-report .filters button:hover
+{
+    color: #005F56;
+}
+
+.citizen-reports .report-list
+{
+    margin-top: 2vw;
+}
+
+.citizen-reports .report-list table
+{
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 1vw;
+    background-color: white;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.citizen-reports .report-list tr
+{
+    border-bottom: 0.2vw solid #CCC;
+}
+
+.citizen-reports .report-list table th, .citizen-reports .report-list table td
+{
+    padding: 1vw;
+    text-align: left;
+}
+
+.citizen-reports .report-list table th
+{
+    color: #005F56;
+}
+
+.citizen-reports .report-list table tr td:first-child
+{
+    color: #005F56;
+    font-weight: 500;
+}
+
+.citizen-reports .report-list table tr td:nth-child(2) p
+{
+    padding: 0.5vw 0.25vw;
+    border-radius: 1vw;
+    text-align: center;
+    color: #005F56;
+    background-color: #DDD;
+}
+
+.citizen-reports .report-list table button
+{
+    display: flex;
+    padding: 0.5vw 1vw;
+    border: none;
+    border-radius: 0.5vw;
+    color: white;
+    background-color: #005F56;
+    gap: 0.4vw;
+    cursor: pointer;
+}
+
+.citizen-reports .report-list table button svg
+{
+    width: 1.1vw;
+}
+
+.citizen-reports .under-review p
+{
+    padding: 0.5vw;
+    border-radius: 1vw;
+    text-align: center;
+    color: white;
+    background-color: #0492c2;
+}
+
+.citizen-reports .pending p
+{
+    padding: 0.5vw;
+    border-radius: 1vw;
+    text-align: center;
+    color: white;
+    background-color: orange;
+}
+
+.citizen-reports .resolved p
+{
+    padding: 0.5vw;
+    border-radius: 1vw;
+    text-align: center;
+    color: white;
+    background-color: #03c04a;
+}
+
+.citizen-reports .rejected p
+{
+    padding: 0.5vw;
+    border-radius: 1vw;
+    text-align: center;
+    color: white;
+    background-color: red;
+}
+
+
+
+
+
