@@ -30,6 +30,7 @@ import CallbackPage from './pages/auth/CallbackPage';
 //CITIZEN PAGES
 import CitizenLayout from './components/layout/CitizenLayout';
 import CitizenDashboard from './pages/citizen/CitizenDashboard';
+import CitizenReports from './pages/citizen/CitizenReports';
 
 //INSPECTOR PAGES
 //Put your inspector imports here
@@ -70,6 +71,16 @@ function App() {
             </CitizenLayout>
           }
         />
+
+        <Route
+          path="citizen/reports"
+          element=
+          {
+            <CitizenLayout activeMenuItem="reports" pageTitle="My Reports">
+              <CitizenReports />
+            </CitizenLayout>
+          }
+         />
 
         {/* Admin Routes */}
         <Route
