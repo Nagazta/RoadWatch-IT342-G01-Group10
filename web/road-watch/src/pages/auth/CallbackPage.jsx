@@ -40,7 +40,7 @@ function CallbackPage() {
                     } else if (userRole === 'INSPECTOR') {
                         navigate('/inspector/dashboard');
                     } else {
-                        navigate('/dashboard');
+                        navigate('/citizen/dashboard');
                     }
                 }, 1500);
             } else {
