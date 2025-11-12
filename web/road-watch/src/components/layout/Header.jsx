@@ -103,7 +103,7 @@ const Header = ({
       </div>
 
       {/* Center Section - Search Bar */}
-      {showSearch && (
+      {(showSearch && userRole !== 'Inspector') && (
         <div className="header-center">
           <div className="header-search">
             <div className="search-icon">
