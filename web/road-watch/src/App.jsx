@@ -31,6 +31,7 @@ import CallbackPage from './pages/auth/CallbackPage';
 import CitizenLayout from './components/layout/CitizenLayout';
 import CitizenDashboard from './pages/citizen/CitizenDashboard';
 import CitizenReports from './pages/citizen/CitizenReports';
+import CitizenSettings from './pages/citizen/CitizenSettings';
 
 //INSPECTOR PAGES
 import InspectorLayout from './components/layout/InspectorLayout';
@@ -86,6 +87,16 @@ function App() {
               <div style={{ padding: '24px', marginLeft: '250px' }}>
                  <CitizenReports />
               </div>
+            </CitizenLayout>
+          }
+         />
+
+         <Route 
+          path="citizen/settings"
+          element=
+          {
+            <CitizenLayout activeMenuItem="settings" pageTitle="Account Settings">
+              <CitizenSettings />
             </CitizenLayout>
           }
          />

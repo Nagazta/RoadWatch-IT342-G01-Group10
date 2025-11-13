@@ -1,0 +1,268 @@
+.citizen-settings
+{
+    margin-left: 250px;
+    padding: 2vw;
+    min-height: 100vh;
+}
+
+.profile-info
+{
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 3vw;
+    padding: 3vw;
+    border-radius: 1vw;
+    background-color: white;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.profile-info h3
+{
+    color: #005F56;
+}
+
+.profile-info .avatar
+{
+    display: flex;
+    margin-top: 2vw;
+    margin-bottom: 2vw;
+    align-items: center;
+    gap: 1vw;
+}
+
+.profile-info .avatar svg
+{
+    width: 5vw;
+    height: 5vw;
+    color: #005F56;
+}
+
+.profile-info .avatar button
+{
+    display: flex;
+    height: fit-content;
+    padding: 0.5vw 1vw;
+    border: none;
+    border-radius: 0.5vw;
+    gap: 0.5vw;
+    background-color: #005F56;
+    color: white;
+    cursor: pointer;
+}
+
+.profile-info .avatar button svg
+{
+    width: 1.1vw;
+    height: 1.1vw;
+    color: white;
+}
+
+.profile-info label
+{
+    font-weight: 500;
+    margin-bottom: 0.5vw;
+}
+
+.profile-info input
+{
+    padding: 1vw;
+    border: 1px solid #999;
+    border-radius: 0.5vw;
+    margin-bottom: 1.5vw;
+    background-color: #EEE;
+}
+
+.profile-info input:focus
+{
+    background-color: white;
+}
+
+.cannot-change
+{
+    margin-top: -1vw;
+    margin-bottom: 1.5vw;
+    font-size: 1vw;
+    color: #999;
+}
+
+.save-changes
+{
+    margin-top: 2vw;
+    padding: 1vw 2vw;
+    border: none;
+    border-radius: 0.5vw;
+    align-self: flex-end;
+    background-color: #005F56;
+    color: white;
+    cursor: pointer;
+}
+
+.notification-preferences
+{
+    display: flex;
+    flex-direction: column;
+    padding: 3vw;
+    border-radius: 1vw;
+    background-color: white;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 3vw;
+}
+
+.notification-preferences h3
+{
+    color: #005F56;
+}
+
+.notification-preferences hr
+{
+    margin-top: 1vw;
+}
+
+.toggle-preference
+{
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.toggle-preference h4
+{
+    margin-top: 1.5vw;
+}
+
+.toggle-preference div
+{
+    width: 95%;
+}
+
+.toggle-preference label
+{
+    justify-self: flex-end;
+}
+
+.toggle-preference p
+{
+    color: #666;
+}
+
+.account-security
+{
+    display: flex;
+    flex-direction: column;
+    padding: 3vw;
+    border-radius: 1vw;
+    background-color: white;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 3vw;
+}
+
+.account-security h3
+{
+    color: #005F56;
+}
+
+.account-security .password
+{
+    display: flex;
+    margin-top: 1.5vw;
+    width: 100%;
+}
+
+.account-security .password div
+{
+    width: 85%;
+}
+
+.account-security .password p
+{
+    color: #666;
+}
+
+.account-security button
+{
+    justify-self: flex-end;
+    display: flex;
+    height: fit-content;
+    padding: 0.7vw 1vw;
+    border: none;
+    border-radius: 0.5vw;
+    gap: 0.5vw;
+    background-color: #005F56;
+    color: white;
+    cursor: pointer;
+}
+
+.account-security hr
+{
+    margin-top: 1vw;
+}
+
+.privacy-settings
+{
+    display: flex;
+    flex-direction: column;
+    padding: 3vw;
+    border-radius: 1vw;
+    background-color: white;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 3vw;
+}
+
+.privacy-settings h3
+{
+    color: #005F56;
+}
+
+.danger-zone
+{
+    display: flex;
+    flex-direction: column;
+    padding: 3vw;
+    border-radius: 1vw;
+    background-color: white;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 3vw;
+}
+
+.danger-zone h3
+{
+    color: #db0f27;
+}
+
+.danger-zone .delete
+{
+    display: flex;
+    margin-top: 1.5vw;
+    width: 100%;
+}
+
+.danger-zone .delete div
+{
+    width: 85%;
+}
+
+.danger-zone .delete h4
+{
+    color: #db0f27;
+}
+
+.danger-zone .delete p
+{
+    color: #666;
+}
+
+.danger-zone .delete button
+{
+    justify-self: flex-end;
+    display: flex;
+    height: fit-content;
+    padding: 0.7vw 1vw;
+    border: none;
+    border-radius: 0.5vw;
+    gap: 0.5vw;
+    background-color: #db0f27;
+    color: white;
+    cursor: pointer;
+}
+
+
