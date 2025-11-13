@@ -15,7 +15,8 @@ const ReportsFilters = ({
   onStatusChange,
   onDateRange,
   onExportCSV,
-  onExportPDF
+  onExportPDF,
+  userRole // <-- add this prop
 }) => {
   return (
     <div className="filters-section">
@@ -35,12 +36,15 @@ const ReportsFilters = ({
         <DateRangeButton onClick={onDateRange} />
       </div>
 
-      <div className="filters-right">
-        <ExportButtons 
-          onExportCSV={onExportCSV}
-          onExportPDF={onExportPDF}
-        />
-      </div>
+      {/* Only show ExportButtons if user is an admin */}
+      {userRole === 'admin' && (
+        <div className="filters-right">
+          <ExportButtons 
+            onExportCSV={onExportCSV}
+            onExportPDF={onExportPDF}
+          />
+        </div>
+      )}
     </div>
   );
 };

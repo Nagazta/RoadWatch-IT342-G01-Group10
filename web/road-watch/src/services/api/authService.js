@@ -5,7 +5,6 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// Validate configuration
 if (!supabaseUrl || !supabaseAnonKey) { 
     alert('Configuration Error: Missing Supabase keys. Check console for details.');
 }

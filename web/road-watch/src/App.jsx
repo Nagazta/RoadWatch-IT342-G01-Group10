@@ -73,7 +73,7 @@ function App() {
           element=
           {
             <CitizenLayout activeMenuItem="dashboard" pageTitle="Citizen Dashboard">
-              <CitizenDashboard />
+                 <CitizenDashboard />
             </CitizenLayout>
           }
         />
@@ -83,7 +83,9 @@ function App() {
           element=
           {
             <CitizenLayout activeMenuItem="reports" pageTitle="My Reports">
-              <CitizenReports />
+              <div style={{ padding: '24px', marginLeft: '250px' }}>
+                 <CitizenReports />
+              </div>
             </CitizenLayout>
           }
          />
