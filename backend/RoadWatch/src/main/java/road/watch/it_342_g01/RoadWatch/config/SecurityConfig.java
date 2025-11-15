@@ -41,6 +41,9 @@ public class SecurityConfig {
                         "/api/admin/add",
                         "/api/citizen/add",
                         "/api/inspector/add",
+                        "/api/reports/add",
+                        "/api/users/getAll",
+                        "/api/reports/getAll",
                         "/api/users/db-test",  // Add this line
                         "/actuator/**"
                     ).permitAll()
