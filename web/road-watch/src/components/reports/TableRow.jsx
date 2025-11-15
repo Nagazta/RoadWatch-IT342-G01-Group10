@@ -10,7 +10,11 @@ const TableRow = ({ report, onView, onEdit, onDelete }) => {
       <td className="report-title">{report.title}</td>
       <td>{report.category}</td>
       <td>{report.submittedBy}</td>
-      <td>{report.date}</td>
+      <td>{new Date(report.dateSubmitted).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      })}</td>
       <td>
         <StatusBadge status={report.status} />
       </td>
