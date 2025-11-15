@@ -29,13 +29,17 @@ const Sidebar = ({ activeItem = 'dashboard', onNavigate, role = 'admin' }) => {
       { id: 'assign_inspector', label: 'Assign Inspectors', icon: <AssignmentIcon />, path: '/admin/assign-inspectors' }
     ],
     inspector: [
-    
+      { id: 'dashboard', label: 'Dashboard', icon: <DashboardIcon />, path: '/inspector/dashboard' },
+      { id: 'search_reports', label: 'Search Reports', icon: <ReportsIcon />, path: '/inspector/search-reports' },
+      { id: 'assigned_reports', label: 'Assigned Reports', icon: <AssignmentIcon />, path: '/inspector/assigned-reports' },
+      { id: 'create_report', label: 'Create Report', icon: <PlusIcon />, path: '/inspector/create-report' },
+      { id: 'settings', label: 'Settings', icon: <SettingsIcon />, path: '/inspector/settings' },
     ],
     citizen: [
       { id: 'dashboard', label: 'Dashboard', icon: <DashboardIcon />, path: '/citizen/dashboard' },
-      { id: 'reports', label: 'My Reports', icon: <ReportsIcon />, path: '/citizen/dashboard' },
+      { id: 'reports', label: 'My Reports', icon: <ReportsIcon />, path: '/citizen/reports' },
       { id: 'submit', label: 'Submit Report', icon: <PlusIcon />, path: '/citizen/dashboard' },
-      { id: 'settings', label: 'Settings', icon: <SettingsIcon />, path: '/citizen/dashboard' },
+      { id: 'settings', label: 'Settings', icon: <SettingsIcon />, path: '/citizen/settings' },
       { id: 'support', label: 'Feedback & Support', icon: <SupportIcon />, path: '/citizen/dashboard'}
     ]
   };

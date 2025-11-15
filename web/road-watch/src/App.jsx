@@ -30,9 +30,17 @@ import CallbackPage from './pages/auth/CallbackPage';
 //CITIZEN PAGES
 import CitizenLayout from './components/layout/CitizenLayout';
 import CitizenDashboard from './pages/citizen/CitizenDashboard';
+import CitizenReports from './pages/citizen/CitizenReports';
+import CitizenSettings from './pages/citizen/CitizenSettings';
 
 //INSPECTOR PAGES
-//Put your inspector imports here
+import InspectorLayout from './components/layout/InspectorLayout';
+import InspectorDashboard from './pages/inspector/InspectorDashboard';
+import SearchReports from './pages/inspector/SearchReports';
+import AssignedReports from './pages/inspector/AssignedReports';
+import CreateReport from './pages/inspector/CreateReport';
+import InspectorSettings from './pages/inspector/Settings';
+import ReportDetail from './pages/inspector/ReportDetail';
 
 function App() { 
   return (
@@ -66,10 +74,32 @@ function App() {
           element=
           {
             <CitizenLayout activeMenuItem="dashboard" pageTitle="Citizen Dashboard">
-              <CitizenDashboard />
+                 <CitizenDashboard />
             </CitizenLayout>
           }
         />
+
+        <Route
+          path="citizen/reports"
+          element=
+          {
+            <CitizenLayout activeMenuItem="reports" pageTitle="My Reports">
+              <div style={{ padding: '24px', marginLeft: '250px' }}>
+                 <CitizenReports />
+              </div>
+            </CitizenLayout>
+          }
+         />
+
+         <Route 
+          path="citizen/settings"
+          element=
+          {
+            <CitizenLayout activeMenuItem="settings" pageTitle="Account Settings">
+              <CitizenSettings />
+            </CitizenLayout>
+          }
+         />
 
         {/* Admin Routes */}
         <Route
@@ -142,7 +172,54 @@ function App() {
         />
 
         {/* Inspector Routes - Add your inspector routes here */}
-     
+        <Route
+          path="inspector/dashboard"
+          element={
+            <InspectorLayout activeMenuItem="dashboard" pageTitle="Inspector Dashboard">
+              <InspectorDashboard />
+            </InspectorLayout>
+          }
+        />
+        <Route
+          path="inspector/search-reports"
+          element={
+            <InspectorLayout activeMenuItem="search_reports" pageTitle="Search Reports">
+              <SearchReports />
+            </InspectorLayout>
+          }
+        />
+        <Route
+          path="inspector/assigned-reports"
+          element={
+            <InspectorLayout activeMenuItem="assigned_reports" pageTitle="Assigned Reports">
+              <AssignedReports />
+            </InspectorLayout>
+          }
+        />
+        <Route
+          path="inspector/create-report"
+          element={
+            <InspectorLayout activeMenuItem="create_report" pageTitle="Create Report">
+              <CreateReport />
+            </InspectorLayout>
+          }
+        />
+        <Route
+          path="inspector/settings"
+          element={
+            <InspectorLayout activeMenuItem="settings" pageTitle="Settings">
+              <InspectorSettings />
+            </InspectorLayout>
+          }
+        />
+        <Route
+          path="inspector/reports/:reportId"
+          element={
+            <InspectorLayout activeMenuItem="assigned_reports" pageTitle="Report Detail">
+              <ReportDetail />
+            </InspectorLayout>
+          }
+        />
         <Route path="*" element={<Navigate to="/landing" replace />} />
       </Routes>
     </BrowserRouter>

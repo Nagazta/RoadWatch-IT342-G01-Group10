@@ -1,0 +1,113 @@
+import './styles/CitizenSettings.css';
+import { UserCircleIcon, UploadIcon } from '../../components/common/Icons';
+import ToggleSwitch from '../../components/settings/ToggleSwitch';
+
+const CitizenSettings = () =>
+{
+    return (
+        <div className="citizen-settings">
+            <div className="profile-info">
+                <h3> Profile Information </h3>
+                <p> Update your personal details and contact information </p>
+
+                <div className="avatar">
+                    <UserCircleIcon/>
+                    <button> <UploadIcon/> Change </button>
+                </div>
+
+                <label htmlFor="fullname"> Full Name </label>
+                <input type="text" placeholder="Maria Santos"/>
+
+                <label htmlFor="email"> Email </label>
+                <input type="email" placeholder="maria.santos@example.com" disabled/>
+                <p className="cannot-change"> Email cannot be changed </p>
+
+                <label htmlFor="contactnum"> Contact Number </label>
+                <input type="text" placeholder="09123456789"/>
+
+                <label htmlFor="address"> Address </label>
+                <input type="text" placeholder="Enter your complete address"/>
+
+                <button className="save-changes"> Save Changes </button>
+            </div>
+
+            <div className="notification-preferences">
+                <h3> Notification Preferences </h3>
+                <p> Choose how you want to receive updates about your reports </p>
+
+                <div className="toggle-preference">
+                    <div>
+                        <h4> Email Notifications </h4>
+                        <p> Receive updates vial email </p>
+                    </div>
+                    <ToggleSwitch />
+                </div>
+                <hr/>
+                <div className="toggle-preference">
+                    <div>
+                        <h4> SMS Notifications </h4>
+                        <p> Receive updates vial text message </p>
+                    </div>
+                    <ToggleSwitch />
+                </div>
+                <hr/>
+                <div className="toggle-preference">
+                    <div>
+                        <h4> App Push Notifications </h4>
+                        <p> Receive push notifications in the app </p>
+                    </div>
+                    <ToggleSwitch />
+                </div>
+            </div>
+
+            <div className="account-security">
+                <h3> Account Security </h3>
+                <p> Manage your password and security settings </p>
+
+                <div className="password">
+                    <div>
+                        <h4> Password </h4>
+                        <p> Keep your account secure with a strong password </p>
+                    </div>
+                    <button> Change Password </button>
+                </div>
+                <hr/>
+                <div className="toggle-preference">
+                    <div>
+                        <h4> Two-Factor Authentication </h4>
+                        <p> Add an extra layer of security to your account </p>
+                    </div>
+                    <ToggleSwitch />
+                </div>
+            </div>
+
+            <div className="privacy-settings">
+                <h3> Privacy Settings </h3>
+                <p> Control your data sharing and privacy preferences </p>
+
+                <div className="toggle-preference">
+                    <div>
+                        <h4> Location Sharing </h4>
+                        <p> Enable GPS auto-location for reports </p>
+                    </div>
+                    <ToggleSwitch />
+                </div>
+            </div>
+
+            <div className="danger-zone"> 
+                <h3> Danger Zone </h3>
+                <p> Irreversible actions that will permanently affect your account </p>
+
+                <div className="delete">
+                    <div>
+                        <h4> Delete My Account </h4>
+                        <p> Once you delete your account, there is no going back. All your data will be permanently deleted. </p>
+                    </div>
+                    <button> Delete Account </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default CitizenSettings;

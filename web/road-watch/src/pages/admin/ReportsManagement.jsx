@@ -25,7 +25,7 @@ const ReportsManagement = () => {
   });
 
   // Mock data - Enhanced with additional fields for modal
-  const reports = [
+  const AdminReports = [
     { id: 'RW-00124', title: 'Deep Pothole on Osmeña Blvd', description: 'Large pothole causing vehicle damage on main boulevard.', category: 'Pothole', location: 'Osmeña Boulevard, Cebu City', submittedBy: 'John Dela Cruz', date: 'Oct 18, 2025', dateSubmitted: 'Oct 18, 2025', status: 'Pending', adminNotes: '' },
     { id: 'RW-00125', title: 'Flooding near CIT-U Gate 3', description: 'Severe flooding during heavy rain affecting traffic flow.', category: 'Flooding', location: 'CIT-U Gate 3, N. Bacalso Ave, Cebu City', submittedBy: 'Maria Santos', date: 'Oct 19, 2025', dateSubmitted: 'Oct 19, 2025', status: 'In Progress', adminNotes: 'Inspector assigned to evaluate drainage system' },
     { id: 'RW-00126', title: 'Debris Blocking Road', description: 'Construction debris blocking one lane of the road.', category: 'Debris', location: 'Mabolo, Cebu City', submittedBy: 'Kyle Sumucad', date: 'Oct 20, 2025', dateSubmitted: 'Oct 20, 2025', status: 'Resolved', adminNotes: 'Debris removed by maintenance team' },
@@ -123,6 +123,7 @@ const ReportsManagement = () => {
   return (
     <div className="reports-management-container">
       <ReportsFilters
+        userRole={'admin'}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         selectedCategory={selectedCategory}
@@ -135,7 +136,7 @@ const ReportsManagement = () => {
       />
 
       <ReportsTable
-        reports={reports}
+        reports={AdminReports}
         onView={handleView}
         onEdit={handleEdit}
         onDelete={handleDelete}
