@@ -1,5 +1,5 @@
 // src/pages/admin/UserManagement.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import UserFilters from '../../components/users/UserFilters';
 import UsersTable from '../../components/users/UsersTable';
 import ReportsPagination from '../../components/reports/ReportsPagination';
@@ -9,37 +9,61 @@ import AddUserModal from '../../components/modal/AddUserModal';
 import '../admin/styles/UserManagement.css';
 
 const UserManagement = () => {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRole, setSelectedRole] = useState('All Roles');
   const [selectedStatus, setSelectedStatus] = useState('All Statuses');
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  
-  // User Details Modal states
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [modalMode, setModalMode] = useState('view');
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
 
-  // Confirmation Modal states
   const [confirmationModal, setConfirmationModal] = useState({
     isOpen: false,
-    type: '', // 'suspend', 'activate', 'revoke'
+    type: '',
     userId: null,
     userName: ''
   });
 
-  // Mock data
-  const users = [
-    { id: 'U-1001', fullName: 'John Dela Cruz', role: 'Citizen', email: 'john.delacruz@citizen.com', dateRegistered: 'Oct 1, 2025', status: 'Active' },
-    { id: 'U-1002', fullName: 'Maria Santos', role: 'Citizen', email: 'maria.santos@citizen.com', dateRegistered: 'Oct 3, 2025', status: 'Active' },
-    { id: 'U-1003', fullName: 'Kyle Sumucad', role: 'Moderator', email: 'kyle.sumucad@roadwatch.gov', dateRegistered: 'Oct 5, 2025', status: 'Active' },
-    { id: 'U-1004', fullName: 'Gab Saniel', role: 'Citizen', email: 'gab.saniel@citizen.com', dateRegistered: 'Oct 7, 2025', status: 'Suspended' },
-    { id: 'U-1005', fullName: 'Adrian Lopez', role: 'Admin', email: 'adrian.lopez@roadwatch.gov', dateRegistered: 'Oct 10, 2025', status: 'Active' },
-    { id: 'U-1006', fullName: 'Janine Cruz', role: 'Citizen', email: 'janine.cruz@citizen.com', dateRegistered: 'Oct 12, 2025', status: 'Active' },
-    { id: 'U-1007', fullName: 'Robert Tan', role: 'Moderator', email: 'robert.tan@roadwatch.gov', dateRegistered: 'Oct 14, 2025', status: 'Active' },
-    { id: 'U-1008', fullName: 'Nina Velasquez', role: 'Citizen', email: 'nina.velasquez@citizen.com', dateRegistered: 'Oct 17, 2025', status: 'Active' },
-  ];
+  // Fetch users from backend
+  const fetchUsers = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch('http://localhost:8080/api/users/getAll');
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const data = await response.json();
 
+      // Map backend fields to frontend table fields
+      const mappedUsers = data.map(user => ({
+        id: user.id,
+        fullName: user.name,  // backend 'name'
+        email: user.email,
+        role: user.role,
+        dateRegistered: new Date(user.createdAt).toLocaleDateString(), // format LocalDateTime
+        status: user.isActive ? 'Active' : 'Suspended' // convert boolean to string
+      }));
+
+      setUsers(mappedUsers);
+      setLoading(false);
+    } catch (err) {
+      console.error('Failed to fetch users:', err);
+      setError(err.message);
+      setLoading(false);
+    }
+  };
+
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  // User Actions
   const handleView = (userId) => {
     const user = users.find(u => u.id === userId);
     setSelectedUser(user);
@@ -59,8 +83,8 @@ const UserManagement = () => {
     setConfirmationModal({
       isOpen: true,
       type: 'suspend',
-      userId: userId,
-      userName: user.fullName
+      userId,
+      userName: user.name
     });
   };
 
@@ -69,8 +93,8 @@ const UserManagement = () => {
     setConfirmationModal({
       isOpen: true,
       type: 'activate',
-      userId: userId,
-      userName: user.fullName
+      userId,
+      userName: user.name
     });
   };
 
@@ -79,111 +103,105 @@ const UserManagement = () => {
     setConfirmationModal({
       isOpen: true,
       type: 'revoke',
-      userId: userId,
-      userName: user.fullName
+      userId,
+      userName: user.name
     });
   };
 
-  const handleConfirmAction = () => {
+  const handleConfirmAction = async () => {
     const { type, userId } = confirmationModal;
-    
-    switch (type) {
-      case 'suspend':
-        console.log('Suspending user:', userId);
-        // Add your suspend logic here
-        break;
-      case 'activate':
-        console.log('Activating user:', userId);
-        // Add your activate logic here
-        break;
-      case 'revoke':
-        console.log('Revoking user:', userId);
-        // Add your revoke logic here
-        break;
-      default:
-        break;
+    try {
+      switch (type) {
+        case 'suspend':
+          await fetch(`http://localhost:8080/api/users/updateBy/${userId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'SUSPENDED' })
+          });
+          break;
+        case 'activate':
+          await fetch(`http://localhost:8080/api/users/updateBy/${userId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'ACTIVE' })
+          });
+          break;
+        case 'revoke':
+          console.log('Revoke not implemented yet');
+          break;
+        default:
+          break;
+      }
+      await fetchUsers(); // refresh table
+    } catch (err) {
+      console.error('Action failed:', err);
+    } finally {
+      setConfirmationModal({ isOpen: false, type: '', userId: null, userName: '' });
     }
-
-    // Close confirmation modal
-    setConfirmationModal({
-      isOpen: false,
-      type: '',
-      userId: null,
-      userName: ''
-    });
   };
 
   const handleCloseConfirmation = () => {
-    setConfirmationModal({
-      isOpen: false,
-      type: '',
-      userId: null,
-      userName: ''
-    });
+    setConfirmationModal({ isOpen: false, type: '', userId: null, userName: '' });
   };
 
-  const handleAddUser = () => {
-  setIsAddUserModalOpen(true);
-  };
-  
-  const handleCloseAddUserModal = () => {
-  setIsAddUserModalOpen(false);
+  const handleAddUser = () => setIsAddUserModalOpen(true);
+  const handleCloseAddUserModal = () => setIsAddUserModalOpen(false);
+
+  // Add User
+  const handleSaveNewUser = async (newUser) => {
+    try {
+      const payload = {
+        username: newUser.email.split('@')[0],
+        name: newUser.name || newUser.fullName,
+        email: newUser.email,
+        contact: newUser.contactNumber,
+        role: newUser.role.toUpperCase(),
+        password: newUser.password
+      };
+
+      const response = await fetch('http://localhost:8080/api/users/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+      if (!response.ok || !data.success) throw new Error(data.error || 'Failed to create user');
+
+      await fetchUsers(); // refresh table
+      setIsAddUserModalOpen(false);
+    } catch (err) {
+      console.error('Error creating user:', err);
+    }
   };
 
-  const handleSaveNewUser = (newUser) => {
-    console.log('New user:', newUser);
-    // Add your logic to save the new user
-    setIsAddUserModalOpen(false);
+  const handleSaveUser = async (updatedUser) => {
+    try {
+      const payload = { ...updatedUser }; // modify fields as needed
+      await fetch(`http://localhost:8080/api/users/updateBy/${updatedUser.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      await fetchUsers(); // refresh table
+      setIsModalOpen(false);
+      setSelectedUser(null);
+    } catch (err) {
+      console.error('Error updating user:', err);
+    }
   };
 
-  const handleExportUsers = () => {
-    console.log('Export users');
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedUser(null);
-  };
-
-  const handleSaveUser = (updatedUser) => {
-    console.log('Save user:', updatedUser);
-    setIsModalOpen(false);
-    setSelectedUser(null);
-  };
-
-  // Get modal content based on type
   const getConfirmationContent = () => {
     const { type, userName } = confirmationModal;
-    
     switch (type) {
       case 'suspend':
-        return {
-          title: 'Suspend User?',
-          message: `Are you sure you want to suspend ${userName}? This action can be reversed later.`,
-          confirmText: 'Suspend User',
-          type: 'warning'
-        };
+        return { title: 'Suspend User?', message: `Suspend ${userName}?`, confirmText: 'Suspend', type: 'warning' };
       case 'activate':
-        return {
-          title: 'Activate User?',
-          message: `Are you sure you want to activate ${userName}? This will restore their access to the system.`,
-          confirmText: 'Activate User',
-          type: 'warning'
-        };
+        return { title: 'Activate User?', message: `Activate ${userName}?`, confirmText: 'Activate', type: 'warning' };
       case 'revoke':
-        return {
-          title: 'Revoke Access?',
-          message: `Are you sure you want to revoke access for ${userName}? This will suspend their administrative privileges.`,
-          confirmText: 'Revoke Access',
-          type: 'warning'
-        };
+        return { title: 'Revoke Access?', message: `Revoke ${userName}?`, confirmText: 'Revoke', type: 'warning' };
       default:
-        return {
-          title: '',
-          message: '',
-          confirmText: '',
-          type: 'warning'
-        };
+        return { title: '', message: '', confirmText: '', type: 'warning' };
     }
   };
 
@@ -191,7 +209,6 @@ const UserManagement = () => {
 
   return (
     <div className="user-management-container">
-      
       <UserFilters
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
@@ -200,17 +217,23 @@ const UserManagement = () => {
         selectedStatus={selectedStatus}
         onStatusChange={setSelectedStatus}
         onAddUser={handleAddUser}
-        onExportUsers={handleExportUsers}
+        onExportUsers={() => console.log('Export')}
       />
 
-      <UsersTable
-        users={users}
-        onView={handleView}
-        onEdit={handleEdit}
-        onSuspend={handleSuspend}
-        onActivate={handleActivate}
-        onRevoke={handleRevoke}
-      />
+      {loading ? (
+        <p>Loading users...</p>
+      ) : error ? (
+        <p style={{ color: 'red' }}>Error: {error}</p>
+      ) : (
+        <UsersTable
+          users={users}
+          onView={handleView}
+          onEdit={handleEdit}
+          onSuspend={handleSuspend}
+          onActivate={handleActivate}
+          onRevoke={handleRevoke}
+        />
+      )}
 
       <ReportsPagination
         rowsPerPage={rowsPerPage}
@@ -219,16 +242,14 @@ const UserManagement = () => {
         totalPages={1}
       />
 
-      {/* User Details Modal */}
       <UserDetailsModal
         user={selectedUser}
         isOpen={isModalOpen}
-        onClose={handleCloseModal}
+        onClose={() => setIsModalOpen(false)}
         onSave={handleSaveUser}
         mode={modalMode}
       />
 
-      {/* Confirmation Modal */}
       <ConfirmationModal
         isOpen={confirmationModal.isOpen}
         onClose={handleCloseConfirmation}
@@ -238,7 +259,7 @@ const UserManagement = () => {
         confirmText={confirmationContent.confirmText}
         type={confirmationContent.type}
       />
-      {/* Add User Modal */}
+
       <AddUserModal
         isOpen={isAddUserModalOpen}
         onClose={handleCloseAddUserModal}
