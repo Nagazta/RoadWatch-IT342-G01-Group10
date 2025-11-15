@@ -5,8 +5,22 @@ const ReportsPagination = ({
   rowsPerPage, 
   onRowsPerPageChange, 
   currentPage, 
-  totalPages 
+  totalPages,
+  onPageChange
 }) => {
+
+  const handlePrevious = () => {
+    if (currentPage > 1) {
+      onPageChange(currentPage - 1);
+    }
+  };
+
+  const handleNext = () => {
+    if (currentPage < totalPages) {
+      onPageChange(currentPage + 1);
+    }
+  };
+
   return (
     <div className="pagination-section">
       <div className="rows-per-page">
@@ -16,10 +30,8 @@ const ReportsPagination = ({
           value={rowsPerPage}
           onChange={(e) => onRowsPerPageChange(Number(e.target.value))}
         >
+          <option value={5}>5</option>
           <option value={10}>10</option>
-          <option value={20}>20</option>
-          <option value={50}>50</option>
-          <option value={100}>100</option>
         </select>
       </div>
 
@@ -28,10 +40,10 @@ const ReportsPagination = ({
       </div>
 
       <div className="pagination-controls">
-        <button className="pagination-btn" disabled={currentPage === 1}>
+        <button className="pagination-btn" onClick={handlePrevious} disabled={currentPage === 1}>
           Previous
         </button>
-        <button className="pagination-btn" disabled={currentPage === totalPages}>
+        <button className="pagination-btn" onClick={handleNext} disabled={currentPage === totalPages}>
           Next
         </button>
       </div>
