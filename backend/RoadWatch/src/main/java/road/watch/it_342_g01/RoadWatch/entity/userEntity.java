@@ -27,7 +27,7 @@ public class userEntity {
     @Column(unique = true, nullable = false)
     private String email;
     
-    @Transient
+    @Column(nullable = false)
     private String password;
     
     private String contact;

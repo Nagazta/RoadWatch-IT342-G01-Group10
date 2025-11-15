@@ -5,11 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 
-import org.hibernate.sql.Update;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional; // ← Add this import
+import org.springframework.transaction.annotation.Transactional;
 import road.watch.it_342_g01.RoadWatch.entity.*;
 import road.watch.it_342_g01.RoadWatch.repository.*;
 
@@ -22,15 +22,7 @@ import java.util.Optional;
 public class userService {
 
     @Autowired
-    private userRepo userRepo;
-    
-    @Autowired
-    private citizenRepo citizenRepo;
-    
-    @Autowired
-    private inspectorRepo inspectorRepo;
-    
-   
+    private userRepo userRepo;   
 
     private final OkHttpClient httpClient = new OkHttpClient();
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -41,30 +33,36 @@ public class userService {
     @Value("${SUPABASE_SERVICE_ROLE_KEY}")
     private String supabaseServiceRoleKey;
 
-   @Transactional
-public userEntity createUser(userEntity user) {
-    try {
-        log.info("🔵 Starting user creation...");
-        
-        // Validate
-        validateUser(user);
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-        // TEMPORARILY SKIP SUPABASE AUTH
-        // String supabaseUserId = createSupabaseAuthUser(user);
-        // user.setSupabaseId(supabaseUserId);
-        user.setSupabaseId("temp-" + System.currentTimeMillis()); // Temporary ID
+    @Transactional
+    public userEntity createUser(userEntity user) {
+        try {
+            // Validate fields
+            validateUser(user);
 
-        // Save to database
-        userEntity savedUser = userRepo.save(user);
-        log.info("✅ User saved with ID: {}", savedUser.getId());
+            // Hash the password before saving
+            if (user.getPassword() != null) {
+                user.setPassword(passwordEncoder.encode(user.getPassword()));
+            }
 
-        return savedUser;
+            // Set default role
+            if (user.getRole() == null) {
+                user.setRole(role.CITIZEN);
+            }
 
-    } catch (Exception e) {
-        log.error("❌ ERROR: {}", e.getMessage(), e);
-        throw new RuntimeException("Failed to create user: " + e.getMessage(), e);
+            // Temp Supabase ID (optional)
+            user.setSupabaseId("temp-" + System.currentTimeMillis());
+
+            // Save user
+            userEntity savedUser = userRepo.save(user);
+            return savedUser;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create user: " + e.getMessage(), e);
+        }
     }
-}
 
     private void validateUser(userEntity user) {
         if (user.getEmail() == null || user.getEmail().trim().isEmpty()) {
@@ -77,7 +75,7 @@ public userEntity createUser(userEntity user) {
             throw new IllegalArgumentException("Password must be at least 6 characters");
         }
         if (user.getRole() == null) {
-            user.setRole(role.CITIZEN); // ← This should now work
+            user.setRole(role.CITIZEN);
         }
     }
 
