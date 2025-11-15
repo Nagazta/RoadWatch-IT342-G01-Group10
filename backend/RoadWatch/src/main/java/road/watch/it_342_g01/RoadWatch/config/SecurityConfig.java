@@ -29,23 +29,28 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints - no authentication required
-                        .requestMatchers(
-                            "/auth/login",
-                            "/auth/google",
-                            "/users/add",           // Registration
-                            "/actuator/**"          // Health checks
-                        ).permitAll()
-                        
-                        // Admin-only endpoints
-                        .requestMatchers("/users/**").hasRole("ADMIN")
-                        
-                        // Authenticated endpoints - any logged-in user
-                        .requestMatchers("/api/**").authenticated()
-                        
-                        // All other requests require authentication
-                        .anyRequest().authenticated()
-                )
+                    // Public endpoints - MOST SPECIFIC FIRST!
+                    .requestMatchers(
+                        "/error",
+                        "/auth/**",
+                        "/api/test/**",
+                        "/api/users/add",
+                        "/api/users/test",
+                        "/api/admin/add",
+                        "/api/citizen/add",
+                        "/api/users/db-test",  // Add this line
+                        "/actuator/**"
+                    ).permitAll()
+                    
+                    // Admin-only endpoints
+                    .requestMatchers("/api/users/**").hasRole("ADMIN")
+                    
+                    // Authenticated endpoints
+                    .requestMatchers("/api/**").authenticated()
+                    
+                    // Fallback for any other requests
+                    .anyRequest().authenticated()
+                )   
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
