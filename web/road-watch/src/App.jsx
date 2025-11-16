@@ -31,6 +31,7 @@ import CallbackPage from './pages/auth/CallbackPage';
 import CitizenLayout from './components/layout/CitizenLayout';
 import CitizenDashboard from './pages/citizen/CitizenDashboard';
 import CitizenReports from './pages/citizen/CitizenReports';
+import CitizenSubmit from './pages/citizen/CitizenSubmit';
 import CitizenSettings from './pages/citizen/CitizenSettings';
 
 //INSPECTOR PAGES
@@ -86,6 +87,18 @@ function App() {
             <CitizenLayout activeMenuItem="reports" pageTitle="My Reports">
               <div style={{ padding: '24px', marginLeft: '250px' }}>
                  <CitizenReports />
+              </div>
+            </CitizenLayout>
+          }
+         />
+
+         <Route
+          path="citizen/submit" 
+          element=
+          {
+            <CitizenLayout activeMenuItem="submit" pageTitle="Submit Report">
+              <div style={{ padding: '24px', marginLeft: '250px' }}>
+                <CitizenSubmit />
               </div>
             </CitizenLayout>
           }

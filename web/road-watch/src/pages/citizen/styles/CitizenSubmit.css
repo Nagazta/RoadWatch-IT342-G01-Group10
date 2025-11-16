@@ -1,0 +1,82 @@
+.citizen-submit
+{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3vw 2vw;
+    border-radius: 1vw;
+    background-color: white;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.cs-header
+{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 4vw;
+    gap: 0.5vw;
+}
+
+.cs-header h2, .cs-input h4
+{
+    color: #005F56;
+}
+
+.cs-input
+{
+    display: flex;
+    flex-direction: column;
+    width: 70%;
+}
+
+.cs-input input, .cs-input select
+{
+    margin-top: 0.5vw;
+    margin-bottom: 2vw;
+    padding: 1vw;
+    border: 1px solid lightblue;
+    border-radius: 0.5vw;
+    background-color: #EEE;
+}
+
+.cs-input input:focus, .cs-input select:focus
+{
+    background-color: white;
+}
+
+.cs-input p
+{
+    margin-top: 0.5vw;
+    font-size: 1vw;
+}
+
+.cs-buttons
+{
+    display: flex;
+    margin-top: 1vw;
+    gap: 1vw;
+}
+
+.cs-buttons button
+{
+    padding: 1vw 2vw;
+    border: none;
+    border-radius: 1vw;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.cs-buttons button:first-child
+{
+    color: white;
+    background-color: #005F56;
+}
+
+.cs-buttons button:last-child
+{
+    color: #005F56;
+    border: 1px solid #005F56;
+}
+
+
