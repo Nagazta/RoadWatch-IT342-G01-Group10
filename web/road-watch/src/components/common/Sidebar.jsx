@@ -38,7 +38,7 @@ const Sidebar = ({ activeItem = 'dashboard', onNavigate, role = 'admin' }) => {
     citizen: [
       { id: 'dashboard', label: 'Dashboard', icon: <DashboardIcon />, path: '/citizen/dashboard' },
       { id: 'reports', label: 'My Reports', icon: <ReportsIcon />, path: '/citizen/reports' },
-      { id: 'submit', label: 'Submit Report', icon: <PlusIcon />, path: '/citizen/dashboard' },
+      { id: 'submit', label: 'Submit Report', icon: <PlusIcon />, path: '/citizen/submit' },
       { id: 'settings', label: 'Settings', icon: <SettingsIcon />, path: '/citizen/settings' },
       { id: 'support', label: 'Feedback & Support', icon: <SupportIcon />, path: '/citizen/dashboard'}
     ]
