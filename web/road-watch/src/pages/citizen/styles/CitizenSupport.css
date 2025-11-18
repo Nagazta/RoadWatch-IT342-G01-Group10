@@ -1,0 +1,96 @@
+.citizensupport-container
+{
+    display: flex;
+    flex-direction: column;
+}
+
+.citizensupport-container h3
+{
+    color: #005F56;
+    margin-bottom: 2vw;
+}
+
+.citizensupport-container form
+{
+    display: flex;
+    flex-direction: column;
+    padding: 2vw;
+    border-radius: 1vw;
+    background-color: white;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    gap: 2vw;
+}
+
+.citizensupport-container form h4
+{
+    color: #005F56;
+}
+
+.citizensupport-input
+{
+    display: flex;
+    flex-direction: column;
+    gap: 0.5vw;
+}
+
+.citizensupport-input label
+{
+    font-weight: 500;
+}
+
+.citizensupport-input select
+{
+    width: 40%;
+}
+
+.citizensupport-input input, .citizensupport-input select, .citizensupport-input textarea
+{
+    padding: 0.75vw 1vw;
+    border: 1px solid lightblue;
+    border-radius: 0.5vw;
+    background-color: #EEE;
+}
+
+.citizensupport-input input:focus, .citizensupport-input select:focus, .citizensupport-input textarea:focus
+{
+    background-color: white;
+}
+
+.support-info
+{
+    display: flex;
+    padding: 1vw;
+    border: 1px solid #005F56;
+    border-radius: 1vw;
+    background-color: lightcyan;
+    font-size: 1vw;
+    gap: 1vw;
+}
+
+.citizensupport-buttons
+{
+    display: flex;
+    align-self: flex-end;
+    gap: 1vw;
+}
+
+.citizensupport-buttons button
+{
+    padding: 1vw 2vw;
+    border: none;
+    border-radius: 1vw;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.citizensupport-buttons button:first-child
+{
+    color: #005F56;
+    border: 1px solid #005F56;
+}
+
+.citizensupport-buttons button:last-child
+{
+    color: white;
+    background-color: #005F56;
+}
