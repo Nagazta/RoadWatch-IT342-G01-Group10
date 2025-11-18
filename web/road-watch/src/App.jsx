@@ -33,6 +33,7 @@ import CitizenDashboard from './pages/citizen/CitizenDashboard';
 import CitizenReports from './pages/citizen/CitizenReports';
 import CitizenSubmit from './pages/citizen/CitizenSubmit';
 import CitizenSettings from './pages/citizen/CitizenSettings';
+import CitizenSupport from './pages/citizen/CitizenSupport';
 
 //INSPECTOR PAGES
 import InspectorLayout from './components/layout/InspectorLayout';
@@ -110,6 +111,18 @@ function App() {
           {
             <CitizenLayout activeMenuItem="settings" pageTitle="Account Settings">
               <CitizenSettings />
+            </CitizenLayout>
+          }
+         />
+
+         <Route 
+          path="citizen/support"
+          element=
+          {
+            <CitizenLayout activeMenuItem="support" pageTitle="Feedback and Support">
+              <div style={{ padding: '24px', marginLeft: '250px' }}>
+                <CitizenSupport />
+              </div>
             </CitizenLayout>
           }
          />
