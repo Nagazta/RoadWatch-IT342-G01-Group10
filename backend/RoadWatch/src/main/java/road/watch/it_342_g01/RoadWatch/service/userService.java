@@ -27,10 +27,10 @@ public class userService {
     private final OkHttpClient httpClient = new OkHttpClient();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Value("${SUPABASE_URL}")
+    @Value("https://jskbdkxzjogtmrzjxmns.supabase.co")
     private String supabaseUrl;
 
-    @Value("${SUPABASE_SERVICE_ROLE_KEY}")
+    @Value("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impza2Jka3h6am9ndG1yemp4bW5zIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MjAwNjY3NCwiZXhwIjoyMDc3NTgyNjc0fQ.zXzPOEsVXv1WyJixRETrTZPHEdejYaqzo-EAfEdb_qw")
     private String supabaseServiceRoleKey;
 
     @Autowired
