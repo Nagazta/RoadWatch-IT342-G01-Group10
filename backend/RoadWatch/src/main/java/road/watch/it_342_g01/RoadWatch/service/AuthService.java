@@ -185,7 +185,7 @@ public class AuthService {
         // Get metadata if exists
         if (supabaseUser.has("user_metadata")) {
             JsonNode metadata = supabaseUser.get("user_metadata");
-            String roleString = metadata.get("role").asText().toUpperCase();
+            
             if (metadata.has("username")) {
                 user.setUsername(metadata.get("username").asText());
             }
@@ -199,22 +199,11 @@ public class AuthService {
             }
             if (metadata.has("role")) {
                 user.setRole(role.valueOf(metadata.get("role").asText()));
-            }
-
-
-
-            if (roleString.equals("USER")) {
+            } else {
                 user.setRole(role.CITIZEN);
-            }else {
-                // Otherwise try to use whatever role is there (ADMIN, INSPECTOR, etc.)
-                try {
-                    user.setRole(role.valueOf(roleString));
-                } catch (IllegalArgumentException e) {
-                    log.warn("Unknown role '{}', defaulting to CITIZEN", roleString);
-                    user.setRole(role.CITIZEN);
-                }
             }
         } else {
+            user.setName(user.getEmail().split("@")[0]);
             user.setRole(role.CITIZEN);
         }
 

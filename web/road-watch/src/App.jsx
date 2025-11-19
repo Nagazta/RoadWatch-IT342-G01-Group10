@@ -246,7 +246,6 @@ function App() {
             </InspectorLayout>
           }
         />
-          <Route path="/auth/callback" element={<CallbackPage />} />
         <Route path="*" element={<Navigate to="/landing" replace />} />
       </Routes>
     </BrowserRouter>
