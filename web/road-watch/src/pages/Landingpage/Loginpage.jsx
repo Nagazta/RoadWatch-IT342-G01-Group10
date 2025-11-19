@@ -33,7 +33,7 @@ function Loginpage() {
                 } else if (userRole === 'INSPECTOR') {
                     navigate('/inspector/dashboard');
                 } else {
-                    navigate('/dashboard');
+                    navigate('/citizen/dashboard');
                 }
             } else {
                 console.error('❌ Login failed:', result.error);
