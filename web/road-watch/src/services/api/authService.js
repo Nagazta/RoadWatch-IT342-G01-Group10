@@ -2,8 +2,8 @@ import axios from 'axios';
 import { createClient } from '@supabase/supabase-js';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
-const supabaseUrl = 'https://jskbdkxzjogtmrzjxmns.supabase.co'
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impza2Jka3h6am9ndG1yemp4bW5zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIwMDY2NzQsImV4cCI6MjA3NzU4MjY3NH0.RhWHR0FsTvo3bKAh9HToX09KfEJzJTs-cnMPrnaFYXQ'
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) { 
     alert('Configuration Error: Missing Supabase keys. Check console for details.');
@@ -13,9 +13,12 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 
 const authService = {
-    // 1. REGISTER
+    // Register new user
     register: async (userData) => {
         try {
+       
+
+            // Step 1: Create user in Supabase Auth
             const { data: authData, error: authError } = await supabase.auth.signUp({
                 email: userData.email,
                 password: userData.password,
@@ -29,34 +32,39 @@ const authService = {
             });
 
             if (authError) {
-                // 🔍 DETECT DUPLICATE EMAIL HERE
-                if (authError.message.includes('already registered') || authError.status === 422) {
-                    throw new Error('This email address is already in use. Please log in instead.');
-                }
+                console.error('❌ Supabase Auth Error:', authError);
                 throw authError;
             }
 
-            // Sync with Backend (Fail-safe)
-            try {
-                await axios.post(`${API_URL}/users/add`, {
-                    username: userData.username,
-                    name: userData.name,
-                    email: userData.email,
-                    password: userData.password,
-                    role: 'CITIZEN',
-                    contact: userData.contact || '',
-                });
-            } catch (backendError) {
-                console.warn('⚠️ Backend sync failed, but Supabase Auth worked.');
-            }
+         
 
-            return { success: true, data: authData };
+            // Step 2: Send to backend to create database record
+            const response = await axios.post(`${API_URL}/users/add`, {
+                username: userData.username,
+                name: userData.name,
+                email: userData.email,
+                password: userData.password,
+                role: 'CITIZEN',
+                contact: userData.contact || '',
+            });
+
+           
+
+            return {
+                success: true,
+                message: 'Registration successful! Please check your email to verify your account.',
+                data: authData,
+            };
         } catch (error) {
-            return { success: false, error: error.message };
+            console.error('❌ Registration failed:', error);
+            return {
+                success: false,
+                error: error.response?.data?.message || error.message || 'Registration failed',
+            };
         }
     },
 
-    // 2. LOGIN
+    // Login with email/password
     login: async (email, password) => {
         try {
             const { data: supabaseData, error: supabaseError } = await supabase.auth.signInWithPassword({
@@ -64,27 +72,40 @@ const authService = {
                 password,
             });
 
-            if (supabaseError) throw supabaseError;
-
-            // Backend Login Sync
-            try {
-                const response = await axios.post(`${API_URL}/auth/login`, { email, password });
-                localStorage.setItem('accessToken', response.data.accessToken);
-                localStorage.setItem('user', JSON.stringify(response.data.user));
-            } catch (e) {
-                console.warn('⚠️ Backend login failed. Using Supabase session only.');
+            if (supabaseError) {
+                console.error('❌ Supabase login error:', supabaseError);
+                throw supabaseError;
             }
+         
+            const response = await axios.post(`${API_URL}/auth/login`, {
+                email,
+                password,
+            });
 
+            console.log('✅ Backend login successful');
+
+            // Step 3: Store tokens and user data
+            localStorage.setItem('accessToken', response.data.accessToken);
+            localStorage.setItem('user', JSON.stringify(response.data.user));
             localStorage.setItem('supabaseToken', supabaseData.session.access_token);
-            return { success: true, data: supabaseData };
+
+            return {
+                success: true,
+                data: response.data,
+            };
         } catch (error) {
-            return { success: false, error: error.message };
+            console.error('❌ Login failed:', error);
+            return {
+                success: false,
+                error: error.response?.data || error.message || 'Invalid email or password',
+            };
         }
     },
 
-    // 3. GOOGLE LOGIN
+    // Login with Google OAuth
     loginWithGoogle: async () => {
         try {
+            
             const { data, error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
@@ -95,57 +116,174 @@ const authService = {
                     }
                 },
             });
-            if (error) throw error;
+
+            if (error) {
+                console.error('❌ Supabase OAuth error:', error);
+                throw error;
+            }
+
+            console.log('✅ Google OAuth initiated successfully');
             return { success: true, data };
         } catch (error) {
-            return { success: false, error: error.message };
+            console.error('❌ Google login failed:', error);
+            return {
+                success: false,
+                error: error.message || 'Google login failed',
+            };
         }
     },
 
-    // 4. HANDLE OAUTH CALLBACK (The function your Page needs!)
-    handleOAuthCallbackWithHash: async (hash) => {
+    // Handle OAuth callback
+    handleOAuthCallback: async () => {
         try {
-            if (!hash || hash === '#') throw new Error('No hash data found');
-
-            // Parse tokens from the hash string
-            const hashParams = new URLSearchParams(hash.substring(1));
+            
+            // Parse the hash parameters
+            const hashParams = new URLSearchParams(window.location.hash.substring(1));
+            
             const accessToken = hashParams.get('access_token');
             const refreshToken = hashParams.get('refresh_token');
+            const expiresAt = hashParams.get('expires_at');
+            const expiresIn = hashParams.get('expires_in');
+            const providerToken = hashParams.get('provider_token');
+            
 
-            if (!accessToken || !refreshToken) throw new Error('Missing tokens in URL');
+            if (!accessToken || !refreshToken) {
+                console.error('❌ Missing required tokens in URL hash');
+                throw new Error('Missing access_token or refresh_token in callback');
+            }
 
-            // Manually set the Supabase session
-            const { data, error } = await supabase.auth.setSession({
+            // Manually set the session in Supabase
+            console.log('📝 Setting session in Supabase...');
+            const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
                 access_token: accessToken,
                 refresh_token: refreshToken,
             });
 
-            if (error) throw error;
-
-            // Sync Google User to Backend
-            try {
-                const response = await axios.post(`${API_URL}/auth/google`, { accessToken });
-                localStorage.setItem('accessToken', response.data.accessToken);
-                localStorage.setItem('user', JSON.stringify(response.data.user));
-            } catch (err) {
-                console.warn('⚠️ Backend Google sync failed');
+            if (sessionError) {
+                console.error('❌ Error setting session:', sessionError);
+                throw sessionError;
             }
 
+            // Now send to backend to sync/create user
+            const response = await axios.post(`${API_URL}/auth/google`, {
+                accessToken: accessToken,
+            });
+
+            // Store tokens and user data
+            localStorage.setItem('accessToken', response.data.accessToken);
+            localStorage.setItem('user', JSON.stringify(response.data.user));
             localStorage.setItem('supabaseToken', accessToken);
-            return { success: true, data };
+
+            // Clear the hash from URL (clean up)
+            window.history.replaceState({}, document.title, window.location.pathname);
+
+            return {
+                success: true,
+                data: response.data,
+            };
 
         } catch (error) {
-            console.error('OAuth Error:', error);
-            return { success: false, error: error.message };
+            console.error('Error details:', {
+                message: error.message,
+                response: error.response?.data,
+                status: error.response?.status,
+            });
+            
+            return {
+                success: false,
+                error: error.message || 'OAuth callback failed',
+            };
         }
     },
 
-    // 5. LOGOUT
+    // Logout
     logout: async () => {
-        await supabase.auth.signOut();
-        localStorage.clear();
-        return { success: true };
-    }
+        try {
+            await supabase.auth.signOut();
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('supabaseToken');
+            localStorage.removeItem('user');
+            return { success: true };
+        } catch (error) {
+            return {
+                success: false,
+                error: error.message,
+            };
+        }
+    },
+
+    // Get current user
+    getCurrentUser: () => {
+        const userStr = localStorage.getItem('user');
+        return userStr ? JSON.parse(userStr) : null;
+    },
+
+    // Check if user is authenticated
+    isAuthenticated: () => {
+        return !!localStorage.getItem('accessToken');
+    },
+    // Handle OAuth callback with pre-captured hash
+    handleOAuthCallbackWithHash: async (hash) => {
+        try {       
+            if (!hash || hash === '#') {
+                throw new Error('No hash data found - OAuth callback may have already been processed');
+            }
+            
+            // Parse the hash parameters
+            const hashParams = new URLSearchParams(hash.substring(1));
+            
+            const accessToken = hashParams.get('access_token');
+            const refreshToken = hashParams.get('refresh_token');
+            const expiresAt = hashParams.get('expires_at');
+            const expiresIn = hashParams.get('expires_in');
+            const providerToken = hashParams.get('provider_token');
+
+            if (!accessToken || !refreshToken) {
+                console.error('❌ Missing required tokens in URL hash');
+                throw new Error('Missing access_token or refresh_token in callback');
+            }
+
+            // Manually set the session in Supabase
+            const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
+                access_token: accessToken,
+                refresh_token: refreshToken,
+            });
+
+            if (sessionError) {
+                console.error('❌ Error setting session:', sessionError);
+                throw sessionError;
+            }
+
+            const response = await axios.post(`${API_URL}/auth/google`, {
+                accessToken: accessToken,
+            });
+
+            // Store tokens and user data
+            localStorage.setItem('accessToken', response.data.accessToken);
+            localStorage.setItem('user', JSON.stringify(response.data.user));
+            localStorage.setItem('supabaseToken', accessToken);
+
+            // Clear the hash from URL (clean up)
+            window.history.replaceState({}, document.title, window.location.pathname);
+
+            return {
+                success: true,
+                data: response.data,
+            };
+
+        } catch (error) {
+            console.error('Error details:', {
+                message: error.message,
+                response: error.response?.data,
+                status: error.response?.status,
+            });
+            
+            return {
+                success: false,
+                error: error.message || 'OAuth callback failed',
+            };
+        }
+    },
 };
 
 
