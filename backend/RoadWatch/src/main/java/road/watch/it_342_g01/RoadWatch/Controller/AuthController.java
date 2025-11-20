@@ -27,7 +27,14 @@ public class AuthController {
      */
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
+         System.out.println("Received login request: " + request);
         AuthResponse response = authService.login(request);
+        return ResponseEntity.ok(response);
+    }
+    @PostMapping("/local-login")
+    public ResponseEntity<AuthResponse> localLogin(@RequestBody LoginRequest request) {
+        System.out.println("Received local login request: " + request);
+        AuthResponse response = authService.localLogin(request);
         return ResponseEntity.ok(response);
     }
 
