@@ -6,6 +6,9 @@ import './styles/CitizenDashboard.css';
 
 const CitizenDashboard = () =>
 {
+    const user = localStorage.getItem('user');
+    console.log(user);
+  
     return (
         <div className="dashboard-container">
             <CitizenDashboardStats />
