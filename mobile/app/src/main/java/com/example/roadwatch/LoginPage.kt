@@ -18,6 +18,11 @@ class LoginPage : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        val btnLoginAccount = findViewById<Button>(R.id.btnSignIn)
+        btnLoginAccount.setOnClickListener {
+            val intent = Intent(this, CitizenDashboard::class.java)
+            startActivity(intent)
+        }
         val btnCreateAccount = findViewById<Button>(R.id.btnCreateAccount)
         btnCreateAccount.setOnClickListener {
             val intent = Intent(this, RegisterPage::class.java)

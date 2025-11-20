@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="200dp"
+    android:background="#00897B"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:gravity="bottom">
+
+    <!-- Logo -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginBottom="16dp"
+        app:cardCornerRadius="40dp"
+        app:cardElevation="4dp">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/logo"
+            android:scaleType="centerCrop"
+            android:padding="12dp"
+            android:background="@android:color/white"
+            android:contentDescription="RoadWatch Logo" />
+    </androidx.cardview.widget.CardView>
+
+    <!-- App Name -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="RoadWatch"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Road Damage Reporting"
+        android:textColor="#E0F2F1"
+        android:textSize="13sp" />
+
+</LinearLayout>
