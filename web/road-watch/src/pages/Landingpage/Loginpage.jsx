@@ -21,31 +21,36 @@ function Loginpage() {
 
         try {
             console.log('🔵 Login attempt:', { email, rememberMe });
-            const result = await authService.login(email, password);
 
-            if (result.success) {
+            // ✅ Explicitly set Content-Type for Spring to parse @RequestBody
+            const response = await authService.login(email, password, {
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            if (response.success) {
                 console.log('✅ Login successful');
-                
-                // Redirect based on role
-                const userRole = result.data.user.role;
+
+                const userRole = response.data.user.role;
+
                 if (userRole === 'ADMIN') {
                     navigate('/admin/dashboard');
                 } else if (userRole === 'INSPECTOR') {
                     navigate('/inspector/dashboard');
                 } else {
-                    navigate('/dashboard');
+                    navigate('/citizen/dashboard');
                 }
             } else {
-                console.error('❌ Login failed:', result.error);
-                setError(result.error);
+                console.error('❌ Login failed:', response.error);
+                setError(response.error);
             }
         } catch (err) {
             console.error('❌ Unexpected error:', err);
-            setError('An unexpected error occurred. Please try again.');
+            setError(err.message || 'An unexpected error occurred. Please try again.');
         } finally {
             setLoading(false);
         }
     };
+
 
     const handleGoogleLogin = async () => {
         setError('');

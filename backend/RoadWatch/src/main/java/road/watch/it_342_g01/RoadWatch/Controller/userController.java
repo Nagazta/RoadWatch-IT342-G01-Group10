@@ -157,6 +157,28 @@ public class userController {
             return ResponseEntity.status(500).body(error);
         }
     }
+    // GET current user profile (for example, based on authentication)
+    @GetMapping("/profile")
+    public ResponseEntity<?> getProfile(@RequestParam Long userId) {
+        return userService.getUserById(userId)
+                .<ResponseEntity<?>>map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("success", false, "message", "User not found")));
+    }
+
+
+    // UPDATE profile
+    @PutMapping("/profile")
+    public ResponseEntity<?> updateProfile(@RequestParam Long userId, @RequestBody userEntity updatedUser) {
+        try {
+            userEntity updated = userService.updateUser(userId, updatedUser);
+            return ResponseEntity.ok(Map.of("success", true, "data", updated));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("success", false, "message", e.getMessage()));
+        }
+    }
+        
     
     
 }
