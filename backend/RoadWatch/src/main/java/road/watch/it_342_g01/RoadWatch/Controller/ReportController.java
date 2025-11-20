@@ -1,10 +1,12 @@
 package road.watch.it_342_g01.RoadWatch.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import road.watch.it_342_g01.RoadWatch.entity.ReportEntity;
 import road.watch.it_342_g01.RoadWatch.service.ReportService;
+import road.watch.it_342_g01.RoadWatch.service.ReportService2;
 
 import java.util.List;
 
@@ -14,6 +16,9 @@ import java.util.List;
 public class ReportController {
 
     private final ReportService reportService; // <-- CamelCase
+
+    @Autowired
+    private ReportService2 reportService2;
 
     @GetMapping("/getAll")
     public ResponseEntity<List<ReportEntity>> getAllReports() {
@@ -29,9 +34,17 @@ public class ReportController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ReportEntity> createReport(@RequestBody ReportEntity report) {
+    public ResponseEntity<ReportEntity> createReport(@RequestBody ReportEntity report)
+    {
         ReportEntity createdReport = reportService.createReport(report);
         return ResponseEntity.ok(createdReport);
+    }
+
+    @PostMapping("/add2")
+    public ResponseEntity<ReportEntity> createReport2(@RequestBody ReportEntity report, @RequestParam String submittedBy)
+    {
+        ReportEntity newReport = reportService2.createReport(report, submittedBy);
+        return ResponseEntity.ok(newReport);
     }
 
     @PutMapping("/update/{id}")
