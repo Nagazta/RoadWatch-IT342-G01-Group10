@@ -28,4 +28,11 @@ public class ReportEntity {
 
     private String status;          // Pending, In Progress, Resolved
     private String adminNotes;
+
+    @PrePersist
+    public void onCreate()
+    {
+        dateSubmitted = LocalDateTime.now();
+        status = "Pending";
+    }
 }
