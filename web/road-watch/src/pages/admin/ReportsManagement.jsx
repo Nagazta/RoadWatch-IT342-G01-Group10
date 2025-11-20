@@ -138,6 +138,7 @@ const ReportsManagement = () => {
         onView={handleView}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        userRole="admin"
       />
 
       <ReportsPagination
