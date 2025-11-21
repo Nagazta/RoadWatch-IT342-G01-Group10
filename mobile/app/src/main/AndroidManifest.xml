@@ -12,6 +12,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.RoadWatch.AppCompat">
         <activity
+            android:name=".CitizenReports"
+            android:exported="false"
+            android:theme="@style/Theme.RoadWatch.Material" />
+        <activity
             android:name=".CitizenDashboard"
             android:exported="false" />
         <activity
