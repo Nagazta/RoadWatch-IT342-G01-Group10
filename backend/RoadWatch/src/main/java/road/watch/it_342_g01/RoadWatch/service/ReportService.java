@@ -12,7 +12,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ReportService {  
 
-    private final ReportRepo reportRepo; 
+    private final ReportRepo reportRepo;
 
     public List<ReportEntity> getAllReports() {
         return reportRepo.findAll();
@@ -28,14 +28,21 @@ public class ReportService {
 
     public ReportEntity updateReport(Long id, ReportEntity updatedReport) {
         return reportRepo.findById(id)
-                .map(existingReport -> {  
+                .map(existingReport -> {
+
                     existingReport.setTitle(updatedReport.getTitle());
                     existingReport.setDescription(updatedReport.getDescription());
                     existingReport.setCategory(updatedReport.getCategory());
                     existingReport.setLocation(updatedReport.getLocation());
+
+                    // NEW
+                    existingReport.setLatitude(updatedReport.getLatitude());
+                    existingReport.setLongitude(updatedReport.getLongitude());
+
                     existingReport.setSubmittedBy(updatedReport.getSubmittedBy());
                     existingReport.setStatus(updatedReport.getStatus());
                     existingReport.setAdminNotes(updatedReport.getAdminNotes());
+
                     return reportRepo.save(existingReport);
                 })
                 .orElseThrow(() -> new RuntimeException("Report not found with id " + id));

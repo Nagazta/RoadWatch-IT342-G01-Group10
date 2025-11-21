@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import StatCard from './StatCard';
 import {
   DocumentIcon,
@@ -9,13 +10,44 @@ import {
 import '../dashboard/styles/DashboardStats.css';
 
 const AdminDashboardStats = () => {
-const statsData = [
-    { id: 'total', icon: <DocumentIcon />, value: 1247, label: 'Total Reports', iconColor: '#00695c' },
-    { id: 'pending', icon: <AlertIcon />, value: 89, label: 'Pending Reports', iconColor: '#f57f17' },
-    { id: 'in-progress', icon: <ClockIcon />, value: 156, label: 'In Progress', iconColor: '#1565c0' },
-    { id: 'resolved', icon: <CheckCircleIcon />, value: 1002, label: 'Resolved Reports', iconColor: '#2e7d32' },
-    { id: 'avg-time', icon: <CalendarIcon />, value: '3.2 days', label: 'Avg Resolution Time', iconColor: '#00695c' }
-];
+  const [stats, setStats] = useState(null);
+
+  useEffect(() => {
+    fetch("http://localhost:8080/api/reports/getAll")
+      .then(res => res.json())
+      .then(reports => {
+        calculateStats(reports);
+      })
+      .catch(err => console.error("Error fetching reports:", err));
+  }, []);
+
+  const calculateStats = (reports) => {
+    const total = reports.length;
+
+    const pending = reports.filter(r => r.status === "Pending").length;
+    const inProgress = reports.filter(r => r.status === "In-Progress").length;
+    const resolved = reports.filter(r => r.status === "Resolved").length;
+
+    // No resolvedAt available in entity → avg time cannot be computed
+    const avgTime = "N/A";
+
+    setStats({
+      total,
+      pending,
+      inProgress,
+      resolved,
+      avgTime
+    });
+  };
+
+  if (!stats) return <p>Loading stats...</p>;
+
+  const statsData = [
+    { id: 'total', icon: <DocumentIcon />, value: stats.total, label: 'Total Reports', iconColor: '#00695c' },
+    { id: 'pending', icon: <AlertIcon />, value: stats.pending, label: 'Pending Reports', iconColor: '#f57f17' },
+    { id: 'in-progress', icon: <ClockIcon />, value: stats.inProgress, label: 'In Progress', iconColor: '#1565c0' },
+    { id: 'resolved', icon: <CheckCircleIcon />, value: stats.resolved, label: 'Resolved Reports', iconColor: '#2e7d32' },
+    { id: 'avg-time', icon: <CalendarIcon />, value: stats.avgTime, label: 'Avg. Resolution Time', iconColor: '#512da8' },];
 
   return (
     <div className="dashboard-stats">

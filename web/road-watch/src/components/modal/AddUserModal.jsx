@@ -138,7 +138,7 @@ const AddUserModal = ({ isOpen, onClose, onSave }) => {
               <option value="">Choose a role</option>
               <option value="Citizen">Citizen</option>
               <option value="Inspector">Inspector</option>
-              <option value="Moderator">Moderator</option>
+              <option value="Admin">Admin</option>
             </select>
             {showRoleError && !formData.role && (
               <span className="field-error">Role is required</span>
