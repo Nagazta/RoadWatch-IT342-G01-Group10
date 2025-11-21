@@ -1,5 +1,6 @@
 package com.example.roadwatch
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.ImageView
@@ -37,10 +38,12 @@ class CitizenDashboard : AppCompatActivity() , NavigationView.OnNavigationItemSe
                 // Already on dashboard
             }
             R.id.nav_my_reports -> {
-                // Navigate to My Reports
+                val intent = Intent(this, CitizenReports::class.java)
+                startActivity(intent)
             }
             R.id.nav_submit_reports -> {
-                // Navigate to Submit Reports
+                val intent = Intent(this, CitizenSubmit::class.java)
+                startActivity(intent)
             }
             R.id.nav_settings -> {
                 // Navigate to Settings
@@ -49,7 +52,11 @@ class CitizenDashboard : AppCompatActivity() , NavigationView.OnNavigationItemSe
                 // Navigate to Feedback
             }
             R.id.nav_logout -> {
-                // Handle logout
+                // Handle logout - go back to login page
+                val intent = Intent(this, LoginPage::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+                finish()
             }
         }
 

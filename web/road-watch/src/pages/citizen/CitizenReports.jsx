@@ -3,30 +3,62 @@ import reportService from '../../services/api/reportService';
 import ReportsFilters from '../../components/reports/ReportsFilter';
 import ReportsTable from '../../components/reports/ReportsTable';
 import ReportsPagination from '../../components/reports/ReportsPagination';
+import axios from 'axios';
 import '../admin/styles/ReportsManagement.css';
 
-const CitizenReports = () => 
-{
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
+const CitizenReports = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
   const [selectedStatus, setSelectedStatus] = useState('All Statuses');
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  // Report Details Modal
+  // Modal
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
 
-  // Mock citizen report data
-  const citizenReports = [
-    { id: 0, title: 'Large pothole on Main Street', category: 'Pothole', status: 'Under Review', date: '1/15/2024', location: 'Main St & 5th Ave', class: 'under-review', description: 'Deep pothole causing accidents on Main Street.' },
-    { id: 1, title: 'Cracked pavement near school', category: 'Crack', status: 'Resolved', date: '1/12/2024', location: 'School Rd, Block 3', class: 'resolved', description: 'Cracked pavement near school entrance repaired last week.' },
-    { id: 2, title: 'Debris blocking bike lane', category: 'Debris', status: 'Pending', date: '1/18/2024', location: 'Bike Path, Mile 2', class: 'pending', description: 'Construction debris obstructing bike lane access.' },
-    { id: 3, title: 'Flooding after rain', category: 'Flooding', status: 'Rejected', date: '1/10/2024', location: 'Low St & Water Ave', class: 'rejected', description: 'Reported flooding after heavy rain, but not approved for cleanup.' },
-    { id: 4, title: 'Road surface deterioration', category: 'Other', status: 'Under Review', date: '1/14/2024', location: 'Highway 101, Exit 5', class: 'under-review', description: 'Surface damage increasing over the last month.' }
-  ];
+  const [reports, setReports] = useState([]);
 
-  // Filtering logic
-  const filteredReports = citizenReports.filter(report => {
+  const fetchReportsAndUsers = async () => {
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    try {
+      // 1️⃣ Fetch all users
+      const usersRes = await axios.get(`${API_URL}/api/users/getAll`);
+      const allUsers = usersRes.data;
+
+      // 2️⃣ Fetch reports
+      let response;
+      if (user.role === 'admin') {
+        response = await reportService.getAllReports();
+      } else {
+        response = await reportService.getReportsByEmail(user.email);
+      }
+
+      if (response.success) {
+        // 3️⃣ Map submittedBy email to full name using allUsers
+        const mappedReports = response.data.map((report) => {
+          const matchedUser = allUsers.find(u => u.email === report.submittedBy);
+          return {
+            ...report,
+            submittedByName: matchedUser ? matchedUser.name : report.submittedBy
+          };
+        });
+
+        setReports(mappedReports);
+      }
+    } catch (error) {
+      console.error('Failed to fetch reports or users:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchReportsAndUsers();
+  }, []);
+
+  // Filter logic
+  const filteredReports = reports.filter((report) => {
     const matchesSearch =
       report.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       report.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -35,12 +67,13 @@ const CitizenReports = () =>
       selectedCategory === 'All Categories' || report.category === selectedCategory;
     const matchesStatus =
       selectedStatus === 'All Statuses' || report.status === selectedStatus;
+
     return matchesSearch && matchesCategory && matchesStatus;
   });
 
-  // Modal handling
+  // Modal handlers
   const handleView = (reportId) => {
-    const report = citizenReports.find(r => r.id === reportId);
+    const report = reports.find((r) => r.id === reportId);
     setSelectedReport(report);
     setIsReportModalOpen(true);
   };
@@ -50,36 +83,8 @@ const CitizenReports = () =>
     setSelectedReport(null);
   };
 
-  // Pagination (placeholder)
-  const currentPage = 1;
-  const totalPages = 1;
-
-  // Test Implementation
-  const [citizenReports2, setCitizenReports2] = useState([]);
-
-  const fetchReports = async() =>
-  {
-    const user = localStorage.getItem('user');
-    const parsedUser = JSON.parse(user);
-    const name = parsedUser.name;
-
-    const response = await reportService.getReportsByName(name);
-
-    if(response.success)
-    {
-      console.log(response.data);
-      setCitizenReports2(response.data);
-    }
-  }
-
-  useEffect(() =>
-  {
-    fetchReports();
-
-  }, []);
-
   return (
-       <div className="reports-management-container">
+    <div className="reports-management-container">
       <ReportsFilters
         userRole="citizen"
         searchQuery={searchQuery}
@@ -90,9 +95,8 @@ const CitizenReports = () =>
         onStatusChange={setSelectedStatus}
       />
 
-
       <ReportsTable
-        reports={citizenReports2}
+        reports={filteredReports}
         onView={handleView}
         userRole="citizen"
       />
