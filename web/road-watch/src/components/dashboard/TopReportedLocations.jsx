@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -29,51 +31,39 @@ const createCustomIcon = (priority) => {
 };
 
 const TopReportedLocations = () => {
-  const locations = [
-    {
-      id: 1,
-      latitude: 10.3157,
-      longitude: 123.8854,
-      name: 'Cebu IT Park',
-      reportCount: 45,
-      priority: 'high'
-    },
-    {
-      id: 2,
-      latitude: 10.2950,
-      longitude: 123.9019,
-      name: 'Ayala Center',
-      reportCount: 32,
-      priority: 'medium'
-    },
-    {
-      id: 3,
-      latitude: 10.3250,
-      longitude: 123.8800,
-      name: 'Banilad',
-      reportCount: 28,
-      priority: 'high'
-    },
-    {
-      id: 4,
-      latitude: 10.2800,
-      longitude: 123.8500,
-      name: 'South Road Properties',
-      reportCount: 15,
-      priority: 'low'
-    }
-  ];
+  const [locations, setLocations] = useState([]);
 
-  const center = [10.3157, 123.8854]; 
+  useEffect(() => {
+    axios
+      .get("http://localhost:8080/api/reports/getAll")
+      .then((res) => {
+        console.log("Reports fetched:", res.data);
+
+        // Extract location-based data (modify if needed)
+        const mapped = res.data.map((r, index) => ({
+          id: index,
+          latitude: parseFloat(r.latitude) || 10.3157,
+          longitude: parseFloat(r.longitude) || 123.8854,
+          name: r.location || "Unknown",
+          reportCount: 1,
+          priority: "medium"
+        }));
+
+        setLocations(mapped);
+      })
+      .catch((err) => {
+        console.error("Error loading reports:", err);
+      });
+  }, []);
+
+  const center = [10.3157, 123.8854];
 
   return (
     <div className="top-reported-locations">
       <div className="map-header">
         <h3 className="chart-title">Top Reported Locations</h3>
-        <div className="map-legend">
-          <span className="legend-badge high">High Priority</span>
-        </div>
       </div>
+
       <div className="map-container">
         <MapContainer
           center={center}
@@ -82,9 +72,10 @@ const TopReportedLocations = () => {
           style={{ height: '100%', width: '100%', borderRadius: '8px' }}
         >
           <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            attribution='&copy; OpenStreetMap contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
+
           {locations.map((location) => (
             <Marker
               key={location.id}
@@ -95,7 +86,7 @@ const TopReportedLocations = () => {
                 <div className="custom-popup">
                   <h4>{location.name}</h4>
                   <p className="report-count">
-                    <strong>{location.reportCount}</strong> reports
+                    Report Count: <strong>{location.reportCount}</strong>
                   </p>
                   <p className="priority-label">
                     Priority: <span className={`priority-${location.priority}`}>
@@ -107,6 +98,7 @@ const TopReportedLocations = () => {
             </Marker>
           ))}
         </MapContainer>
+
         <div className="map-overlay">
           Interactive Map - Click markers for details
         </div>

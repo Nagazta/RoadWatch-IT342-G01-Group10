@@ -1,4 +1,4 @@
-package road.watch.it_342_g01.RoadWatch.Controller;
+package road.watch.it_342_g01.RoadWatch.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -20,7 +20,11 @@ public class ReportEntity {
     private String title;
     private String description;
     private String category;
-    private String location;
+
+    private String location;   // still optional if you store readable location
+    private Double latitude;   // NEW
+    private Double longitude;  // NEW
+
     private String submittedBy;
 
     @Column(name = "date_submitted")
@@ -30,8 +34,7 @@ public class ReportEntity {
     private String adminNotes;
 
     @PrePersist
-    public void onCreate()
-    {
+    public void onCreate() {
         dateSubmitted = LocalDateTime.now();
         status = "Pending";
     }
