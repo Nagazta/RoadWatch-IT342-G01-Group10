@@ -42,7 +42,8 @@ class CitizenDashboard : AppCompatActivity() , NavigationView.OnNavigationItemSe
                 startActivity(intent)
             }
             R.id.nav_submit_reports -> {
-                // Navigate to Submit Reports
+                val intent = Intent(this, CitizenSubmit::class.java)
+                startActivity(intent)
             }
             R.id.nav_settings -> {
                 // Navigate to Settings

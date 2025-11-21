@@ -69,7 +69,8 @@ class CitizenReports : AppCompatActivity(), NavigationView.OnNavigationItemSelec
                 // Already on this page
             }
             R.id.nav_submit_reports -> {
-                // Navigate to Submit Reports page
+                val intent = Intent(this, CitizenSubmit::class.java)
+                startActivity(intent)
             }
             R.id.nav_settings -> {
                 // Navigate to Settings page
