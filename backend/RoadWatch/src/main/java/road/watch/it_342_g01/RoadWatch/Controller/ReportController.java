@@ -1,4 +1,4 @@
-package road.watch.it_342_g01.RoadWatch.Controller;
+package road.watch.it_342_g01.RoadWatch.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +31,13 @@ public class ReportController {
         return reportService.getReportById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/getAll/name")
+    public ResponseEntity<List<ReportEntity>> getAllReportsByName(@RequestParam String submittedBy)
+    {
+        List<ReportEntity> reports = reportService2.getAllReportsByName(submittedBy);
+        return ResponseEntity.ok(reports);
     }
 
     @PostMapping("/add")

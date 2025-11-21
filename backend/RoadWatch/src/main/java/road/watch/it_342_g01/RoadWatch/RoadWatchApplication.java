@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
 @ConfigurationPropertiesScan
-@EnableTransactionManagement  
+@EnableTransactionManagement
 public class RoadWatchApplication {
 
 	public static void main(String[] args) {

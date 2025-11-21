@@ -39,7 +39,7 @@ const CitizenSubmit = () =>
         {
             console.log('Report submitted!');
             alert('Report submitted!');
-            navigate('/citizen/dashboard');
+            navigate('/citizen/reports');
         } 
     }
 

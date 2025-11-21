@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import reportService from '../../services/api/reportService';
 import ReportsFilters from '../../components/reports/ReportsFilter';
 import ReportsTable from '../../components/reports/ReportsTable';
 import ReportsPagination from '../../components/reports/ReportsPagination';
 import '../admin/styles/ReportsManagement.css';
-const CitizenReports = () => {
+
+const CitizenReports = () => 
+{
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
   const [selectedStatus, setSelectedStatus] = useState('All Statuses');
@@ -51,6 +54,30 @@ const CitizenReports = () => {
   const currentPage = 1;
   const totalPages = 1;
 
+  // Test Implementation
+  const [citizenReports2, setCitizenReports2] = useState([]);
+
+  const fetchReports = async() =>
+  {
+    const user = localStorage.getItem('user');
+    const parsedUser = JSON.parse(user);
+    const name = parsedUser.name;
+
+    const response = await reportService.getReportsByName(name);
+
+    if(response.success)
+    {
+      console.log(response.data);
+      setCitizenReports2(response.data);
+    }
+  }
+
+  useEffect(() =>
+  {
+    fetchReports();
+
+  }, []);
+
   return (
        <div className="reports-management-container">
       <ReportsFilters
@@ -65,7 +92,7 @@ const CitizenReports = () => {
 
 
       <ReportsTable
-        reports={citizenReports}
+        reports={citizenReports2}
         onView={handleView}
         userRole="citizen"
       />
