@@ -67,4 +67,9 @@ public class ReportController {
         reportService.deleteReport(id);
         return ResponseEntity.noContent().build();
     }
+    @GetMapping("/getByEmail")
+    public ResponseEntity<List<ReportEntity>> getReportsByEmail(@RequestParam String email) {
+        List<ReportEntity> reports = reportService.getReportsByEmail(email);
+        return ResponseEntity.ok(reports);
+    }
 }
