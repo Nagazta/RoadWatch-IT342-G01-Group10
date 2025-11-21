@@ -39,8 +39,6 @@ public class AuthService {
     @Value("${supabase.anon-key}")
     private String supabaseAnonKey;
 
-
-
     public AuthResponse login(LoginRequest request) {
 
         // Step 1: Try to find user locally
@@ -98,14 +96,13 @@ public class AuthService {
 
             // Step 3: Find or create user in our database
             userEntity user = userRepository.findBySupabaseId(supabaseUserId)
-                .orElseGet(() -> syncUserFromSupabase(userInfo));
+                    .orElseGet(() -> syncUserFromSupabase(userInfo));
 
             // Step 4: Generate OUR JWT token
             String jwtToken = jwtUtil.generateToken(
-                user.getEmail(),
-                user.getId(),
-                user.getRole().toString()
-            );
+                    user.getEmail(),
+                    user.getId(),
+                    user.getRole().toString());
 
             // Step 5: Build response
             UserDTO userDTO = buildUserDTO(user);
@@ -113,10 +110,10 @@ public class AuthService {
             log.info("✅ Google login successful for user: {}", user.getEmail());
 
             return AuthResponse.builder()
-                .accessToken(jwtToken)
-                .refreshToken(null)
-                .user(userDTO)
-                .build();
+                    .accessToken(jwtToken)
+                    .refreshToken(null)
+                    .user(userDTO)
+                    .build();
 
         } catch (Exception e) {
             log.error("❌ Google login failed: {}", e.getMessage(), e);
@@ -129,23 +126,22 @@ public class AuthService {
      */
     private JsonNode loginWithSupabase(String email, String password) throws IOException {
         String jsonBody = String.format("""
-            {
-                "email": "%s",
-                "password": "%s"
-            }
-            """, email, password);
+                {
+                    "email": "%s",
+                    "password": "%s"
+                }
+                """, email, password);
 
         RequestBody body = RequestBody.create(
-            jsonBody,
-            MediaType.parse("application/json")
-        );
+                jsonBody,
+                MediaType.parse("application/json"));
 
         Request request = new Request.Builder()
-            .url(supabaseUrl + "/auth/v1/token?grant_type=password")
-            .addHeader("apikey", supabaseAnonKey)
-            .addHeader("Content-Type", "application/json")
-            .post(body)
-            .build();
+                .url(supabaseUrl + "/auth/v1/token?grant_type=password")
+                .addHeader("apikey", supabaseAnonKey)
+                .addHeader("Content-Type", "application/json")
+                .post(body)
+                .build();
 
         try (Response response = httpClient.newCall(request).execute()) {
             String responseBody = response.body().string();
@@ -164,11 +160,11 @@ public class AuthService {
      */
     private JsonNode getSupabaseUserInfo(String accessToken) throws IOException {
         Request request = new Request.Builder()
-            .url(supabaseUrl + "/auth/v1/user")
-            .addHeader("Authorization", "Bearer " + accessToken)
-            .addHeader("apikey", supabaseAnonKey)
-            .get()
-            .build();
+                .url(supabaseUrl + "/auth/v1/user")
+                .addHeader("Authorization", "Bearer " + accessToken)
+                .addHeader("apikey", supabaseAnonKey)
+                .get()
+                .build();
 
         try (Response response = httpClient.newCall(request).execute()) {
             String responseBody = response.body().string();
@@ -194,7 +190,7 @@ public class AuthService {
         // Get metadata if exists
         if (supabaseUser.has("user_metadata")) {
             JsonNode metadata = supabaseUser.get("user_metadata");
-            
+
             if (metadata.has("username")) {
                 user.setUsername(metadata.get("username").asText());
             }
@@ -224,15 +220,16 @@ public class AuthService {
      */
     private UserDTO buildUserDTO(userEntity user) {
         return UserDTO.builder()
-            .id(user.getId())
-            .supabaseId(user.getSupabaseId())
-            .username(user.getUsername())
-            .name(user.getName())
-            .email(user.getEmail())
-            .role(user.getRole() != null ? user.getRole().toString() : "CITIZEN")
-            .contact(user.getContact())
-            .build();
+                .id(user.getId())
+                .supabaseId(user.getSupabaseId())
+                .username(user.getUsername())
+                .name(user.getName())
+                .email(user.getEmail())
+                .role(user.getRole() != null ? user.getRole().toString() : "CITIZEN")
+                .contact(user.getContact())
+                .build();
     }
+
     // Inside AuthService
     public AuthResponse getUserProfile(String email) {
         userEntity user = userRepository.findByEmail(email)
@@ -276,6 +273,7 @@ public class AuthService {
             return objectMapper.readTree(responseBody);
         }
     }
+
     public AuthResponse localLogin(LoginRequest request) {
 
         // Step 1: Fetch user from local DB only
@@ -297,7 +295,5 @@ public class AuthService {
                 .user(buildUserDTO(user))
                 .build();
     }
-
-
 
 }
