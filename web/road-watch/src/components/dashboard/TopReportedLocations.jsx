@@ -34,19 +34,30 @@ const TopReportedLocations = () => {
   const [locations, setLocations] = useState([]);
 
   useEffect(() => {
+    const user = localStorage.getItem('user');
+    const parsedUser = user ? JSON.parse(user) : null;
+    const userEmail = parsedUser?.email;
+    const role = parsedUser?.role;
+
     axios
       .get("http://localhost:8080/api/reports/getAll")
       .then((res) => {
         console.log("Reports fetched:", res.data);
 
-        // Extract location-based data (modify if needed)
-        const mapped = res.data.map((r, index) => ({
+        // Filter reports for non-admin users
+        let reports = res.data;
+        if (role !== 'admin') {
+          reports = reports.filter(r => r.submittedBy === userEmail);
+        }
+
+        // Map reports to location data
+        const mapped = reports.map((r, index) => ({
           id: index,
           latitude: parseFloat(r.latitude) || 10.3157,
           longitude: parseFloat(r.longitude) || 123.8854,
           name: r.location || "Unknown",
-          reportCount: 1,
-          priority: "medium"
+          reportCount: 1, // you can sum counts per location if needed
+          priority: r.status === 'Pending' ? 'medium' : r.status === 'Resolved' ? 'low' : 'high'
         }));
 
         setLocations(mapped);

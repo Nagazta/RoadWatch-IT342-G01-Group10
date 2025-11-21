@@ -51,4 +51,7 @@ public class ReportService {
     public void deleteReport(Long id) {
         reportRepo.deleteById(id);
     }
+    public List<ReportEntity> getReportsByEmail(String email) {
+    return reportRepo.findBySubmittedBy(email);
+    }
 }
