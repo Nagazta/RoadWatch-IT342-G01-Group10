@@ -1,4 +1,5 @@
 import React, { useState } from 'react'; 
+import { useNavigate } from 'react-router-dom';
 import {
   DashboardIcon,
   ReportsIcon,
@@ -15,8 +16,11 @@ import logo from '../../assets/images/logo.png';
 import './Sidebar.css';
 import LogoutModal from '../modal/LogoutModal';
 
+
 const Sidebar = ({ activeItem = 'dashboard', onNavigate, role = 'admin' }) => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const navigate = useNavigate();
+
 
   const roleBasedNav = {
     admin: [
@@ -53,14 +57,22 @@ const Sidebar = ({ activeItem = 'dashboard', onNavigate, role = 'admin' }) => {
   const handleLogoutClick = () => {
     setShowLogoutModal(true);
   };
-
-  const handleConfirmLogout = () => {
-    console.log('Logging out...');
-    setShowLogoutModal(false);
+  const handleCloseLogout = () => { 
+    setShowLogoutModal(false); 
   };
 
-  const handleCloseLogout = () => {
+  const handleConfirmLogout = () => {
+    // 1. Clear session
+    localStorage.removeItem('token'); // or whatever key you use for auth
+    localStorage.removeItem('userRole'); // optional
+
+    // 2. Redirect to login page
+    navigate('/login');
+
+    // 3. Close the modal
     setShowLogoutModal(false);
+
+    console.log('Logged out successfully');
   };
 
   return (
