@@ -35,27 +35,7 @@ const reportService =
         }
     },
 
-    createReportInspector: async(formData, name) =>
-        {
-            try
-            {
-                const response = await axios.post
-                (
-                    `${API_URL}/api/reports/add3`, formData, { params: {submittedBy: name} }
-                );
     
-                if(response.data)
-                    return { success: true };
-                else
-                    throw new Error('Failed to create report');
-            }
-            catch(error)
-            {
-                console.error(error.message);
-                return { success: false };
-            }
-        },
-
     getReportsByEmail: async(email) => {
         try {
             const response = await axios.get(`${API_URL}/api/reports/getAll/name`, {

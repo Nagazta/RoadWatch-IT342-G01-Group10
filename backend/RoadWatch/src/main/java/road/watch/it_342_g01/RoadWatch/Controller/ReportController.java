@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import road.watch.it_342_g01.RoadWatch.entity.ReportEntity;
 import road.watch.it_342_g01.RoadWatch.service.ReportService;
 import road.watch.it_342_g01.RoadWatch.service.ReportService2;
-import road.watch.it_342_g01.RoadWatch.service.ReportService3;
+
 import java.util.List;
 
 @RestController
@@ -19,7 +19,6 @@ public class ReportController {
 
     @Autowired
     private ReportService2 reportService2;
-    private ReportService3 reportService3;
 
     @GetMapping("/getAll")
     public ResponseEntity<List<ReportEntity>> getAllReports() {
@@ -50,13 +49,6 @@ public class ReportController {
     public ResponseEntity<ReportEntity> createReport2(@RequestBody ReportEntity report,
             @RequestParam String submittedBy) {
         ReportEntity newReport = reportService2.createReport(report, submittedBy);
-        return ResponseEntity.ok(newReport);
-    }
-
-    @PostMapping("/add3")
-    public ResponseEntity<ReportEntity> createReport3(@RequestBody ReportEntity report,
-            @RequestParam String submittedBy) {
-        ReportEntity newReport = reportService3.createReport(report, submittedBy);
         return ResponseEntity.ok(newReport);
     }
 
