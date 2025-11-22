@@ -30,19 +30,19 @@ public class userController {
         log.info("Username: {}", user.getUsername());
         log.info("Role: {}", user.getRole());
         log.info("========================================");
-        
+
         try {
             // Validate input
             if (user.getEmail() == null || user.getEmail().trim().isEmpty()) {
                 log.error("❌ Validation failed: Email is required");
                 return ResponseEntity.badRequest().body(createErrorResponse("Email is required"));
             }
-            
+
             if (user.getPassword() == null || user.getPassword().trim().isEmpty()) {
                 log.error("❌ Validation failed: Password is required");
                 return ResponseEntity.badRequest().body(createErrorResponse("Password is required"));
             }
-            
+
             if (user.getPassword().length() < 6) {
                 log.error("❌ Validation failed: Password too short");
                 return ResponseEntity.badRequest().body(createErrorResponse("Password must be at least 6 characters"));
@@ -50,24 +50,23 @@ public class userController {
 
             // Create user
             userEntity createdUser = userService.createUser(user);
-            
+
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "User created successfully");
             response.put("data", Map.of(
-                "id", createdUser.getId(),
-                "username", createdUser.getUsername(),
-                "email", createdUser.getEmail(),
-                "role", createdUser.getRole().toString()
-            ));
-            
+                    "id", createdUser.getId(),
+                    "username", createdUser.getUsername(),
+                    "email", createdUser.getEmail(),
+                    "role", createdUser.getRole().toString()));
+
             log.info("✅ User created successfully with ID: {}", createdUser.getId());
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
-            
+
         } catch (IllegalArgumentException e) {
             log.error("❌ Validation error: {}", e.getMessage());
             return ResponseEntity.badRequest().body(createErrorResponse(e.getMessage()));
-            
+
         } catch (Exception e) {
             log.error("❌ Unexpected error creating user", e);
             log.error("Error class: {}", e.getClass().getName());
@@ -128,35 +127,37 @@ public class userController {
             return ResponseEntity.badRequest().body(createErrorResponse(e.getMessage()));
         }
     }
-    
+
     @GetMapping("/test")
     public ResponseEntity<String> test() {
         log.info("🧪 Test endpoint called");
         return ResponseEntity.ok("Hello from users endpoint!");
     }
+
     @GetMapping("/db-test")
     public ResponseEntity<?> testDatabaseConnection() {
         try {
             // Try to count users (simple query)
-            long count = userService.getAllUsers().size();  // Use userService instead
-            
+            long count = userService.getAllUsers().size(); // Use userService instead
+
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Database connection working!");
             response.put("userCount", count);
-            
+
             return ResponseEntity.ok(response);
-            
+
         } catch (Exception e) {
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
             error.put("error", e.getClass().getName());
             error.put("message", e.getMessage());
             error.put("cause", e.getCause() != null ? e.getCause().getMessage() : "No cause");
-            
+
             return ResponseEntity.status(500).body(error);
         }
     }
+
     // GET current user profile (for example, based on authentication)
     @GetMapping("/profile")
     public ResponseEntity<?> getProfile(@RequestParam Long userId) {
@@ -165,7 +166,6 @@ public class userController {
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(Map.of("success", false, "message", "User not found")));
     }
-
 
     // UPDATE profile
     @PutMapping("/profile")
@@ -178,7 +178,5 @@ public class userController {
                     .body(Map.of("success", false, "message", e.getMessage()));
         }
     }
-        
-    
-    
+
 }

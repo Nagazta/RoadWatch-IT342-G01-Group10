@@ -35,6 +35,7 @@ const reportService =
         }
     },
 
+    
     getReportsByEmail: async(email) => {
         try {
             const response = await axios.get(`${API_URL}/api/reports/getAll/name`, {

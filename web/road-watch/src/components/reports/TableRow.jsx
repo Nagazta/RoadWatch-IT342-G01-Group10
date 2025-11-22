@@ -3,9 +3,13 @@ import StatusBadge from '../reports/StatusBadge';
 import ActionButtons from '../reports/ActionsButton';
 import '../reports/styles/TableRow.css';
 
-const TableRow = ({ report, onView, onEdit, onDelete }) => {
-  console.log('name: ', report.submittedByName);
-  console.log('email: ', report.submittedBy);
+const TableRow = ({
+  report,
+  onView,
+  onEdit,
+  onDelete,
+  userRole = 'admin'
+}) => {
   return (
     <tr className="table-row">
       <td className="report-id">{report.id}</td>
@@ -26,6 +30,7 @@ const TableRow = ({ report, onView, onEdit, onDelete }) => {
           onView={onView}
           onEdit={onEdit}
           onDelete={onDelete}
+          userRole={userRole}
         />
       </td>
     </tr>

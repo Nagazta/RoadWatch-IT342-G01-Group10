@@ -86,6 +86,7 @@ const CitizenReports = () => {
   return (
     <div className="reports-management-container">
       <ReportsFilters
+        userRole="citizen"
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         selectedCategory={selectedCategory}
@@ -94,13 +95,18 @@ const CitizenReports = () => {
         onStatusChange={setSelectedStatus}
       />
 
-      <ReportsTable reports={filteredReports} onView={handleView} />
+      <ReportsTable
+        reports={filteredReports}
+        onView={handleView}
+        userRole="citizen"
+      />
 
       <ReportsPagination
         rowsPerPage={rowsPerPage}
         onRowsPerPageChange={setRowsPerPage}
         currentPage={1}
         totalPages={1}
+        onPageChange={() => {}}
       />
     </div>
   );

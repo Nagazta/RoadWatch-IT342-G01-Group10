@@ -34,22 +34,20 @@ public class ReportController {
     }
 
     @GetMapping("/getAll/name")
-    public ResponseEntity<List<ReportEntity>> getAllReportsByName(@RequestParam String submittedBy)
-    {
+    public ResponseEntity<List<ReportEntity>> getAllReportsByName(@RequestParam String submittedBy) {
         List<ReportEntity> reports = reportService2.getAllReportsByName(submittedBy);
         return ResponseEntity.ok(reports);
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ReportEntity> createReport(@RequestBody ReportEntity report)
-    {
+    public ResponseEntity<ReportEntity> createReport(@RequestBody ReportEntity report) {
         ReportEntity createdReport = reportService.createReport(report);
         return ResponseEntity.ok(createdReport);
     }
 
     @PostMapping("/add2")
-    public ResponseEntity<ReportEntity> createReport2(@RequestBody ReportEntity report, @RequestParam String submittedBy)
-    {
+    public ResponseEntity<ReportEntity> createReport2(@RequestBody ReportEntity report,
+            @RequestParam String submittedBy) {
         ReportEntity newReport = reportService2.createReport(report, submittedBy);
         return ResponseEntity.ok(newReport);
     }
@@ -67,6 +65,7 @@ public class ReportController {
         reportService.deleteReport(id);
         return ResponseEntity.noContent().build();
     }
+
     @GetMapping("/getByEmail")
     public ResponseEntity<List<ReportEntity>> getReportsByEmail(@RequestParam String email) {
         List<ReportEntity> reports = reportService.getReportsByEmail(email);
