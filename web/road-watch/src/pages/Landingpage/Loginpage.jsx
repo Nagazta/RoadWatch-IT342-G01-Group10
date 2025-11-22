@@ -14,55 +14,62 @@ function Loginpage() {
     
     const navigate = useNavigate();
 
+    // Helper function to handle successful login
+    const handleLoginSuccess = (token, role) => {
+        localStorage.setItem("token", token);
+        localStorage.setItem("userRole", role); // Save user role for ProtectedRoute
+        sessionStorage.removeItem("authInProgress");
+
+        if (role === 'ADMIN') {
+            navigate('/admin/dashboard');
+        } else if (role === 'INSPECTOR') {
+            navigate('/inspector/dashboard');
+        } else {
+            navigate('/citizen/dashboard');
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
         setLoading(true);
+        sessionStorage.setItem("authInProgress", "true");
 
         try {
-            console.log('🔵 Login attempt:', { email, rememberMe });
-
-            // ✅ Explicitly set Content-Type for Spring to parse @RequestBody
             const response = await authService.login(email, password, {
                 headers: { 'Content-Type': 'application/json' }
             });
 
             if (response.success) {
-                console.log('✅ Login successful');
-
-                const userRole = response.data.user.role;
-
-                if (userRole === 'ADMIN') {
-                    navigate('/admin/dashboard');
-                } else if (userRole === 'INSPECTOR') {
-                    navigate('/inspector/dashboard');
-                } else {
-                    navigate('/citizen/dashboard');
-                }
+                handleLoginSuccess(response.data.token, response.data.user.role);
             } else {
-                console.error('❌ Login failed:', response.error);
                 setError(response.error);
+                sessionStorage.removeItem("authInProgress");
             }
         } catch (err) {
-            console.error('❌ Unexpected error:', err);
             setError(err.message || 'An unexpected error occurred. Please try again.');
+            sessionStorage.removeItem("authInProgress");
         } finally {
             setLoading(false);
         }
     };
 
-
     const handleGoogleLogin = async () => {
         setError('');
         setLoading(true);
+        sessionStorage.setItem("authInProgress", "true");
 
         try {
             const result = await authService.loginWithGoogle();
-            if (!result.success) {
+
+            if (result.success) {
+                handleLoginSuccess(result.data.token, result.data.user.role);
+            } else {
                 setError(result.error);
+                sessionStorage.removeItem("authInProgress");
             }
         } catch (err) {
-            setError('Google login failed. Please try again.');
+            sessionStorage.removeItem("authInProgress");
         } finally {
             setLoading(false);
         }
@@ -76,12 +83,9 @@ function Loginpage() {
 
                 {/* --- CHILD 1: Sidebar (on the left) --- */}
                 <div className="login-sidebar">
-
-                    {/* --- NEW GEOMETRIC ILLUSTRATION PLACEHOLDER --- */}
                     <div className="sidebar-illustration">
                         <div className="illustration-placeholder"></div>
                     </div>
-                    {/* --- END NEW PLACEHOLDER --- */}
 
                     <div className="sidebar-content">
                         <h3>Road Watch</h3>
@@ -98,7 +102,6 @@ function Loginpage() {
                                 <span>Help improve local infrastructure</span>
                             </div>
                         </div>
-
                     </div>
                 </div>
 
