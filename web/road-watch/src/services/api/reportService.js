@@ -14,13 +14,13 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const reportService =
 {
-    createReport: async(formData, name) =>
+    createReport: async(formData, email) =>
     {
         try
         {
             const response = await axios.post
             (
-                `${API_URL}/api/reports/add2`, formData, { params: {submittedBy: name} }
+                `${API_URL}/api/reports/add2`, formData, { params: {submittedBy: email} }
             );
 
             if(response.data)
@@ -36,19 +36,26 @@ const reportService =
     },
 
     
-    getReportsByEmail: async(email) => {
-        try {
-            const response = await axios.get(`${API_URL}/api/reports/getAll/name`, {
-                params: { submittedBy: email }
-            });
-            if (response.data) return { success: true, data: response.data };
-            throw new Error('Failed to fetch reports');
-        } catch (error) {
+    getReportsByEmail: async(email) => 
+    {
+        try 
+        {
+            const response = await axios.get
+            (
+                `${API_URL}/api/reports/getAll/name`, { params: {submittedBy: email} }
+            );
+
+            if (response.data)
+                 return { success: true, data: response.data };
+            else
+                throw new Error('Failed to fetch reports');
+        } 
+        catch (error) 
+        {
             console.error(error.message);
             return { success: false };
         }
     }
-
 }
 
 export default reportService;
