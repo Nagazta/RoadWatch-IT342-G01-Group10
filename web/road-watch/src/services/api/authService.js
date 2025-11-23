@@ -16,11 +16,18 @@ const authService = {
     // Email/Password login via backend
     // -----------------------------
     login: async (email, password, config = {}) => {
+        // 1. DEBUGGING: Check if data is actually arriving here
+        console.log("Attempting login with:", { email, password });
+
+        if (!email || !password) {
+            return { success: false, error: "Email and Password are required" };
+        }
+
         try {
             const response = await axios.post(
-                `${API_URL}/auth/local-login`, // 🔹 Updated endpoint
-                { email, password }, // JSON body
-                config // Pass headers here
+                `${API_URL}/auth/local-login`,
+                { email, password }, // <--- This is the "Request Body"
+                config
             );
 
             localStorage.setItem('accessToken', response.data.accessToken);
@@ -29,12 +36,29 @@ const authService = {
             return { success: true, data: response.data };
         } catch (error) {
             console.error('❌ Login failed:', error);
+
+            // 2. UI FIX: Stop the "Required request body..." error from showing to the user
+            // If the backend sends a 400/Bad Request, show a custom message
+            let errorMessage = 'Invalid email or password';
+
+            if (error.response && error.response.data && error.response.data.message) {
+                // If the error is that technical Java string, hide it
+                if (error.response.data.message.includes("Required request body is missing")) {
+                    errorMessage = errorMessage;
+                } else {
+                    // Otherwise, use the backend message
+                    errorMessage = error.response.data.message;
+                }
+            }
+
+            // 3. LOGIC FIX: You had "success: true" here previously.
+            // It MUST be "success: false" so your frontend knows it failed.
             return {
                 success: false,
-                error: error.response?.data?.message || error.message || 'Invalid email or password',
+                error: errorMessage,
             };
         }
-},
+    },
 
 
 

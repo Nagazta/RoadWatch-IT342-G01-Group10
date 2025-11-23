@@ -10,15 +10,24 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
 
   // Not logged in
   if (!token) {
-    alert("You cannot access this page. Please log in first.");
-    return <Navigate to="/login" replace />;
+      return <Navigate to="/unauthorizedUser" state={{ reason: "login_required" }} replace />;
   }
 
   // Role not allowed
-  if (allowedRoles.length && !allowedRoles.includes(userRole)) {
-    alert("You do not have permission to access this page.");
-    return <Navigate to="/landing" replace />;
-  }
+    if (allowedRoles && !allowedRoles.includes(userRole)) {
+        if(userRole === 'Admin' && !UserRole === 'Inspector' || 'Citizen'){
+            return <Navigate to="/unauthorizedUser" state={{ reason: "access_denied" }} replace />;
+        }
+        if(userRole === 'Inspector' && !UserRole === 'Admin' || 'Citizen'){
+            return <Navigate to="/unauthorizedUser" state={{ reason: "access_denied" }} replace />;
+        }
+        if(userRole === 'Citizen' && !UserRole === 'Admin' || 'Inspector'){
+            return <Navigate to="/unauthorizedUser" state={{ reason: "access_denied" }} replace />;
+        }
+        else {
+            return null;
+        }
+    }
 
   return children;
 };
