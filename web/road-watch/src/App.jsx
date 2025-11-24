@@ -122,65 +122,65 @@ function App() {
 
         {/* Admin Routes */}
         <Route path="/admin/dashboard" element={
-          <ProtectedRoute allowedRoles={['ADMIN']}>
+
             <AdminLayout activeMenuItem="dashboard" pageTitle="Dashboard Overview">
               <AdminDashboard />
             </AdminLayout>
-          </ProtectedRoute>
+
         } />
         <Route path="/admin/reports" element={
-          <ProtectedRoute allowedRoles={['ADMIN']}>
+
             <AdminLayout activeMenuItem="reports" pageTitle="Reports Management">
               <div style={{ padding: '24px', marginLeft: '250px' }}>
                 <ReportsManagement />
               </div>
             </AdminLayout>
-          </ProtectedRoute>
+
         } />
         <Route path="/admin/users" element={
-          <ProtectedRoute allowedRoles={['ADMIN']}>
+
             <AdminLayout activeMenuItem="users" pageTitle="User Management">
               <div style={{ padding: '24px', marginLeft: '250px' }}>
                 <UserManagement />
               </div>
             </AdminLayout>
-          </ProtectedRoute>
+
         } />
         <Route path="/admin/audit" element={
-          <ProtectedRoute allowedRoles={['ADMIN']}>
+
             <AdminLayout activeMenuItem="audit" pageTitle="Audit Logs">
               <div style={{ padding: '24px', marginLeft: '250px' }}>
                 <AuditLogs />
               </div>
             </AdminLayout>
-          </ProtectedRoute>
+
         } />
         <Route path="/admin/settings" element={
-          <ProtectedRoute allowedRoles={['ADMIN']}>
+
             <AdminLayout activeMenuItem="settings" pageTitle="System Settings">
               <div style={{ padding: '24px', marginLeft: '250px' }}>
                 <SystemSettings />
               </div>
             </AdminLayout>
-          </ProtectedRoute>
+
         } />
         <Route path="/admin/support" element={
-          <ProtectedRoute allowedRoles={['ADMIN']}>
+
             <AdminLayout activeMenuItem="support" pageTitle="Feedback & Support">
               <div style={{ padding: '24px', marginLeft: '250px' }}>
                 <FeedbackSupport />
               </div>
             </AdminLayout>
-          </ProtectedRoute>
+
         } />
         <Route path="/admin/assign-inspectors" element={
-          <ProtectedRoute allowedRoles={['ADMIN']}>
+
             <AdminLayout activeMenuItem="assign_inspector" pageTitle="Assign Inspectors">
               <div style={{ padding: '24px', marginLeft: '250px' }}>
                 <AssignInspector />
               </div>
             </AdminLayout>
-          </ProtectedRoute>
+
         } />
 
         {/* Inspector Routes */}

@@ -8,6 +8,7 @@ const UnauthorizedUser = () => {
 
     // Check if we passed a "reason" via state, otherwise default to "access_denied"
     const reason = location.state?.reason || "access_denied";
+    const userRole = localStorage.getItem("userRole");
 
     const content = {
         login_required: {
@@ -19,8 +20,10 @@ const UnauthorizedUser = () => {
         access_denied: {
             title: "Access Denied",
             message: "You do not have permission to view this page.",
-            buttonText: "Go Back Home",
-            action: () => navigate('/')
+            buttonText: "Go Back",
+            action: () => {
+                window.history.back();
+            }
         }
     };
 
