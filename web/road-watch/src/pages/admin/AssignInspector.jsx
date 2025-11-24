@@ -1,65 +1,115 @@
-import React, { useState } from 'react';
+// src/pages/admin/AssignInspector.jsx
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import InspectorsList from '../../components/assign/InspectorsList';
 import AvailableInspectors from '../../components/assign/AvailableInspectors';
 import AssignReportsSection from '../../components/assign/AssignReportsSection';
 import '../admin/styles/AssignInspector.css';
 
 const AssignInspector = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All Categories');
-  const [selectedStatus, setSelectedStatus] = useState('All Statuses');
+    const [reports, setReports] = useState([]);
+    const [inspectors, setInspectors] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-  // Mock inspectors data
-  const inspectors = [
-    { id: 1, name: 'Inspector Davis', activeAssignments: 3, status: 'Busy' },
-    { id: 2, name: 'Inspector Santos', activeAssignments: 1, status: 'Available' },
-    { id: 3, name: 'Inspector Reyes', activeAssignments: 1, status: 'Available' }
-  ];
+    // Filters
+    const [searchQuery, setSearchQuery] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState('All Categories');
+    const [selectedStatus, setSelectedStatus] = useState('All Statuses');
 
-  // Mock available inspectors
-  const availableInspectors = [
-    { id: 1, name: 'Inspector Sepulveda', assignments: 0 },
-    { id: 2, name: 'Inspector Sumucad', assignments: 0 }
-  ];
+    // 1. Fetch Data
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            const token = localStorage.getItem('accessToken');
+            const config = { headers: { 'Authorization': `Bearer ${token}` } };
 
-  // Mock reports data
-  const reports = [
-    { id: '#501', title: 'Large pothole on Osmeña Blvd', category: 'Pothole', location: 'Cebu City', dateSubmitted: '2025-10-21', status: 'Unassigned', assignedInspector: null },
-    { id: '#502', title: 'Flooding near Ayala tunnel', category: 'Flooding', location: 'Cebu Business Park', dateSubmitted: '2025-10-20', status: 'Assigned', assignedInspector: 'Inspector Daviz' },
-    { id: '#503', title: 'Cracked sidewalk', category: 'Crack', location: 'IT Park', dateSubmitted: '2025-10-19', status: 'In Progress', assignedInspector: 'Inspector Santos' },
-    { id: '#504', title: 'Broken street light', category: 'Street Light', location: 'Mandaue City', dateSubmitted: '2025-10-18', status: 'Unassigned', assignedInspector: null },
-    { id: '#505', title: 'Road sign missing', category: 'Signage', location: 'Lahuq', dateSubmitted: '2025-10-17', status: 'Resolved', assignedInspector: 'Inspector Reyes' }
-  ];
+            const [reportsRes, inspectorsRes] = await Promise.all([
+                axios.get('http://localhost:8080/api/reports/getAll', config),
+                axios.get('http://localhost:8080/api/inspector/getAll', config)
+            ]);
 
-  const handleAssign = (reportId) => {
-    console.log('Assign inspector to report:', reportId);
-  };
+            setReports(reportsRes.data);
+            setInspectors(inspectorsRes.data);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  const handleReassign = (reportId) => {
-    console.log('Reassign inspector for report:', reportId);
-  };
+    useEffect(() => {
+        fetchData();
+    }, []);
 
-  return (
-    <div className="assign-inspector-container">
+    // 2. Process Inspectors
+    const processedInspectors = inspectors.map(inspector => {
+        const activeCount = reports.filter(r =>
+            r.assignedInspector?.id === inspector.id &&
+            r.status !== 'Resolved'
+        ).length;
 
-      <div className="inspectors-section">
-        <InspectorsList inspectors={inspectors} />
-        <AvailableInspectors availableInspectors={availableInspectors} />
-      </div>
+        let status = 'Available';
+        if (activeCount >= 3) status = 'Busy';
 
-      <AssignReportsSection
-        reports={reports}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        selectedCategory={selectedCategory}
-        onCategoryChange={setSelectedCategory}
-        selectedStatus={selectedStatus}
-        onStatusChange={setSelectedStatus}
-        onAssign={handleAssign}
-        onReassign={handleReassign}
-      />
-    </div>
-  );
+        return {
+            ...inspector,
+            name: inspector.user ? inspector.user.name : `Inspector #${inspector.id}`,
+            activeAssignments: activeCount,
+            status: status
+        };
+    });
+
+    const availableInspectorsList = processedInspectors.filter(i => i.status === 'Available');
+
+    // 3. Handle Assign
+    const handleAssign = async (reportId, inspectorId) => {
+        if (!inspectorId) {
+            alert("Please select an inspector first.");
+            return;
+        }
+
+        try {
+            const token = localStorage.getItem('accessToken');
+            const config = { headers: { 'Authorization': `Bearer ${token}` } };
+
+            await axios.put(
+                `http://localhost:8080/api/reports/${reportId}/assign/${inspectorId}`,
+                {},
+                config
+            );
+
+            alert("Inspector assigned successfully!");
+            fetchData();
+        } catch (error) {
+            console.error("Failed to assign:", error);
+            alert("Failed to assign inspector.");
+        }
+    };
+
+    if (loading) return <div>Loading...</div>;
+
+    return (
+        <div className="assign-inspector-container">
+            <div className="inspectors-section">
+                <InspectorsList inspectors={processedInspectors} />
+                <AvailableInspectors availableInspectors={availableInspectorsList} />
+            </div>
+
+            {/* ✅ THIS IS THE CRITICAL PART
+          This forces the app to look at 'src/components/assign/AssignReportsSection.jsx'
+          It sends the data there. It does NOT render a table here.
+      */}
+            <AssignReportsSection
+                reports={reports}
+                inspectors={processedInspectors}
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery} // Note: You need to pass the setter if the search bar is inside the child
+                selectedCategory={selectedCategory}
+                selectedStatus={selectedStatus}
+                onAssign={handleAssign}
+            />
+        </div>
+    );
 };
 
 export default AssignInspector;

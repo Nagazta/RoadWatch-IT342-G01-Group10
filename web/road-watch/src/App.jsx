@@ -46,6 +46,8 @@ import ReportDetail from './pages/inspector/ReportDetail';
 
 //SECURITY
 import ProtectedRoute from './services/security/ProtectedRoute.jsx';
+import UnauthorizedUser from "./pages/UnauthorizedUser/UnauthorizedUser.jsx";
+
 
 function App() { 
   return (
@@ -62,6 +64,7 @@ function App() {
         <Route path="/register" element={<Registrationpage />} />
         <Route path="/auth/callback" element={<CallbackPage />} />
 
+
         {/* Public Pages */}
         <Route path="/features" element={<Featurespage />} />
         <Route path="/how-it-works" element={<HowItWorkspage />} />
@@ -70,6 +73,9 @@ function App() {
         <Route path="/faq" element={<FAQpage />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TermsOfService />} />
+        <Route path="/unauthorizedUser" element={<UnauthorizedUser />} />
+
+
 
         {/* Citizen Routes */}
         <Route path="citizen/dashboard" element={
@@ -222,6 +228,7 @@ function App() {
         } />
 
         {/* Fallback */}
+
         <Route path="*" element={<Navigate to="/landing" replace />} />
       </Routes>
     </BrowserRouter>

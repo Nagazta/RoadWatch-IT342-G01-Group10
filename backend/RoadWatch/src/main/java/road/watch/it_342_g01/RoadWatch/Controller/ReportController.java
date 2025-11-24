@@ -60,6 +60,15 @@ public class ReportController {
         return ResponseEntity.ok(report);
     }
 
+    @PutMapping("/{reportId}/assign/{inspectorId}")
+    public ResponseEntity<ReportEntity> assignInspector(
+            @PathVariable Long reportId,
+            @PathVariable Long inspectorId) {
+
+        ReportEntity updatedReport = reportService.assignInspectorToReport(reportId, inspectorId);
+        return ResponseEntity.ok(updatedReport);
+    }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteReport(@PathVariable Long id) {
         reportService.deleteReport(id);

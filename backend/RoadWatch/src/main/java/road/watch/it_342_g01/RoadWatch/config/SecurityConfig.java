@@ -58,6 +58,7 @@ public class SecurityConfig {
                     
                     // Fallback for any other requests
                     .anyRequest().authenticated()
+                        
                 )   
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

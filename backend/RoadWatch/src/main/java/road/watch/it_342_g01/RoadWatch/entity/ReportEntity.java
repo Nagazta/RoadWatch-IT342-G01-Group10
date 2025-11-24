@@ -11,27 +11,33 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReportEntity {  
+public class ReportEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String reportId;      
+    private String reportId;
     private String title;
     private String description;
     private String category;
 
-    private String location;   // still optional if you store readable location
-    private Double latitude;   // NEW
-    private Double longitude;  // NEW
+    private String location;
+    private Double latitude;
+    private Double longitude;
 
     private String submittedBy;
 
     @Column(name = "date_submitted")
     private LocalDateTime dateSubmitted;
 
-    private String status;          // Pending, In Progress, Resolved
+    private String status;
     private String adminNotes;
+
+    // --- ⬇️ ADD THIS SECTION ⬇️ ---
+    @ManyToOne // This means One Inspector can have Many Reports
+    @JoinColumn(name = "assigned_inspector_id") // Creates a column in DB to store Inspector ID
+    private inspectorEntity assignedInspector;
+    // ------------------------------
 
     @PrePersist
     public void onCreate() {

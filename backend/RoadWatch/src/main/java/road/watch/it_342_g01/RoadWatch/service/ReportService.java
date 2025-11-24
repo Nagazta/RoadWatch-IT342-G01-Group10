@@ -3,17 +3,20 @@ package road.watch.it_342_g01.RoadWatch.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import road.watch.it_342_g01.RoadWatch.entity.ReportEntity;
+import road.watch.it_342_g01.RoadWatch.entity.inspectorEntity;
 import road.watch.it_342_g01.RoadWatch.repository.ReportRepo;
+import road.watch.it_342_g01.RoadWatch.repository.inspectorRepo;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class ReportService {  
+public class ReportService {
 
     private final ReportRepo reportRepo;
 
+    private final inspectorRepo inspectorRepo;
     public List<ReportEntity> getAllReports() {
         return reportRepo.findAll();
     }
@@ -23,6 +26,23 @@ public class ReportService {
     }
 
     public ReportEntity createReport(ReportEntity report) {
+        return reportRepo.save(report);
+    }
+
+    public ReportEntity assignInspectorToReport(Long reportId, Long inspectorId) {
+        // 1. Find the Report
+        ReportEntity report = reportRepo.findById(reportId)
+                .orElseThrow(() -> new RuntimeException("Report not found with id: " + reportId));
+
+        // 2. Find the Inspector
+        inspectorEntity inspector = inspectorRepo.findById(inspectorId)
+                .orElseThrow(() -> new RuntimeException("Inspector not found with id: " + inspectorId));
+
+        // 3. Link them together
+        report.setAssignedInspector(inspector);
+        report.setStatus("Assigned");
+
+        // 4. Save
         return reportRepo.save(report);
     }
 
