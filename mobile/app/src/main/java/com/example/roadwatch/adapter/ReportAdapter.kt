@@ -8,8 +8,11 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.roadwatch.models.ReportEntity
+import java.text.SimpleDateFormat
+import java.util.Locale
 
-class ReportAdapter(private val reports: List<Report>) : RecyclerView.Adapter<ReportAdapter.ReportViewHolder>() {
+class ReportAdapter(private val reports: List<ReportEntity>) : RecyclerView.Adapter<ReportAdapter.ReportViewHolder>() {
 
     class ReportViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val reportTitle: TextView = view.findViewById(R.id.reportTitle)
@@ -25,26 +28,46 @@ class ReportAdapter(private val reports: List<Report>) : RecyclerView.Adapter<Re
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_report, parent, false)
         return ReportViewHolder(view)
     }
+    fun formatDate(dateString: String?): String {
+        if (dateString.isNullOrEmpty()) return "N/A"
+
+        return try {
+            // Input format with optional microseconds
+            val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS", Locale.getDefault())
+            val date = inputFormat.parse(dateString)
+
+            // Desired output format: "Nov 25, 2025"
+            val outputFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+            outputFormat.format(date!!)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            "N/A"
+        }
+    }
+
 
     override fun onBindViewHolder(holder: ReportViewHolder, position: Int) {
         val report = reports[position]
 
         holder.reportTitle.text = report.title
         holder.reportDescription.text = report.description
-        holder.categoryTag.text = report.category
+        holder.categoryTag.text = report.category ?: "N/A"
         holder.statusTag.text = report.status
-        holder.reportDate.text = report.date
+        holder.reportDate.text = formatDate(report.dateSubmitted)
 
-        // Set status color on the CardView
-        when (report.status) {
-            "Under Review" -> holder.statusTagCard.setCardBackgroundColor(Color.parseColor("#2196F3"))
-            "Resolved" -> holder.statusTagCard.setCardBackgroundColor(Color.parseColor("#4CAF50"))
-            "Pending" -> holder.statusTagCard.setCardBackgroundColor(Color.parseColor("#FFA726"))
+        // Map backend status to color
+        val statusColor = when (report.status.uppercase()) {
+            "PENDING" -> "#FFA726"      // Orange
+            "IN_PROGRESS" -> "#2196F3"  // Blue
+            "RESOLVED" -> "#4CAF50"     // Green
+            "REJECTED" -> "#F44336"     // Red
+            else -> "#BDBDBD"            // Gray for unknown
         }
+        holder.statusTagCard.setCardBackgroundColor(Color.parseColor(statusColor))
 
-        // View button click listener
+        // Handle View button click
         holder.viewButton.setOnClickListener {
-            // Handle view button click - navigate to report details page
+            // TODO: navigate to Report Details page, passing report.id or the whole object
         }
     }
 
