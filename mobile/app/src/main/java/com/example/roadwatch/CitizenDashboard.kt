@@ -32,6 +32,9 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class CitizenDashboard : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -339,11 +342,28 @@ class CitizenDashboard : AppCompatActivity(), NavigationView.OnNavigationItemSel
                 ${report.description}
                 
                 Submitted by: ${report.submittedBy ?: "Unknown"}
-                Created: ${report.createdAt ?: "N/A"}
+                Created: ${formatDateToReadable(report.dateSubmitted)}
             """.trimIndent())
             .setPositiveButton("Close", null)
             .show()
     }
+    fun formatDateToReadable(dateString: String?): String {
+        if (dateString.isNullOrEmpty()) return "N/A"
+
+        return try {
+            // Parse the ISO 8601 date string
+            val isoFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS", Locale.getDefault())
+            val date: Date = isoFormat.parse(dateString)!!
+
+            // Format to "Nov 25, 2025"
+            val readableFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+            readableFormat.format(date)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            dateString // fallback to original if parsing fails
+        }
+    }
+
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
