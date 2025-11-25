@@ -14,10 +14,16 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.lifecycleScope
+import com.example.roadwatch.models.ReportEntity
+import com.example.roadwatch.network.RetrofitClient
+import com.example.roadwatch.repository.ReportRepository
+import com.example.roadwatch.utils.PreferenceManager
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.textfield.TextInputEditText
+import kotlinx.coroutines.launch
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -279,36 +285,62 @@ class CitizenSubmit : AppCompatActivity(), NavigationView.OnNavigationItemSelect
         val title = findViewById<TextInputEditText>(R.id.titleInput).text.toString()
         val description = findViewById<TextInputEditText>(R.id.descriptionInput).text.toString()
         val category = findViewById<AutoCompleteTextView>(R.id.categoryDropdown).text.toString()
+        val locationAddress = tvLocationAddress.text.toString() // address from geocoder
 
-        if (title.isEmpty()) {
-            Toast.makeText(this, "Please enter a title", Toast.LENGTH_SHORT).show()
+        if (title.isEmpty() || description.isEmpty() || category.isEmpty() ||
+            (currentLatitude == 0.0 && currentLongitude == 0.0)
+        ) {
+            Toast.makeText(this, "Please fill all fields and set location", Toast.LENGTH_SHORT).show()
             return
         }
 
-        if (description.isEmpty()) {
-            Toast.makeText(this, "Please enter a description", Toast.LENGTH_SHORT).show()
+        // Get logged-in user's email
+        val email = PreferenceManager(this).getUserEmail()
+        if (email.isNullOrEmpty()) {
+            Toast.makeText(this, "User email not found. Please login again.", Toast.LENGTH_LONG).show()
             return
         }
 
-        if (category.isEmpty()) {
-            Toast.makeText(this, "Please select a category", Toast.LENGTH_SHORT).show()
-            return
+        // Create report object
+        val report = ReportEntity(
+            title = title,
+            description = description,
+            location = locationAddress.ifEmpty { "Unknown Location" },
+            latitude = currentLatitude,
+            longitude = currentLongitude,
+            status = "PENDING", // default status
+            category = category,
+            submittedBy = email
+        )
+
+        // Make network call
+        lifecycleScope.launch {
+            try {
+                val repo = ReportRepository(RetrofitClient.apiService) // your retrofit instance
+                val response = repo.submitReport(report, email)
+
+                if (response.isSuccessful) {
+                    Toast.makeText(this@CitizenSubmit, "Report submitted successfully!", Toast.LENGTH_LONG).show()
+                    // Navigate back to dashboard
+                    val intent = Intent(this@CitizenSubmit, CitizenDashboard::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    startActivity(intent)
+                    finish()
+                } else {
+                    Toast.makeText(
+                        this@CitizenSubmit,
+                        "Failed to submit report: ${response.code()} ${response.message()}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+
+            } catch (e: Exception) {
+                Toast.makeText(this@CitizenSubmit, "Error: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+            }
         }
-
-        if (currentLatitude == 0.0 && currentLongitude == 0.0) {
-            Toast.makeText(this, "Please detect your location", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        // TODO: Save report to database
-        Toast.makeText(this, "Report submitted successfully!", Toast.LENGTH_LONG).show()
-
-        // Navigate back to dashboard
-        val intent = Intent(this, CitizenDashboard::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-        startActivity(intent)
-        finish()
     }
+
+
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -379,13 +411,5 @@ class CitizenSubmit : AppCompatActivity(), NavigationView.OnNavigationItemSelect
     override fun onDestroy() {
         super.onDestroy()
         mapView.onDetach()
-    }
-
-    override fun onBackPressed() {
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawer(GravityCompat.START)
-        } else {
-            super.onBackPressed()
-        }
     }
 }

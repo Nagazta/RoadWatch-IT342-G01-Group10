@@ -21,6 +21,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
 import com.example.roadwatch.models.DashboardStats
 import com.example.roadwatch.models.ReportEntity
+import com.example.roadwatch.network.RetrofitClient
 import com.example.roadwatch.repository.AuthRepository
 import com.example.roadwatch.repository.ReportRepository
 import com.example.roadwatch.utils.PreferenceManager
@@ -48,7 +49,7 @@ class CitizenDashboard : AppCompatActivity(), NavigationView.OnNavigationItemSel
     private lateinit var tvResolvedReports: TextView
 
     private val authRepository = AuthRepository()
-    private val reportRepository = ReportRepository()
+    private val reportRepository = ReportRepository(RetrofitClient.apiService)
 
     private var allReports: List<ReportEntity> = emptyList()
 
