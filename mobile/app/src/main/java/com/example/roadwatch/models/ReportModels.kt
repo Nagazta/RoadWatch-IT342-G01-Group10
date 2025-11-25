@@ -15,7 +15,7 @@ data class ReportEntity(
     val imageUrl: String? = null,
     val submittedBy: String? = null,
     val assignedTo: String? = null,
-    val createdAt: String? = null,
+    val dateSubmitted: String? = null,
     val updatedAt: String? = null
 )
 
