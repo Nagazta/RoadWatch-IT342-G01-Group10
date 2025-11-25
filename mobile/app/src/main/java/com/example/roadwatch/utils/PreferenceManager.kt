@@ -86,4 +86,11 @@ class PreferenceManager(context: Context) {
     fun isLoggedIn(): Boolean {
         return !getAuthToken().isNullOrEmpty()
     }
+    fun saveUserEmail(email: String) {
+        prefs.edit().putString("user_email", email).apply()
+    }
+
+    fun clear() {
+        prefs.edit().clear().apply()
+    }
 }
