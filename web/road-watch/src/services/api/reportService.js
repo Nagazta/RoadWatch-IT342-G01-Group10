@@ -55,6 +55,21 @@ const reportService =
             console.error(error.message);
             return { success: false };
         }
+    },
+
+    getAllReports: async () => {
+        try {
+            const response = await axios.get(`${API_URL}/api/reports/getAll`);
+            if(response.data && Array.isArray(response.data)) {
+                // Optionally sort newest to oldest if backend does not
+                return { success: true, data: response.data.sort((a,b)=>new Date(b.dateSubmitted || b.createdAt)-new Date(a.dateSubmitted || a.createdAt)) };
+            } else {
+                return { success: false };
+            }
+        } catch(error) {
+            console.error(error.message);
+            return { success: false };
+        }
     }
 }
 

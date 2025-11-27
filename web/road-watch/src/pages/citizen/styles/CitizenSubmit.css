@@ -4,9 +4,12 @@
     flex-direction: column;
     align-items: center;
     padding: 3vw 2vw;
-    border-radius: 1vw;
-    background-color: white;
-    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    margin: 3vw auto; /* Add margin around the form */
+    max-width: 750px; /* limit the width for card look */
+    border-radius: 2vw; /* more pronounced corners */
+    border: 2px solid #cce4e6; /* subtle blue border */
+    background-color: #fff;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18), 0 1.5px 3px rgba(0,0,0,0.12);
 }
 
 .cs-header
@@ -27,7 +30,13 @@
 {
     display: flex;
     flex-direction: column;
-    width: 70%;
+    width: 80%;
+    background: #fafdfe;
+    border-radius: 1vw; /* individual corner radius */
+    border: 1px solid #c7e0e4;
+    padding: 1.2vw 1vw;
+    margin-bottom: 1.5vw;
+    box-shadow: 0 2px 10px rgba(100,180,220,0.08);
 }
 
 .cs-input input, .cs-input select
