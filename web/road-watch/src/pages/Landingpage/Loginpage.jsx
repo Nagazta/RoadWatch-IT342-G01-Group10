@@ -15,9 +15,11 @@ function Loginpage() {
     const navigate = useNavigate();
 
     // Helper function to handle successful login
-    const handleLoginSuccess = (token, role) => {
+    const handleLoginSuccess = (token, role, adminId) => {
         localStorage.setItem("token", token);
-        localStorage.setItem("userRole", role); // Save user role for ProtectedRoute
+        localStorage.setItem("userRole", role);
+        localStorage.setItem("adminId", adminId);
+        console.log("Logged in user ID:", adminId); 
         sessionStorage.removeItem("authInProgress");
 
         if (role === 'ADMIN') {
@@ -41,7 +43,12 @@ function Loginpage() {
             });
 
             if (response.success) {
-                handleLoginSuccess(response.data.token, response.data.user.role);
+                // ✅ Pass userId to handleLoginSuccess
+                handleLoginSuccess(
+                    response.data.token, 
+                    response.data.user.role,
+                    response.data.user.id // Add this
+                );
             } else {
                 setError(response.error);
                 sessionStorage.removeItem("authInProgress");
@@ -63,7 +70,12 @@ function Loginpage() {
             const result = await authService.loginWithGoogle();
 
             if (result.success) {
-                handleLoginSuccess(result.data.token, result.data.user.role);
+                // ✅ Pass userId to handleLoginSuccess
+                handleLoginSuccess(
+                    result.data.token, 
+                    result.data.user.role,
+                    result.data.user.id // Add this
+                );
             } else {
                 setError(result.error);
                 sessionStorage.removeItem("authInProgress");

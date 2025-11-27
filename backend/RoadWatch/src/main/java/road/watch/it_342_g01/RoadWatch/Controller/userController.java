@@ -21,35 +21,81 @@ public class userController {
     @Autowired
     private userService userService;
 
-    // CREATE
+    // CREATE - Updated to accept Map to handle createdByAdminId
     @PostMapping("/add")
-    public ResponseEntity<?> addUser(@RequestBody userEntity user) {
+    public ResponseEntity<?> addUser(@RequestBody Map<String, Object> requestBody) {
         log.info("========================================");
         log.info("📥 Received user creation request");
-        log.info("Email: {}", user.getEmail());
-        log.info("Username: {}", user.getUsername());
-        log.info("Role: {}", user.getRole());
+        log.info("Request body: {}", requestBody);
         log.info("========================================");
 
         try {
+            // Extract fields from request body
+            String email = (String) requestBody.get("email");
+            String username = (String) requestBody.get("username");
+            String name = (String) requestBody.get("name");
+            String password = (String) requestBody.get("password");
+            String contact = (String) requestBody.get("contact");
+            String assignedArea = (String) requestBody.get("assignedArea");
+            String roleStr = (String) requestBody.get("role");
+            Object createdByAdminIdObj = requestBody.get("createdByAdminId");
+            
+            // Parse createdByAdminId
+            Long createdByAdminId = null;
+            if (createdByAdminIdObj != null) {
+                if (createdByAdminIdObj instanceof Number) {
+                    createdByAdminId = ((Number) createdByAdminIdObj).longValue();
+                } else if (createdByAdminIdObj instanceof String) {
+                    try {
+                        createdByAdminId = Long.parseLong((String) createdByAdminIdObj);
+                    } catch (NumberFormatException e) {
+                        log.warn("⚠️ Invalid createdByAdminId format: {}", createdByAdminIdObj);
+                    }
+                }
+            }
+
+            log.info("Email: {}", email);
+            log.info("Username: {}", username);
+            log.info("Role: {}", roleStr);
+            log.info("Assigned Area: {}", assignedArea); // Add this log
+            log.info("Created by admin ID: {}", createdByAdminId);
+
             // Validate input
-            if (user.getEmail() == null || user.getEmail().trim().isEmpty()) {
+            if (email == null || email.trim().isEmpty()) {
                 log.error("❌ Validation failed: Email is required");
                 return ResponseEntity.badRequest().body(createErrorResponse("Email is required"));
             }
 
-            if (user.getPassword() == null || user.getPassword().trim().isEmpty()) {
+            if (password == null || password.trim().isEmpty()) {
                 log.error("❌ Validation failed: Password is required");
                 return ResponseEntity.badRequest().body(createErrorResponse("Password is required"));
             }
 
-            if (user.getPassword().length() < 6) {
+            if (password.length() < 6) {
                 log.error("❌ Validation failed: Password too short");
                 return ResponseEntity.badRequest().body(createErrorResponse("Password must be at least 6 characters"));
             }
 
-            // Create user
-            userEntity createdUser = userService.createUser(user);
+            // Create user entity
+            userEntity user = new userEntity();
+            user.setEmail(email);
+            user.setUsername(username);
+            user.setName(name);
+            user.setPassword(password);
+            user.setContact(contact);
+            
+            // Set role
+            if (roleStr != null) {
+                try {
+                    user.setRole(road.watch.it_342_g01.RoadWatch.entity.role.valueOf(roleStr.toUpperCase()));
+                } catch (IllegalArgumentException e) {
+                    log.error("❌ Invalid role: {}", roleStr);
+                    return ResponseEntity.badRequest().body(createErrorResponse("Invalid role: " + roleStr));
+                }
+            }
+
+            // ✅ Create user with admin ID
+            userEntity createdUser = userService.createUser(user, createdByAdminId, assignedArea);
 
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
@@ -137,8 +183,7 @@ public class userController {
     @GetMapping("/db-test")
     public ResponseEntity<?> testDatabaseConnection() {
         try {
-            // Try to count users (simple query)
-            long count = userService.getAllUsers().size(); // Use userService instead
+            long count = userService.getAllUsers().size();
 
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
@@ -158,7 +203,6 @@ public class userController {
         }
     }
 
-    // GET current user profile (for example, based on authentication)
     @GetMapping("/profile")
     public ResponseEntity<?> getProfile(@RequestParam Long userId) {
         return userService.getUserById(userId)
@@ -167,7 +211,6 @@ public class userController {
                         .body(Map.of("success", false, "message", "User not found")));
     }
 
-    // UPDATE profile
     @PutMapping("/profile")
     public ResponseEntity<?> updateProfile(@RequestParam Long userId, @RequestBody userEntity updatedUser) {
         try {
@@ -178,5 +221,4 @@ public class userController {
                     .body(Map.of("success", false, "message", e.getMessage()));
         }
     }
-
 }
