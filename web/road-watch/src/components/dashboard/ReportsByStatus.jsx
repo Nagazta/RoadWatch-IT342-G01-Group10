@@ -82,7 +82,7 @@ const ReportsByStatus = () => {
 
         <div className="legend-item">
           <span className="legend-dot" style={{ backgroundColor: '#00695c' }}></span>
-          <span className="legend-text">In Progress ({inProgress})</span>
+          <span className="legend-text">In-Progress ({inProgress})</span>
         </div>
 
         <div className="legend-item">
