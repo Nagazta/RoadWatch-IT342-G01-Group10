@@ -14,34 +14,48 @@ function Loginpage() {
     
     const navigate = useNavigate();
 
+    // Helper function to handle successful login
+    const handleLoginSuccess = (token, role, adminId) => {
+        localStorage.setItem("token", token);
+        localStorage.setItem("userRole", role);
+        localStorage.setItem("adminId", adminId);
+        console.log("Logged in user ID:", adminId); 
+        sessionStorage.removeItem("authInProgress");
+
+        if (role === 'ADMIN') {
+            navigate('/admin/dashboard');
+        } else if (role === 'INSPECTOR') {
+            navigate('/inspector/dashboard');
+        } else {
+            navigate('/citizen/dashboard');
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
         setLoading(true);
+        sessionStorage.setItem("authInProgress", "true");
 
         try {
-            console.log('🔵 Login attempt:', { email, rememberMe });
-            const result = await authService.login(email, password);
+            const response = await authService.login(email, password, {
+                headers: { 'Content-Type': 'application/json' }
+            });
 
-            if (result.success) {
-                console.log('✅ Login successful');
-                
-                // Redirect based on role
-                const userRole = result.data.user.role;
-                if (userRole === 'ADMIN') {
-                    navigate('/admin/dashboard');
-                } else if (userRole === 'INSPECTOR') {
-                    navigate('/inspector/dashboard');
-                } else {
-                    navigate('/dashboard');
-                }
+            if (response.success) {
+                // ✅ Pass userId to handleLoginSuccess
+                handleLoginSuccess(
+                    response.data.token, 
+                    response.data.user.role,
+                    response.data.user.id // Add this
+                );
             } else {
-                console.error('❌ Login failed:', result.error);
-                setError(result.error);
+                setError(response.error);
+                sessionStorage.removeItem("authInProgress");
             }
         } catch (err) {
-            console.error('❌ Unexpected error:', err);
-            setError('An unexpected error occurred. Please try again.');
+            setError(err.message || 'An unexpected error occurred. Please try again.');
+            sessionStorage.removeItem("authInProgress");
         } finally {
             setLoading(false);
         }
@@ -50,14 +64,24 @@ function Loginpage() {
     const handleGoogleLogin = async () => {
         setError('');
         setLoading(true);
+        sessionStorage.setItem("authInProgress", "true");
 
         try {
             const result = await authService.loginWithGoogle();
-            if (!result.success) {
+
+            if (result.success) {
+                // ✅ Pass userId to handleLoginSuccess
+                handleLoginSuccess(
+                    result.data.token, 
+                    result.data.user.role,
+                    result.data.user.id // Add this
+                );
+            } else {
                 setError(result.error);
+                sessionStorage.removeItem("authInProgress");
             }
         } catch (err) {
-            setError('Google login failed. Please try again.');
+            sessionStorage.removeItem("authInProgress");
         } finally {
             setLoading(false);
         }
@@ -71,12 +95,9 @@ function Loginpage() {
 
                 {/* --- CHILD 1: Sidebar (on the left) --- */}
                 <div className="login-sidebar">
-
-                    {/* --- NEW GEOMETRIC ILLUSTRATION PLACEHOLDER --- */}
                     <div className="sidebar-illustration">
                         <div className="illustration-placeholder"></div>
                     </div>
-                    {/* --- END NEW PLACEHOLDER --- */}
 
                     <div className="sidebar-content">
                         <h3>Road Watch</h3>
@@ -93,7 +114,6 @@ function Loginpage() {
                                 <span>Help improve local infrastructure</span>
                             </div>
                         </div>
-
                     </div>
                 </div>
 

@@ -3,7 +3,13 @@ import TableHeader from './TableHeader';
 import TableRow from './TableRow';
 import '../reports/styles/ReportsTable.css';
 
-const ReportsTable = ({ reports, onView, onEdit, onDelete }) => {
+const ReportsTable = ({
+  reports = [],
+  onView = () => {},
+  onEdit = () => {},
+  onDelete = () => {},
+  userRole = 'admin'
+}) => {
   return (
     <div className="table-container">
       <table className="reports-table">
@@ -16,6 +22,7 @@ const ReportsTable = ({ reports, onView, onEdit, onDelete }) => {
               onView={onView}
               onEdit={onEdit}
               onDelete={onDelete}
+              userRole={userRole}
             />
           ))}
         </tbody>

@@ -115,7 +115,7 @@ const UserDetailsModal = ({ user, isOpen, onClose, onSave, mode = 'view' }) => {
                   onChange={handleRoleChange}
                 >
                   <option value="Citizen">Citizen</option>
-                  <option value="Moderator">Moderator</option>
+                  <option value="Inspector">Inspector</option>
                   <option value="Admin">Admin</option>
                 </select>
               ) : (

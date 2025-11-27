@@ -44,6 +44,11 @@ import CreateReport from './pages/inspector/CreateReport';
 import InspectorSettings from './pages/inspector/Settings';
 import ReportDetail from './pages/inspector/ReportDetail';
 
+//SECURITY
+import ProtectedRoute from './services/security/ProtectedRoute.jsx';
+import UnauthorizedUser from "./pages/UnauthorizedUser/UnauthorizedUser.jsx";
+
+
 function App() { 
   return (
     <BrowserRouter>
@@ -59,193 +64,171 @@ function App() {
         <Route path="/register" element={<Registrationpage />} />
         <Route path="/auth/callback" element={<CallbackPage />} />
 
-        {/* Public Pages - Navbar Links */}
+
+        {/* Public Pages */}
         <Route path="/features" element={<Featurespage />} />
         <Route path="/how-it-works" element={<HowItWorkspage />} />
         <Route path="/about-us" element={<AboutUspage />} />
         <Route path="/contact" element={<Contactpage />} />
-
-        {/* Public Pages - Footer Links */}
         <Route path="/faq" element={<FAQpage />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TermsOfService />} />
+        <Route path="/unauthorizedUser" element={<UnauthorizedUser />} />
 
-        {/* Citizen Routes ⭐ ADD THIS */}
-        <Route
-          path="citizen/dashboard"
-          element=
-          {
+
+
+        {/* Citizen Routes */}
+        <Route path="citizen/dashboard" element={
+          <ProtectedRoute allowedRoles={['CITIZEN']}>
             <CitizenLayout activeMenuItem="dashboard" pageTitle="Citizen Dashboard">
-                 <CitizenDashboard />
+              <CitizenDashboard />
             </CitizenLayout>
-          }
-        />
-
-        <Route
-          path="citizen/reports"
-          element=
-          {
+          </ProtectedRoute>
+        } />
+        <Route path="citizen/reports" element={
+          <ProtectedRoute allowedRoles={['CITIZEN']}>
             <CitizenLayout activeMenuItem="reports" pageTitle="My Reports">
               <div style={{ padding: '24px', marginLeft: '250px' }}>
-                 <CitizenReports />
+                <CitizenReports />
               </div>
             </CitizenLayout>
-          }
-         />
-
-         <Route
-          path="citizen/submit" 
-          element=
-          {
+          </ProtectedRoute>
+        } />
+        <Route path="citizen/submit" element={
+          <ProtectedRoute allowedRoles={['CITIZEN']}>
             <CitizenLayout activeMenuItem="submit" pageTitle="Submit Report">
               <div style={{ padding: '24px', marginLeft: '250px' }}>
                 <CitizenSubmit />
               </div>
             </CitizenLayout>
-          }
-         />
-
-         <Route 
-          path="citizen/settings"
-          element=
-          {
+          </ProtectedRoute>
+        } />
+        <Route path="citizen/settings" element={
+          <ProtectedRoute allowedRoles={['CITIZEN']}>
             <CitizenLayout activeMenuItem="settings" pageTitle="Account Settings">
               <CitizenSettings />
             </CitizenLayout>
-          }
-         />
-
-         <Route 
-          path="citizen/support"
-          element=
-          {
+          </ProtectedRoute>
+        } />
+        <Route path="citizen/support" element={
+          <ProtectedRoute allowedRoles={['CITIZEN']}>
             <CitizenLayout activeMenuItem="support" pageTitle="Feedback and Support">
               <div style={{ padding: '24px', marginLeft: '250px' }}>
                 <CitizenSupport />
               </div>
             </CitizenLayout>
-          }
-         />
+          </ProtectedRoute>
+        } />
 
         {/* Admin Routes */}
-        <Route
-          path="/admin/dashboard"
-          element={
+        <Route path="/admin/dashboard" element={
+          <ProtectedRoute allowedRoles={['ADMIN']}>
             <AdminLayout activeMenuItem="dashboard" pageTitle="Dashboard Overview">
               <AdminDashboard />
             </AdminLayout>
-          }
-        />
-        <Route
-          path="/admin/reports"
-          element={
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/reports" element={
+          <ProtectedRoute allowedRoles={['ADMIN']}>
             <AdminLayout activeMenuItem="reports" pageTitle="Reports Management">
               <div style={{ padding: '24px', marginLeft: '250px' }}>
                 <ReportsManagement />
               </div>
             </AdminLayout>
-          }
-        />
-        <Route
-          path="/admin/users"
-          element={
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/users" element={
+          <ProtectedRoute allowedRoles={['ADMIN']}>
             <AdminLayout activeMenuItem="users" pageTitle="User Management">
               <div style={{ padding: '24px', marginLeft: '250px' }}>
                 <UserManagement />
               </div>
             </AdminLayout>
-          }
-        />
-        <Route
-          path="/admin/audit"
-          element={
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/audit" element={
+          <ProtectedRoute allowedRoles={['ADMIN']}>
             <AdminLayout activeMenuItem="audit" pageTitle="Audit Logs">
               <div style={{ padding: '24px', marginLeft: '250px' }}>
                 <AuditLogs />
               </div>
             </AdminLayout>
-          }
-        />
-        <Route
-          path="/admin/settings"
-          element={
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/settings" element={
+          <ProtectedRoute allowedRoles={['ADMIN']}>
             <AdminLayout activeMenuItem="settings" pageTitle="System Settings">
               <div style={{ padding: '24px', marginLeft: '250px' }}>
                 <SystemSettings />
               </div>
             </AdminLayout>
-          }
-        />
-        <Route
-          path="/admin/support"
-          element={
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/support" element={
+          <ProtectedRoute allowedRoles={['ADMIN']}>
             <AdminLayout activeMenuItem="support" pageTitle="Feedback & Support">
               <div style={{ padding: '24px', marginLeft: '250px' }}>
                 <FeedbackSupport />
               </div>
             </AdminLayout>
-          }
-        />
-        <Route
-          path="/admin/assign-inspectors"
-          element={
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/assign-inspectors" element={
+          <ProtectedRoute allowedRoles={['ADMIN']}>
             <AdminLayout activeMenuItem="assign_inspector" pageTitle="Assign Inspectors">
               <div style={{ padding: '24px', marginLeft: '250px' }}>
                 <AssignInspector />
               </div>
             </AdminLayout>
-          }
-        />
+          </ProtectedRoute>
+        } />
 
-        {/* Inspector Routes - Add your inspector routes here */}
-        <Route
-          path="inspector/dashboard"
-          element={
+        {/* Inspector Routes */}
+        <Route path="inspector/dashboard" element={
+          <ProtectedRoute allowedRoles={['INSPECTOR']}>
             <InspectorLayout activeMenuItem="dashboard" pageTitle="Inspector Dashboard">
               <InspectorDashboard />
             </InspectorLayout>
-          }
-        />
-        <Route
-          path="inspector/search-reports"
-          element={
+          </ProtectedRoute>
+        } />
+        <Route path="inspector/search-reports" element={
+          <ProtectedRoute allowedRoles={['INSPECTOR']}>
             <InspectorLayout activeMenuItem="search_reports" pageTitle="Search Reports">
               <SearchReports />
             </InspectorLayout>
-          }
-        />
-        <Route
-          path="inspector/assigned-reports"
-          element={
+          </ProtectedRoute>
+        } />
+        <Route path="inspector/assigned-reports" element={
+          <ProtectedRoute allowedRoles={['INSPECTOR']}>
             <InspectorLayout activeMenuItem="assigned_reports" pageTitle="Assigned Reports">
               <AssignedReports />
             </InspectorLayout>
-          }
-        />
-        <Route
-          path="inspector/create-report"
-          element={
+          </ProtectedRoute>
+        } />
+        <Route path="inspector/create-report" element={
+          <ProtectedRoute allowedRoles={['INSPECTOR']}>
             <InspectorLayout activeMenuItem="create_report" pageTitle="Create Report">
               <CreateReport />
             </InspectorLayout>
-          }
-        />
-        <Route
-          path="inspector/settings"
-          element={
+          </ProtectedRoute>
+        } />
+        <Route path="inspector/settings" element={
+          <ProtectedRoute allowedRoles={['INSPECTOR']}>
             <InspectorLayout activeMenuItem="settings" pageTitle="Settings">
               <InspectorSettings />
             </InspectorLayout>
-          }
-        />
-        <Route
-          path="inspector/reports/:reportId"
-          element={
+          </ProtectedRoute>
+        } />
+        <Route path="inspector/reports/:reportId" element={
+          <ProtectedRoute allowedRoles={['INSPECTOR']}>
             <InspectorLayout activeMenuItem="assigned_reports" pageTitle="Report Detail">
               <ReportDetail />
             </InspectorLayout>
-          }
-        />
+          </ProtectedRoute>
+        } />
+
+        {/* Fallback */}
+
         <Route path="*" element={<Navigate to="/landing" replace />} />
       </Routes>
     </BrowserRouter>

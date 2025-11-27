@@ -1,4 +1,4 @@
-package road.watch.it_342_g01.RoadWatch.Controller;
+package road.watch.it_342_g01.RoadWatch.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,16 +33,21 @@ public class ReportController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/getAll/name")
+    public ResponseEntity<List<ReportEntity>> getAllReportsByName(@RequestParam String submittedBy) {
+        List<ReportEntity> reports = reportService2.getAllReportsByName(submittedBy);
+        return ResponseEntity.ok(reports);
+    }
+
     @PostMapping("/add")
-    public ResponseEntity<ReportEntity> createReport(@RequestBody ReportEntity report)
-    {
+    public ResponseEntity<ReportEntity> createReport(@RequestBody ReportEntity report) {
         ReportEntity createdReport = reportService.createReport(report);
         return ResponseEntity.ok(createdReport);
     }
 
     @PostMapping("/add2")
-    public ResponseEntity<ReportEntity> createReport2(@RequestBody ReportEntity report, @RequestParam String submittedBy)
-    {
+    public ResponseEntity<ReportEntity> createReport2(@RequestBody ReportEntity report,
+            @RequestParam String submittedBy) {
         ReportEntity newReport = reportService2.createReport(report, submittedBy);
         return ResponseEntity.ok(newReport);
     }
@@ -55,9 +60,24 @@ public class ReportController {
         return ResponseEntity.ok(report);
     }
 
+    @PutMapping("/{reportId}/assign/{inspectorId}")
+    public ResponseEntity<ReportEntity> assignInspector(
+            @PathVariable Long reportId,
+            @PathVariable Long inspectorId) {
+
+        ReportEntity updatedReport = reportService.assignInspectorToReport(reportId, inspectorId);
+        return ResponseEntity.ok(updatedReport);
+    }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteReport(@PathVariable Long id) {
         reportService.deleteReport(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/getByEmail")
+    public ResponseEntity<List<ReportEntity>> getReportsByEmail(@RequestParam String email) {
+        List<ReportEntity> reports = reportService.getReportsByEmail(email);
+        return ResponseEntity.ok(reports);
     }
 }

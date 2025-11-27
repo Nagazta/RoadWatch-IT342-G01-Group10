@@ -5,41 +5,72 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseAnonKey) { 
+if (!supabaseUrl || !supabaseAnonKey) {
     alert('Configuration Error: Missing Supabase keys. Check console for details.');
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-
 const authService = {
-    // Register new user
-    register: async (userData) => {
+    // -----------------------------
+    // Email/Password login via backend
+    // -----------------------------
+    login: async (email, password, config = {}) => {
+        // 1. DEBUGGING: Check if data is actually arriving here
+        console.log("Attempting login with:", { email, password });
+
+        if (!email || !password) {
+            return { success: false, error: "Email and Password are required" };
+        }
+
         try {
-       
+            const response = await axios.post(
+                `${API_URL}/auth/local-login`,
+                { email, password }, // <--- This is the "Request Body"
+                config
+            );
 
-            // Step 1: Create user in Supabase Auth
-            const { data: authData, error: authError } = await supabase.auth.signUp({
-                email: userData.email,
-                password: userData.password,
-                options: {
-                    data: {
-                        username: userData.username,
-                        name: userData.name,
-                        contact: userData.contact,
-                    }
+            localStorage.setItem('accessToken', response.data.accessToken);
+            localStorage.setItem('user', JSON.stringify(response.data.user));
+
+            return { success: true, data: response.data };
+        } catch (error) {
+            console.error('❌ Login failed:', error);
+
+            // 2. UI FIX: Stop the "Required request body..." error from showing to the user
+            // If the backend sends a 400/Bad Request, show a custom message
+            let errorMessage = 'Invalid email or password';
+
+            if (error.response && error.response.data && error.response.data.message) {
+                // If the error is that technical Java string, hide it
+                if (error.response.data.message.includes("Required request body is missing")) {
+                    errorMessage = errorMessage;
+                } else {
+                    // Otherwise, use the backend message
+                    errorMessage = error.response.data.message;
                 }
-            });
-
-            if (authError) {
-                console.error('❌ Supabase Auth Error:', authError);
-                throw authError;
             }
 
-         
+            // 3. LOGIC FIX: You had "success: true" here previously.
+            // It MUST be "success: false" so your frontend knows it failed.
+            return {
+                success: false,
+                error: errorMessage,
+            };
+        }
+    },
 
-            // Step 2: Send to backend to create database record
-            const response = await axios.post(`${API_URL}/users/add`, {
+
+
+
+
+    // -----------------------------
+    // Register new user
+    // -----------------------------
+    register: async (userData) => {
+        try {
+            // Step 1: Send to backend to create user in DB
+            const response = await axios.post(`${API_URL}/api/users/add`, {
                 username: userData.username,
                 name: userData.name,
                 email: userData.email,
@@ -48,12 +79,10 @@ const authService = {
                 contact: userData.contact || '',
             });
 
-           
-
             return {
                 success: true,
-                message: 'Registration successful! Please check your email to verify your account.',
-                data: authData,
+                message: 'Registration successful!',
+                data: response.data,
             };
         } catch (error) {
             console.error('❌ Registration failed:', error);
@@ -64,48 +93,11 @@ const authService = {
         }
     },
 
-    // Login with email/password
-    login: async (email, password) => {
-        try {
-            const { data: supabaseData, error: supabaseError } = await supabase.auth.signInWithPassword({
-                email,
-                password,
-            });
-
-            if (supabaseError) {
-                console.error('❌ Supabase login error:', supabaseError);
-                throw supabaseError;
-            }
-         
-            const response = await axios.post(`${API_URL}/auth/login`, {
-                email,
-                password,
-            });
-
-            console.log('✅ Backend login successful');
-
-            // Step 3: Store tokens and user data
-            localStorage.setItem('accessToken', response.data.accessToken);
-            localStorage.setItem('user', JSON.stringify(response.data.user));
-            localStorage.setItem('supabaseToken', supabaseData.session.access_token);
-
-            return {
-                success: true,
-                data: response.data,
-            };
-        } catch (error) {
-            console.error('❌ Login failed:', error);
-            return {
-                success: false,
-                error: error.response?.data || error.message || 'Invalid email or password',
-            };
-        }
-    },
-
-    // Login with Google OAuth
+    // -----------------------------
+    // Google OAuth login
+    // -----------------------------
     loginWithGoogle: async () => {
         try {
-            
             const { data, error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
@@ -133,70 +125,44 @@ const authService = {
         }
     },
 
+    // -----------------------------
     // Handle OAuth callback
-    handleOAuthCallback: async () => {
+    // -----------------------------
+    handleOAuthCallbackWithHash: async (hash) => {
         try {
-            
-            // Parse the hash parameters
-            const hashParams = new URLSearchParams(window.location.hash.substring(1));
-            
+            const hashParams = new URLSearchParams(hash.substring(1));
             const accessToken = hashParams.get('access_token');
             const refreshToken = hashParams.get('refresh_token');
-            const expiresAt = hashParams.get('expires_at');
-            const expiresIn = hashParams.get('expires_in');
-            const providerToken = hashParams.get('provider_token');
-            
 
             if (!accessToken || !refreshToken) {
-                console.error('❌ Missing required tokens in URL hash');
                 throw new Error('Missing access_token or refresh_token in callback');
             }
 
-            // Manually set the session in Supabase
-            console.log('📝 Setting session in Supabase...');
-            const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
+            // Set session in Supabase
+            const { error: sessionError } = await supabase.auth.setSession({
                 access_token: accessToken,
                 refresh_token: refreshToken,
             });
+            if (sessionError) throw sessionError;
 
-            if (sessionError) {
-                console.error('❌ Error setting session:', sessionError);
-                throw sessionError;
-            }
+            // Sync with backend and get JWT
+            const response = await axios.post(`${API_URL}/auth/google`, { accessToken });
 
-            // Now send to backend to sync/create user
-            const response = await axios.post(`${API_URL}/auth/google`, {
-                accessToken: accessToken,
-            });
-
-            // Store tokens and user data
             localStorage.setItem('accessToken', response.data.accessToken);
             localStorage.setItem('user', JSON.stringify(response.data.user));
             localStorage.setItem('supabaseToken', accessToken);
 
-            // Clear the hash from URL (clean up)
-            window.history.replaceState({}, document.title, window.location.pathname);
-
-            return {
-                success: true,
-                data: response.data,
-            };
-
+            return { success: true, data: response.data };
         } catch (error) {
-            console.error('Error details:', {
-                message: error.message,
-                response: error.response?.data,
-                status: error.response?.status,
-            });
-            
-            return {
-                success: false,
-                error: error.message || 'OAuth callback failed',
-            };
+            console.error('❌ OAuth callback failed:', error);
+            return { success: false, error: error.message || 'OAuth callback failed' };
         }
     },
 
+
+    // -----------------------------
     // Logout
+    // -----------------------------
     logout: async () => {
         try {
             await supabase.auth.signOut();
@@ -205,86 +171,18 @@ const authService = {
             localStorage.removeItem('user');
             return { success: true };
         } catch (error) {
-            return {
-                success: false,
-                error: error.message,
-            };
+            return { success: false, error: error.message };
         }
     },
 
-    // Get current user
+    // -----------------------------
+    // Current user helpers
+    // -----------------------------
     getCurrentUser: () => {
         const userStr = localStorage.getItem('user');
         return userStr ? JSON.parse(userStr) : null;
     },
-
-    // Check if user is authenticated
-    isAuthenticated: () => {
-        return !!localStorage.getItem('accessToken');
-    },
-    // Handle OAuth callback with pre-captured hash
-    handleOAuthCallbackWithHash: async (hash) => {
-        try {       
-            if (!hash || hash === '#') {
-                throw new Error('No hash data found - OAuth callback may have already been processed');
-            }
-            
-            // Parse the hash parameters
-            const hashParams = new URLSearchParams(hash.substring(1));
-            
-            const accessToken = hashParams.get('access_token');
-            const refreshToken = hashParams.get('refresh_token');
-            const expiresAt = hashParams.get('expires_at');
-            const expiresIn = hashParams.get('expires_in');
-            const providerToken = hashParams.get('provider_token');
-
-            if (!accessToken || !refreshToken) {
-                console.error('❌ Missing required tokens in URL hash');
-                throw new Error('Missing access_token or refresh_token in callback');
-            }
-
-            // Manually set the session in Supabase
-            const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
-                access_token: accessToken,
-                refresh_token: refreshToken,
-            });
-
-            if (sessionError) {
-                console.error('❌ Error setting session:', sessionError);
-                throw sessionError;
-            }
-
-            const response = await axios.post(`${API_URL}/auth/google`, {
-                accessToken: accessToken,
-            });
-
-            // Store tokens and user data
-            localStorage.setItem('accessToken', response.data.accessToken);
-            localStorage.setItem('user', JSON.stringify(response.data.user));
-            localStorage.setItem('supabaseToken', accessToken);
-
-            // Clear the hash from URL (clean up)
-            window.history.replaceState({}, document.title, window.location.pathname);
-
-            return {
-                success: true,
-                data: response.data,
-            };
-
-        } catch (error) {
-            console.error('Error details:', {
-                message: error.message,
-                response: error.response?.data,
-                status: error.response?.status,
-            });
-            
-            return {
-                success: false,
-                error: error.message || 'OAuth callback failed',
-            };
-        }
-    },
+    isAuthenticated: () => !!localStorage.getItem('accessToken'),
 };
-
 
 export default authService;

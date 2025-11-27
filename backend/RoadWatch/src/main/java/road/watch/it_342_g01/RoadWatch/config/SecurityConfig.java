@@ -35,6 +35,8 @@ public class SecurityConfig {
                     .requestMatchers(
                         "/error",
                         "/auth/**",
+                        "/auth/login",
+                        "/auth/local-login",
                         "/api/test/**",
                         "/api/users/add",
                         "/api/users/test",
@@ -56,6 +58,7 @@ public class SecurityConfig {
                     
                     // Fallback for any other requests
                     .anyRequest().authenticated()
+                        
                 )   
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

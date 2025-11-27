@@ -30,6 +30,29 @@ const UserManagement = () => {
     userName: ''
   });
 
+  // ✅ Get admin ID from localStorage
+  const getAdminId = () => {
+    const userId = localStorage.getItem('userId');
+    const userRole = localStorage.getItem('userRole');
+    
+    console.log('🔍 getAdminId Debug:');
+    console.log('  - Raw userId from localStorage:', userId);
+    console.log('  - Raw userRole from localStorage:', userRole);
+    console.log('  - userRole type:', typeof userRole);
+    console.log('  - userId type:', typeof userId);
+    console.log('  - Is ADMIN?', userRole === 'ADMIN');
+    console.log('  - Has userId?', !!userId);
+    
+    // Only return userId if the current user is an ADMIN
+    if (userRole === 'ADMIN' && userId) {
+      const parsedId = parseInt(userId, 10);
+      console.log('  ✅ Returning admin ID:', parsedId);
+      return parsedId;
+    }
+    console.log('  ❌ Returning null (not an admin or no userId)');
+    return null;
+  };
+
   // Fetch users from backend
   const fetchUsers = async () => {
     setLoading(true);
@@ -42,11 +65,11 @@ const UserManagement = () => {
       // Map backend fields to frontend table fields
       const mappedUsers = data.map(user => ({
         id: user.id,
-        fullName: user.name,  // backend 'name'
+        fullName: user.name,
         email: user.email,
         role: user.role,
-        dateRegistered: new Date(user.createdAt).toLocaleDateString(), // format LocalDateTime
-        status: user.isActive ? 'Active' : 'Suspended' // convert boolean to string
+        dateRegistered: new Date(user.createdAt).toLocaleDateString(),
+        status: user.isActive ? 'Active' : 'Suspended'
       }));
 
       setUsers(mappedUsers);
@@ -57,7 +80,6 @@ const UserManagement = () => {
       setLoading(false);
     }
   };
-
 
   useEffect(() => {
     fetchUsers();
@@ -84,7 +106,7 @@ const UserManagement = () => {
       isOpen: true,
       type: 'suspend',
       userId,
-      userName: user.name
+      userName: user.fullName
     });
   };
 
@@ -94,7 +116,7 @@ const UserManagement = () => {
       isOpen: true,
       type: 'activate',
       userId,
-      userName: user.name
+      userName: user.fullName
     });
   };
 
@@ -104,7 +126,7 @@ const UserManagement = () => {
       isOpen: true,
       type: 'revoke',
       userId,
-      userName: user.name
+      userName: user.fullName
     });
   };
 
@@ -116,18 +138,20 @@ const UserManagement = () => {
           await fetch(`http://localhost:8080/api/users/updateBy/${userId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status: 'SUSPENDED' })
+            body: JSON.stringify({ isActive: false })
           });
           break;
         case 'activate':
           await fetch(`http://localhost:8080/api/users/updateBy/${userId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status: 'ACTIVE' })
+            body: JSON.stringify({ isActive: true })
           });
           break;
         case 'revoke':
-          console.log('Revoke not implemented yet');
+          await fetch(`http://localhost:8080/api/users/deleteBy/${userId}`, {
+            method: 'DELETE'
+          });
           break;
         default:
           break;
@@ -147,17 +171,32 @@ const UserManagement = () => {
   const handleAddUser = () => setIsAddUserModalOpen(true);
   const handleCloseAddUserModal = () => setIsAddUserModalOpen(false);
 
-  // Add User
+  // ✅ Add User with Admin ID
   const handleSaveNewUser = async (newUser) => {
+    console.log('====================================');
+    console.log('🚀 handleSaveNewUser called');
+    console.log('====================================');
+    
     try {
+      const adminId = getAdminId(); // Get logged-in admin's ID
+      
+      console.log('📦 New User Data:', newUser);
+      console.log('👤 Admin ID:', adminId);
+      
       const payload = {
         username: newUser.email.split('@')[0],
         name: newUser.name || newUser.fullName,
         email: newUser.email,
         contact: newUser.contactNumber,
         role: newUser.role.toUpperCase(),
-        password: newUser.password
+        password: newUser.password,
+        assignedArea: newUser.assignedArea, 
+        createdByAdminId: adminId
       };
+
+      console.log('📤 FINAL PAYLOAD TO BACKEND:');
+      console.log(JSON.stringify(payload, null, 2));
+      console.log('====================================');
 
       const response = await fetch('http://localhost:8080/api/users/add', {
         method: 'POST',
@@ -165,29 +204,47 @@ const UserManagement = () => {
         body: JSON.stringify(payload)
       });
 
+      console.log('📥 Response status:', response.status);
+      
       const data = await response.json();
-      if (!response.ok || !data.success) throw new Error(data.error || 'Failed to create user');
+      console.log('📥 Response data:', data);
 
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to create user');
+      }
+
+      console.log('✅ User created successfully!');
       await fetchUsers(); // refresh table
       setIsAddUserModalOpen(false);
     } catch (err) {
-      console.error('Error creating user:', err);
+      console.error('❌ Error creating user:', err);
+      console.error('❌ Error details:', err.message);
+      alert(`Failed to create user: ${err.message}`);
     }
   };
 
   const handleSaveUser = async (updatedUser) => {
     try {
-      const payload = { ...updatedUser }; // modify fields as needed
+      const payload = {
+        username: updatedUser.username,
+        name: updatedUser.fullName || updatedUser.name,
+        email: updatedUser.email,
+        contact: updatedUser.contact || updatedUser.contactNumber,
+        role: updatedUser.role
+      };
+      
       await fetch(`http://localhost:8080/api/users/updateBy/${updatedUser.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
+      
       await fetchUsers(); // refresh table
       setIsModalOpen(false);
       setSelectedUser(null);
     } catch (err) {
       console.error('Error updating user:', err);
+      alert(`Failed to update user: ${err.message}`);
     }
   };
 
@@ -195,11 +252,26 @@ const UserManagement = () => {
     const { type, userName } = confirmationModal;
     switch (type) {
       case 'suspend':
-        return { title: 'Suspend User?', message: `Suspend ${userName}?`, confirmText: 'Suspend', type: 'warning' };
+        return { 
+          title: 'Suspend User?', 
+          message: `Are you sure you want to suspend ${userName}?`, 
+          confirmText: 'Suspend', 
+          type: 'warning' 
+        };
       case 'activate':
-        return { title: 'Activate User?', message: `Activate ${userName}?`, confirmText: 'Activate', type: 'warning' };
+        return { 
+          title: 'Activate User?', 
+          message: `Are you sure you want to activate ${userName}?`, 
+          confirmText: 'Activate', 
+          type: 'warning' 
+        };
       case 'revoke':
-        return { title: 'Revoke Access?', message: `Revoke ${userName}?`, confirmText: 'Revoke', type: 'warning' };
+        return { 
+          title: 'Revoke Access?', 
+          message: `Are you sure you want to permanently delete ${userName}?`, 
+          confirmText: 'Revoke', 
+          type: 'danger' 
+        };
       default:
         return { title: '', message: '', confirmText: '', type: 'warning' };
     }

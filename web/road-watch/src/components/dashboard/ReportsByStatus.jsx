@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Doughnut } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -10,11 +11,28 @@ import '../dashboard/styles/ReportsByStatus.css';
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const ReportsByStatus = () => {
+  const [resolved, setResolved] = useState(0);
+  const [inProgress, setInProgress] = useState(0);
+  const [pending, setPending] = useState(0);
+
+  useEffect(() => {
+    fetch("http://localhost:8080/api/reports/getAll")
+      .then(res => res.json())
+      .then(reports => {
+        setResolved(reports.filter(r => r.status === "Resolved").length);
+        setInProgress(reports.filter(r => r.status === "In-Progress").length);
+        setPending(reports.filter(r => r.status === "Pending").length);
+      })
+      .catch(err => console.error("Error fetching chart data:", err));
+  }, []);
+
+  const total = resolved + inProgress + pending;
+
   const chartData = {
-    labels: ['Resolved', 'In Progress', 'Pending'],
+    labels: ['Resolved', 'In-Progress', 'Pending'],
     datasets: [
       {
-        data: [1002, 156, 89],
+        data: [resolved, inProgress, pending],
         backgroundColor: ['#2e7d32', '#00695c', '#fbc02d'],
         borderWidth: 0,
         cutout: '70%'
@@ -22,30 +40,19 @@ const ReportsByStatus = () => {
     ]
   };
 
-  const total = 1247;
-
   const options = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: {
-        display: false 
-      },
+      legend: { display: false },
       tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        backgroundColor: 'rgba(0,0,0,0.8)',
         padding: 12,
         borderRadius: 8,
-        titleFont: {
-          size: 14,
-          weight: '600'
-        },
-        bodyFont: {
-          size: 13
-        },
         callbacks: {
           label: (context) => {
             const value = context.parsed;
-            const percentage = ((value / total) * 100).toFixed(1);
+            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
             return `${context.label}: ${value} (${percentage}%)`;
           }
         }
@@ -56,6 +63,7 @@ const ReportsByStatus = () => {
   return (
     <div className="reports-by-status">
       <h3 className="chart-title">Reports by Status</h3>
+
       <div className="chart-container">
         <div className="doughnut-wrapper">
           <Doughnut data={chartData} options={options} />
@@ -65,18 +73,21 @@ const ReportsByStatus = () => {
           </div>
         </div>
       </div>
+
       <div className="custom-legend">
         <div className="legend-item">
           <span className="legend-dot" style={{ backgroundColor: '#2e7d32' }}></span>
-          <span className="legend-text">Resolved ({chartData.datasets[0].data[0]})</span>
+          <span className="legend-text">Resolved ({resolved})</span>
         </div>
+
         <div className="legend-item">
           <span className="legend-dot" style={{ backgroundColor: '#00695c' }}></span>
-          <span className="legend-text">In Progress ({chartData.datasets[0].data[1]})</span>
+          <span className="legend-text">In Progress ({inProgress})</span>
         </div>
+
         <div className="legend-item">
           <span className="legend-dot" style={{ backgroundColor: '#fbc02d' }}></span>
-          <span className="legend-text">Pending ({chartData.datasets[0].data[2]})</span>
+          <span className="legend-text">Pending ({pending})</span>
         </div>
       </div>
     </div>

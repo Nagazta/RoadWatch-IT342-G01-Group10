@@ -3,7 +3,18 @@
 
     <style name="Theme.RoadWatch" parent="android:Theme.Material.Light.NoActionBar" />
 
+    <!-- AppCompat theme for activities that need it -->
     <style name="Theme.RoadWatch.AppCompat" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="colorPrimary">#00796B</item>
+        <item name="colorPrimaryDark">#00695C</item>
+        <item name="colorAccent">#4DB6AC</item>
+    </style>
+
+    <!-- MaterialComponents theme for activities with Material components -->
+    <style name="Theme.RoadWatch.Material" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">#00796B</item>
+        <item name="colorPrimaryDark">#00695C</item>
+        <item name="colorAccent">#4DB6AC</item>
     </style>
 
 </resources>

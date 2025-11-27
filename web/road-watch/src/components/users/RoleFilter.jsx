@@ -6,7 +6,7 @@ const RoleFilter = ({ value, onChange }) => {
   const roles = [
     'All Roles',
     'Citizen',
-    'Moderator',
+    'Inspector',
     'Admin'
   ];
 

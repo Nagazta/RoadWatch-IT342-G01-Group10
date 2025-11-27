@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDateTime;
 
 @Entity
@@ -12,16 +13,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class inspectorEntity {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "inspector_id")
-    private Long inspectorId;
-    
-    @OneToOne
-    @JoinColumn(name = "user_id", unique = true, nullable = false)
-    private userEntity user;
-    
+    private Long id;
+
     @Column(name = "area_assignment")
     private String areaAssignment;
     
@@ -30,6 +27,18 @@ public class inspectorEntity {
     
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    // These fields do NOT exist in Supabase, so we mark them Transient
+    @Transient
+    private String status = "Available";
+
+    @Transient
+    private int activeAssignments = 0;
+
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    @JsonIgnoreProperties({"password", "roles", "hibernateLazyInitializer", "handler"})
+    private userEntity user;
     
     @PrePersist
     protected void onCreate() {

@@ -1,93 +1,175 @@
+import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-const categories = ['Pothole','Crack','Debris','Flooding','Other'];
-const MAX_PHOTOS = 5, MAX_SIZE_MB = 5;
-const CreateReport = () => {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('');
-  const [location, setLocation] = useState('');
-  const [photos, setPhotos] = useState([]);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const handlePhotoChange = e => {
-    const files = Array.from(e.target.files);
-    if (files.length + photos.length > MAX_PHOTOS) {
-      setError(`You can upload up to ${MAX_PHOTOS} photos.`);
-      return;
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import reportService from '../../services/api/reportService';
+import '../citizen/styles/CitizenSubmit.css';
+
+// Custom component for picking a location
+const LocationPicker = ({ position, setPosition }) => {
+  useMapEvents({
+    click(e) {
+      setPosition(e.latlng);
     }
-    for (let f of files) {
-      if (f.size > MAX_SIZE_MB * 1024 * 1024) {
-        setError(`Each photo must be under ${MAX_SIZE_MB}MB.`);
-        return;
-      }
-    }
-    setPhotos([...photos, ...files]);
-    setError('');
-  };
-  const handleRemovePhoto = idx => {
-    setPhotos(photos.filter((_, i) => i !== idx));
-  };
-  const handleSubmit = e => {
-    e.preventDefault();
-    setSuccess('');
-    if (!title || !category || !location) {
-      setError('Please fill all required fields.');
-      return;
-    }
-    if (photos.length === 0) {
-      setError('Please upload at least 1 photo.');
-      return;
-    }
-    setError('');
-    setSuccess('Report created successfully (demo only)!');
-    setTitle(''); setDescription(''); setCategory(''); setLocation(''); setPhotos([]);
-  };
-  return (
-    <div style={{maxWidth:520,margin:'38px auto',padding:'14px'}}>
-      <div style={{background:'#fff',borderRadius:14,boxShadow:'0 3px 16px #cfe3d94a',padding:'36px 34px',marginBottom:22}}>
-        <h2 style={{fontWeight:700,fontSize:26,color:'#219487',margin:'0 0 20px'}}>Create New Report</h2>
-        <form onSubmit={handleSubmit}>
-          <div style={{marginBottom:20}}>
-            <label style={{fontWeight:600,display:'block',marginBottom:7}}>Title<span style={{color:'#ba1919'}}>*</span></label>
-            <input style={{width:'100%',padding:'11px',fontSize:16,borderRadius:7,border:'1.5px solid #b9ebe0',outline:'none',boxSizing:'border-box'}}
-              value={title} onChange={e=>setTitle(e.target.value)} placeholder="Short descriptive title" required />
-          </div>
-          <div style={{marginBottom:20}}>
-            <label style={{fontWeight:600,display:'block',marginBottom:7}}>Description</label>
-            <textarea style={{width:'100%',padding:'11px',fontSize:16,borderRadius:7,border:'1.5px solid #b9ebe0',outline:'none',minHeight:80,resize:'vertical',boxSizing:'border-box'}}
-              value={description} onChange={e=>setDescription(e.target.value)} placeholder="Add any details (optional)" />
-          </div>
-          <div style={{marginBottom:20}}>
-            <label style={{fontWeight:600,display:'block',marginBottom:7}}>Category<span style={{color:'#ba1919'}}>*</span></label>
-            <select style={{width:'100%',padding:'11px',fontSize:16,borderRadius:7,border:'1.5px solid #b9ebe0',outline:'none',background:'#f3fbf9'}} value={category} onChange={e=>setCategory(e.target.value)} required>
-              <option value="">Select Category</option>
-              {categories.map(c=>(<option key={c} value={c}>{c}</option>))}
-            </select>
-          </div>
-          <div style={{marginBottom:20}}>
-            <label style={{fontWeight:600,display:'block',marginBottom:7}}>Location<span style={{color:'#ba1919'}}>*</span></label>
-            <input style={{width:'100%',padding:'11px',fontSize:16,borderRadius:7,border:'1.5px solid #b9ebe0',outline:'none',boxSizing:'border-box'}}
-              value={location} onChange={e=>setLocation(e.target.value)} placeholder="e.g. 123 Main St, Barangay" required />
-          </div>
-          <hr style={{border:'none',borderTop:'1.5px solid #f1efef',margin:'32px 0 20px'}} />
-          <div style={{marginBottom:10}}>
-            <label style={{fontWeight:600,display:'block',marginBottom:12}}>Photos<span style={{color:'#ba1919'}}>*</span> <span style={{fontWeight:400, fontSize:13, color:'#5b7c6b'}}>(1–5 images, max 5MB each)</span></label>
-            <input type="file" multiple accept="image/*" onChange={handlePhotoChange} style={{fontSize:15}} />
-            {photos.length > 0 && <div style={{display:'flex',flexWrap:'wrap',gap:'10px',marginTop:13}}>{photos.map((p,i)=>(<div key={i} style={{position:'relative'}}>
-              <img alt="preview" src={URL.createObjectURL(p)} style={{width:65,height:65,objectFit:'cover',borderRadius:8,border:'1px solid #aad2ca'}} />
-              <button type="button" aria-label="Remove Photo" onClick={()=>handleRemovePhoto(i)} style={{position:'absolute',top:-7,right:-7,background:'#db5757',border:'none',borderRadius:'50%',width:22,height:22,color:'#fff',fontWeight:700,fontSize:15,cursor:'pointer',boxShadow:'0 2px 10px #ccc'}}>×</button>
-            </div>))}</div>}
-          </div>
-          {error && <div style={{background:'#fff4f4',color:'#b31212',fontWeight:600,padding:'11px 18px',borderRadius:7,margin:'20px 0 4px',fontSize:15,border:'1px solid #ffecec'}}>{error}</div>}
-          {success && <div style={{background:'#edfbf2',color:'#1a7e46',fontWeight:600,padding:'13px 18px',borderRadius:9,margin:'20px 0 14px',fontSize:15,border:'1.5px solid #c6eeda',boxShadow:'0 2px 12px #c2ebe11a'}}>{success}</div>}
-          <button type="submit" style={{width:'100%',background:'#26bd5b',color:'#fff',border:'none',borderRadius:8,padding:'15px 0',fontWeight:700,fontSize:18,marginTop:14, boxShadow:'0 2px 10px #b9ebe08c', cursor:'pointer', transition: 'background .145s'}}
-            onMouseOver={e => e.currentTarget.style.background='#179a3f'}
-            onMouseOut={e => e.currentTarget.style.background='#26bd5b'}>
-            Submit Report
-          </button>
-        </form>
-      </div>
-    </div>
+  });
+
+  return position === null ? null : (
+    <Marker position={position} icon={L.icon({ iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', iconSize: [25, 41], iconAnchor: [12, 41] })} />
   );
 };
+
+const CreateReport = () => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    category: '',
+    location: '',
+    latitude: null,
+    longitude: null
+  });
+
+  const [mapPosition, setMapPosition] = useState(null);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleCancel = () => {
+    navigate('/inspector/dashboard');
+  };
+
+  const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const user = localStorage.getItem('user');
+        const parsedUser = JSON.parse(user);
+
+        // Use email instead of full name
+        const email = parsedUser.email;
+
+        // Include lat/lng in the report
+        const payload = {
+            ...formData,
+            latitude: mapPosition?.lat,
+            longitude: mapPosition?.lng,
+            submittedBy: email  // <-- send email
+        };
+
+        const response = await reportService.createReport(payload, email);
+
+        if (response.success) {
+            console.log('Report submitted!');
+            alert('Report submitted!');
+            navigate('/inspector/dashboard');
+        }
+    };
+
+
+  return (
+    <form className="citizen-submit" onSubmit={handleSubmit}>
+      <div className="cs-header">
+        <h2> Submit a New Report </h2>
+        <p> Help improve road safety in your community by reporting damage or hazards </p>
+      </div>
+
+      {/* Report Title */}
+      <div className="cs-input">
+        <h4> Report Title </h4>
+        <input
+          id="title"
+          name="title"
+          type="text"
+          placeholder="Brief description of the issue (e.g., Large pothole on Main Street)"
+          value={formData.title}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      {/* Report Description */}
+      <div className="cs-input">
+        <h4> Description </h4>
+        <input
+          id="description"
+          name="description"
+          type="text"
+          value={formData.description}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      {/* Report Category */}
+      <div className="cs-input">
+        <h4> Category </h4>
+        <select
+          id="category"
+          name="category"
+          value={formData.category}
+          onChange={(e) => setFormData((prev) => ({ ...prev, category: e.target.value }))}
+          required
+        >
+          <option value=""> </option>
+          <option value="Pothole"> Pothole </option>
+          <option value="Flooding"> Flooding </option>
+          <option value="Debris"> Debris </option>
+          <option value="Crack"> Crack </option>
+          <option value="Other"> Other </option>
+        </select>
+      </div>
+
+      {/* Report Location */}
+      <div className="cs-input">
+        <h4> Location </h4>
+        <input
+          id="location"
+          name="location"
+          type="text"
+          value={formData.location}
+          onChange={handleChange}
+          placeholder="Enter street address or landmark"
+          required
+        />
+
+        <p>Click on the map to pick the exact location:</p>
+        <div className="map-wrapper" style={{ height: '300px', marginBottom: '16px' }}>
+          <MapContainer
+            center={[10.3157, 123.8854]}
+            zoom={13}
+            style={{ height: '100%', width: '100%' }}
+          >
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            />
+            <LocationPicker position={mapPosition} setPosition={setMapPosition} />
+          </MapContainer>
+        </div>
+
+        {mapPosition && (
+          <p>
+            Selected Coordinates: Latitude {mapPosition.lat.toFixed(6)}, Longitude {mapPosition.lng.toFixed(6)}
+          </p>
+        )}
+      </div>
+
+      {/* Report Images */}
+      <div className="cs-input">
+        <h4> Photos </h4>
+        <p> Upload up to 5 photos (JPEG/PNG, max 5MB each) </p>
+        <input type="file" accept="image/*" multiple />
+      </div>
+
+      {/* Buttons */}
+      <div className="cs-buttons">
+        <button type="submit"> Submit </button>
+        <button type="button" onClick={handleCancel}> Cancel </button>
+      </div>
+    </form>
+  );
+};
+
 export default CreateReport;
