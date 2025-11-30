@@ -265,4 +265,303 @@
     cursor: pointer;
 }
 
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .citizen-settings {
+        margin-left: 220px;
+        padding: 20px;
+    }
+
+    .profile-info,
+    .notification-preferences,
+    .account-security,
+    .privacy-settings,
+    .danger-zone {
+        padding: 24px;
+        margin-bottom: 24px;
+        border-radius: 12px;
+    }
+
+    .profile-info h3,
+    .notification-preferences h3,
+    .account-security h3,
+    .privacy-settings h3,
+    .danger-zone h3 {
+        font-size: 20px;
+    }
+
+    .profile-info input,
+    .profile-info textarea {
+        padding: 10px;
+        margin-bottom: 12px;
+    }
+
+    .save-changes {
+        padding: 10px 20px;
+        margin-top: 16px;
+    }
+
+    .account-security .password,
+    .danger-zone .delete {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .account-security .password div,
+    .danger-zone .delete div {
+        width: 100%;
+    }
+
+    .account-security button,
+    .danger-zone .delete button {
+        width: auto;
+        align-self: flex-start;
+    }
+}
+
+@media (max-width: 768px) {
+    .citizen-settings {
+        margin-left: 0;
+        padding: 16px;
+    }
+
+    .profile-info,
+    .notification-preferences,
+    .account-security,
+    .privacy-settings,
+    .danger-zone {
+        padding: 20px;
+        margin-bottom: 20px;
+        border-radius: 12px;
+    }
+
+    .profile-info h3,
+    .notification-preferences h3,
+    .account-security h3,
+    .privacy-settings h3,
+    .danger-zone h3 {
+        font-size: 18px;
+        margin-bottom: 12px;
+    }
+
+    .profile-info p,
+    .notification-preferences p,
+    .account-security p,
+    .privacy-settings p,
+    .danger-zone p {
+        font-size: 14px;
+    }
+
+    .profile-info .avatar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        margin: 16px 0;
+    }
+
+    .profile-info .avatar svg {
+        width: 60px;
+        height: 60px;
+    }
+
+    .profile-info .avatar button {
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+
+    .profile-info label {
+        font-size: 14px;
+        margin-bottom: 6px;
+    }
+
+    .profile-info input,
+    .profile-info textarea {
+        padding: 10px;
+        margin-bottom: 12px;
+        font-size: 14px;
+        border-radius: 6px;
+    }
+
+    .cannot-change {
+        font-size: 12px;
+        margin-top: -8px;
+        margin-bottom: 12px;
+    }
+
+    .save-changes {
+        padding: 10px 16px;
+        margin-top: 12px;
+        align-self: flex-start;
+        font-size: 14px;
+    }
+
+    .toggle-preference {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .toggle-preference h4 {
+        margin-top: 12px;
+        font-size: 15px;
+    }
+
+    .toggle-preference div {
+        width: 100%;
+    }
+
+    .account-security .password,
+    .danger-zone .delete {
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 12px;
+    }
+
+    .account-security .password div,
+    .danger-zone .delete div {
+        width: 100%;
+    }
+
+    .account-security .password h4,
+    .danger-zone .delete h4 {
+        font-size: 15px;
+        margin: 0;
+    }
+
+    .account-security button,
+    .danger-zone .delete button {
+        width: 100%;
+        padding: 10px 12px;
+        font-size: 14px;
+        justify-self: auto;
+        align-self: auto;
+    }
+
+    .account-security hr,
+    .notification-preferences hr {
+        margin: 12px 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .citizen-settings {
+        margin-left: 0;
+        padding: 12px;
+    }
+
+    .profile-info,
+    .notification-preferences,
+    .account-security,
+    .privacy-settings,
+    .danger-zone {
+        padding: 16px;
+        margin-bottom: 16px;
+        border-radius: 10px;
+    }
+
+    .profile-info h3,
+    .notification-preferences h3,
+    .account-security h3,
+    .privacy-settings h3,
+    .danger-zone h3 {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+    .profile-info p,
+    .notification-preferences p,
+    .account-security p,
+    .privacy-settings p,
+    .danger-zone p {
+        font-size: 13px;
+    }
+
+    .profile-info .avatar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        margin: 12px 0;
+    }
+
+    .profile-info .avatar svg {
+        width: 50px;
+        height: 50px;
+    }
+
+    .profile-info .avatar button {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+
+    .profile-info label {
+        font-size: 13px;
+        margin-bottom: 6px;
+    }
+
+    .profile-info input,
+    .profile-info textarea {
+        padding: 10px;
+        margin-bottom: 10px;
+        font-size: 16px;
+        border-radius: 6px;
+    }
+
+    .cannot-change {
+        font-size: 11px;
+        margin-top: -6px;
+        margin-bottom: 10px;
+    }
+
+    .save-changes {
+        padding: 10px 12px;
+        margin-top: 10px;
+        align-self: flex-start;
+        font-size: 13px;
+    }
+
+    .toggle-preference {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .toggle-preference h4 {
+        margin-top: 10px;
+        font-size: 14px;
+    }
+
+    .toggle-preference div {
+        width: 100%;
+    }
+
+    .account-security .password,
+    .danger-zone .delete {
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .account-security .password div,
+    .danger-zone .delete div {
+        width: 100%;
+    }
+
+    .account-security .password h4,
+    .danger-zone .delete h4 {
+        font-size: 14px;
+        margin: 0;
+    }
+
+    .account-security button,
+    .danger-zone .delete button {
+        width: 100%;
+        padding: 10px 10px;
+        font-size: 12px;
+        justify-self: auto;
+        align-self: auto;
+    }
+
+    .account-security hr,
+    .notification-preferences hr {
+        margin: 10px 0;
+    }
+}
 

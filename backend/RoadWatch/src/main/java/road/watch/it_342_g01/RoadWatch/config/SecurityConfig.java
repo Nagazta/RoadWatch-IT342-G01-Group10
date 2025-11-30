@@ -43,12 +43,18 @@ public class SecurityConfig {
                         "/api/admin/add",
                         "/api/citizen/add",
                         "/api/inspector/add",
-                        "/api/reports/**",
                         "/api/users/getAll",
                         "/api/reports/getAll",
-                        "/api/users/db-test",  // Add this line
+                        "/api/reports/getAll/name",
+                        "/api/reports/getByEmail",
+                        "/api/users/db-test",
                         "/actuator/**"
                     ).permitAll()
+                    
+                    // Authenticated endpoints for reports
+                    .requestMatchers("/api/reports/getDetail/**").authenticated()
+                    .requestMatchers("/api/reports/getMyAssignedReport").authenticated()
+                    .requestMatchers("/api/reports/**").permitAll()
                     
                     // Admin-only endpoints
                     .requestMatchers("/api/users/**").hasRole("ADMIN")

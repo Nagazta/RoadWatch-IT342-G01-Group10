@@ -5,6 +5,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import reportService from '../../services/api/reportService';
 import '../citizen/styles/CitizenSubmit.css';
+import './styles/SubmittedReports.css';
 
 // Custom component for picking a location
 const LocationPicker = ({ position, setPosition }) => {
@@ -90,7 +91,7 @@ const CreateReport = () => {
   };
 
   return (
-    <>
+    <div className="dashboard-container inspector-page">
       <form className="citizen-submit" onSubmit={handleSubmit}>
         <div className="cs-header">
           <h2> Submit a New Report </h2>
@@ -183,42 +184,106 @@ const CreateReport = () => {
           <button type="button" onClick={handleCancel}> Cancel </button>
         </div>
       </form>
-      <div style={{ maxWidth: '950px', margin: '32px auto', padding: '0 1vw' }}>
-        <h3>Submitted Reports</h3>
+
+      {/* Submitted Reports Section */}
+      <div className="submitted-reports-section">
+        <h2 className="submitted-reports-title">Submitted Reports</h2>
+        
         {loadingReports ? (
-          <p>Loading reports...</p>
-        ) : errorReports ? (
-          <p style={{ color: 'red' }}>{errorReports}</p>
-        ) : !reportList.length ? (
-          <p>No reports submitted yet.</p>
-        ) : (
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', background: '#fff', borderCollapse: 'collapse', border: '1px solid #d6dcf0' }}>
-              <thead style={{ background: '#f5f8fc' }}>
-                <tr>
-                  <th style={{ padding: '10px 16px', borderBottom: '1px solid #e3e7f1' }}>Title</th>
-                  <th style={{ padding: '10px 16px', borderBottom: '1px solid #e3e7f1' }}>Category</th>
-                  <th style={{ padding: '10px 16px', borderBottom: '1px solid #e3e7f1' }}>Location</th>
-                  <th style={{ padding: '10px 12px', borderBottom: '1px solid #e3e7f1' }}>Status</th>
-                  <th style={{ padding: '10px 12px', borderBottom: '1px solid #e3e7f1' }}>Date Submitted</th>
-                </tr>
-              </thead>
-              <tbody>
-                {reportList.map((rep, i) => (
-                  <tr key={rep.id || i}>
-                    <td style={{ padding: '6px 16px', borderBottom: '1px solid #e3e7f1' }}>{rep.title}</td>
-                    <td style={{ padding: '6px 16px', borderBottom: '1px solid #e3e7f1' }}>{rep.category}</td>
-                    <td style={{ padding: '6px 16px', borderBottom: '1px solid #e3e7f1' }}>{rep.location || '-'}</td>
-                    <td style={{ padding: '6px 12px', borderBottom: '1px solid #e3e7f1' }}>{rep.status || '-'}</td>
-                    <td style={{ padding: '6px 12px', borderBottom: '1px solid #e3e7f1' }}>{rep.dateSubmitted || rep.createdAt || '-'}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="submitted-reports-empty">
+            <p>Loading reports...</p>
           </div>
+        ) : errorReports ? (
+          <div className="submitted-reports-error">
+            <p>{errorReports}</p>
+          </div>
+        ) : !reportList.length ? (
+          <div className="submitted-reports-empty">
+            <p>No reports submitted yet.</p>
+          </div>
+        ) : (
+          <>
+            {/* Desktop Table View */}
+            <div className="submitted-reports-table-wrapper">
+              <table className="submitted-reports-table">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                    <th>Date Submitted</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {reportList.map((rep, i) => (
+                    <tr key={rep.id || i}>
+                      <td className="report-title-cell">{rep.title}</td>
+                      <td>{rep.category}</td>
+                      <td>{rep.location || '-'}</td>
+                      <td>
+                        <span className={`status-badge status-${rep.status?.toLowerCase().replace(/\s+/g, '-') || 'pending'}`}>
+                          {rep.status || '-'}
+                        </span>
+                      </td>
+                      <td className="date-cell">
+                        {rep.dateSubmitted ? new Date(rep.dateSubmitted).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric'
+                        }) : (rep.createdAt ? new Date(rep.createdAt).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric'
+                        }) : '-')}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="submitted-reports-cards">
+              {reportList.map((rep, i) => (
+                <div key={rep.id || i} className="submitted-report-card">
+                  <div className="card-header">
+                    <h3 className="card-title">{rep.title}</h3>
+                    <span className={`status-badge status-${rep.status?.toLowerCase().replace(/\s+/g, '-') || 'pending'}`}>
+                      {rep.status || '-'}
+                    </span>
+                  </div>
+                  <div className="card-body">
+                    <div className="card-row">
+                      <span className="card-label">Category:</span>
+                      <span className="card-value">{rep.category}</span>
+                    </div>
+                    <div className="card-row">
+                      <span className="card-label">Location:</span>
+                      <span className="card-value">{rep.location || '-'}</span>
+                    </div>
+                    <div className="card-row">
+                      <span className="card-label">Date:</span>
+                      <span className="card-value">
+                        {rep.dateSubmitted ? new Date(rep.dateSubmitted).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric'
+                        }) : (rep.createdAt ? new Date(rep.createdAt).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric'
+                        }) : '-')}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
-    </>
+    </div>
   );
 };
 

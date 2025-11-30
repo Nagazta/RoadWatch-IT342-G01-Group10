@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import '../citizen/styles/CitizenSettings.css';
 import '../admin/styles/Dashboard.css';
 import './styles/InspectorStyles.css';
@@ -27,18 +27,32 @@ const Modal = ({ open, onClose, children }) => {
 };
 
 const Settings = () => {
-  const [name, setName] = useState('Inspector Davis');
-  const [email, setEmail] = useState('inspector.davis@email.com');
-  const [contact, setContact] = useState('09171234567');
-  const [address, setAddress] = useState('IT Park, Cebu City');
-  const [googleAuth, setGoogleAuth] = useState(true);
-  const [editingPassword, setEditingPassword] = useState(false);
-  const [newPass, setNewPass] = useState('');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [contact, setContact] = useState('');
+  const [address, setAddress] = useState('');
+  const [googleAuth, setGoogleAuth] = useState(false);
   const [editError, setEditError] = useState('');
   const [editSuccess, setEditSuccess] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [profilePic, setProfilePic] = useState(null);
   const [uploadErr, setUploadErr] = useState('');
+  const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordSuccess, setPasswordSuccess] = useState('');
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+      setName(user.name || '');
+      setEmail(user.email || '');
+      setContact(user.contact || '');
+      setAddress(user.address || '');
+    }
+  }, []);
 
   const handleProfileEdit = (e) => {
     e.preventDefault();
@@ -52,15 +66,36 @@ const Settings = () => {
     setTimeout(() => setEditSuccess(''), 1500);
   };
 
-  const handlePasswordSave = () => {
-    if (!newPass.trim()) {
-      setEditError('Password is required');
+  const handlePasswordChange = () => {
+    setPasswordError('');
+    
+    if (!currentPassword.trim()) {
+      setPasswordError('Current password is required');
       return;
     }
-    setEditError('');
-    setEditSuccess('Password changed!');
-    setEditingPassword(false);
-    setTimeout(() => setEditSuccess(''), 1500);
+    if (!newPassword.trim()) {
+      setPasswordError('New password is required');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordError('Passwords do not match');
+      return;
+    }
+    if (newPassword.length < 6) {
+      setPasswordError('Password must be at least 6 characters');
+      return;
+    }
+
+    // TODO: Call backend API to change password with verification
+    setPasswordSuccess('Password changed successfully!');
+    setPasswordError('');
+    setCurrentPassword('');
+    setNewPassword('');
+    setConfirmPassword('');
+    setTimeout(() => {
+      setPasswordSuccess('');
+      setPasswordModalOpen(false);
+    }, 1500);
   };
 
   const handleUpload = (e) => {
@@ -96,6 +131,66 @@ const Settings = () => {
           <button className="inspector-btn-primary" type="button" onClick={() => setModalOpen(false)}>
             Save
           </button>
+        </div>
+      </Modal>
+
+      <Modal open={passwordModalOpen} onClose={() => {
+        setPasswordModalOpen(false);
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+        setPasswordError('');
+        setPasswordSuccess('');
+      }}>
+        <div className="inspector-modal-content">
+          <h3>Change Password</h3>
+          <label htmlFor="current-pass">Current Password</label>
+          <input
+            id="current-pass"
+            type="password"
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+            placeholder="Enter current password"
+            className="inspector-text-input"
+          />
+          
+          <label htmlFor="new-pass">New Password</label>
+          <input
+            id="new-pass"
+            type="password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            placeholder="Enter new password"
+            className="inspector-text-input"
+          />
+          
+          <label htmlFor="confirm-pass">Confirm Password</label>
+          <input
+            id="confirm-pass"
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            placeholder="Confirm new password"
+            className="inspector-text-input"
+          />
+          
+          {passwordError && <div className="inspector-alert inspector-alert--error">{passwordError}</div>}
+          {passwordSuccess && <div className="inspector-alert inspector-alert--success">{passwordSuccess}</div>}
+          
+          <div style={{ display: 'flex', gap: '10px', marginTop: '16px' }}>
+            <button className="inspector-btn-primary" type="button" onClick={handlePasswordChange}>
+              Change Password
+            </button>
+            <button className="inspector-btn-secondary" type="button" onClick={() => {
+              setPasswordModalOpen(false);
+              setCurrentPassword('');
+              setNewPassword('');
+              setConfirmPassword('');
+              setPasswordError('');
+            }}>
+              Cancel
+            </button>
+          </div>
         </div>
       </Modal>
 
@@ -164,34 +259,9 @@ const Settings = () => {
             <h4>Password</h4>
             <p>Keep your account secure with a strong password</p>
           </div>
-          {editingPassword ? (
-            <div className="inspector-password-actions">
-              <input
-                type="password"
-                value={newPass}
-                onChange={(e) => setNewPass(e.target.value)}
-                placeholder="New password..."
-                className="inspector-text-input"
-              />
-              <button type="button" className="inspector-btn-primary" onClick={handlePasswordSave}>
-                Save
-              </button>
-              <button
-                type="button"
-                className="inspector-btn-secondary"
-                onClick={() => {
-                  setEditingPassword(false);
-                  setNewPass('');
-                }}
-              >
-                Cancel
-              </button>
-            </div>
-          ) : (
-            <button type="button" className="inspector-btn-secondary" onClick={() => setEditingPassword(true)}>
-              Change Password
-            </button>
-          )}
+          <button type="button" className="inspector-btn-secondary" onClick={() => setPasswordModalOpen(true)}>
+            Change Password
+          </button>
         </div>
         <hr />
         <div className="toggle-preference">

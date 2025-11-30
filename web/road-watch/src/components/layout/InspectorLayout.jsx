@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MainLayout from './MainLayout';
 import Sidebar from '../common/Sidebar';
@@ -9,6 +9,29 @@ import Header from './Header';
 const InspectorLayout = ({ children, activeMenuItem, pageTitle }) => {
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
+  const [userData, setUserData] = useState({ name: 'Inspector User', role: 'Inspector', avatar: 'IN' });
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const user = JSON.parse(storedUser);
+        const initials = (user.name || user.username || 'IN')
+          .split(' ')
+          .map(n => n[0])
+          .join('')
+          .toUpperCase()
+          .slice(0, 2);
+        setUserData({
+          name: user.name || user.username || 'Inspector User',
+          role: user.role || 'Inspector',
+          avatar: initials || 'IN'
+        });
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+      }
+    }
+  }, []);
 
   const handleNavigate = (item) => {
     if (item.path) {
@@ -50,9 +73,9 @@ const InspectorLayout = ({ children, activeMenuItem, pageTitle }) => {
         header={
           <Header
             pageTitle={pageTitle}
-            userName="Inspector User"
-            userRole="Inspector"
-            userAvatar="IN"
+            userName={userData.name}
+            userRole={userData.role}
+            userAvatar={userData.avatar}
             notificationCount={2}
             onProfileClick={handleHeaderAction}
             onNotificationClick={() => setShowNotifications(true)} 

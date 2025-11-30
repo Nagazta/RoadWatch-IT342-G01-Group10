@@ -12,6 +12,93 @@
   border-collapse: collapse;
 }
 
+.table-view {
+  display: block;
+}
+
+.cards-view {
+  display: none;
+}
+
+/* Mobile Card Styles */
+.cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.report-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2eeea;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.report-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid #f0f3f5;
+  background: #fafbfc;
+}
+
+.report-card-title {
+  font-weight: 600;
+  font-size: 15px;
+  color: #155e74;
+  flex: 1;
+}
+
+.report-card-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.report-card-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.report-card-label {
+  font-weight: 600;
+  font-size: 13px;
+  color: #399cbb;
+  min-width: 90px;
+}
+
+.report-card-value {
+  font-size: 14px;
+  color: #3f6277;
+  flex: 1;
+  text-align: right;
+}
+
+.report-card-footer {
+  padding: 12px 16px;
+  border-top: 1px solid #f0f3f5;
+  background: #fafbfc;
+}
+
+/* Desktop - Show table, hide cards */
+@media (min-width: 769px) {
+  .table-view {
+    display: block;
+  }
+
+  .cards-view {
+    display: none;
+  }
+}
+
+/* Tablet - Show table with horizontal scroll */
 @media (max-width: 768px) {
   .table-container {
     overflow-x: auto;
@@ -19,5 +106,59 @@
 
   .reports-table {
     min-width: 1000px;
+  }
+
+  .table-view {
+    display: block;
+  }
+
+  .cards-view {
+    display: none;
+  }
+}
+
+/* Mobile - Show cards, hide table */
+@media (max-width: 480px) {
+  .table-view {
+    display: none;
+  }
+
+  .cards-view {
+    display: flex;
+  }
+
+  .report-card {
+    border-radius: 10px;
+  }
+
+  .report-card-header {
+    padding: 14px;
+    gap: 10px;
+  }
+
+  .report-card-title {
+    font-size: 14px;
+  }
+
+  .report-card-body {
+    padding: 14px;
+    gap: 10px;
+  }
+
+  .report-card-row {
+    gap: 10px;
+  }
+
+  .report-card-label {
+    font-size: 12px;
+    min-width: 70px;
+  }
+
+  .report-card-value {
+    font-size: 13px;
+  }
+
+  .report-card-footer {
+    padding: 10px 14px;
   }
 }

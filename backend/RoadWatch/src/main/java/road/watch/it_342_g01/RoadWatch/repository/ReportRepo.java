@@ -12,4 +12,5 @@ public interface ReportRepo extends JpaRepository<ReportEntity, Long>
     List<ReportEntity> findByCategory(String category);
     List<ReportEntity> findByStatus(String status);
     List<ReportEntity> findBySubmittedBy(String submittedBy);
+    List<ReportEntity> findByAssignedInspector_Id(Long inspectorId);
 }

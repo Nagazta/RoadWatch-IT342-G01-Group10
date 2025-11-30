@@ -1,4 +1,5 @@
 import { useMemo, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ReportsFilters from '../../components/reports/ReportsFilter';
 import ReportsTable from '../../components/reports/ReportsTable';
 import ReportsPagination from '../../components/reports/ReportsPagination';
@@ -9,6 +10,7 @@ import '../admin/styles/ReportsManagement.css';
 import './styles/InspectorStyles.css';
 
 const InspectorDashboard = () => {
+  const navigate = useNavigate();
   const [allReports, setAllReports] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
@@ -22,12 +24,12 @@ const InspectorDashboard = () => {
     const fetchAllReports = async () => {
       setFetching(true);
       setFetchErr('');
-      const res = await reportService.getAllReports();
+      const res = await reportService.getMyAssignedReports();
       setFetching(false);
       if(res.success) {
         setAllReports(Array.isArray(res.data) ? res.data : []);
       } else {
-        setFetchErr('Failed to fetch reports');
+        setFetchErr(res.error || 'Failed to fetch assigned reports');
       }
     };
     fetchAllReports();
@@ -58,7 +60,7 @@ const InspectorDashboard = () => {
   };
 
   const handleView = (reportId) => {
-    console.log('View report', reportId);
+    navigate(`/inspector/reports/${reportId}`);
   };
 
   return (

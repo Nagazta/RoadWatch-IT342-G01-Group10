@@ -74,4 +74,30 @@ public class ReportService {
     public List<ReportEntity> getReportsByEmail(String email) {
     return reportRepo.findBySubmittedBy(email);
     }
+
+    public List<ReportEntity> getMyAssignedReports(Long inspectorId) {
+        return reportRepo.findByAssignedInspector_Id(inspectorId);
+    }
+
+    public ReportEntity updateReportStatus(Long reportId, String newStatus) {
+        return reportRepo.findById(reportId)
+                .map(report -> {
+                    report.setStatus(newStatus);
+                    return reportRepo.save(report);
+                })
+                .orElseThrow(() -> new RuntimeException("Report not found with id: " + reportId));
+    }
+
+    public ReportEntity addCommentToReport(Long reportId, String comment) {
+        return reportRepo.findById(reportId)
+                .map(report -> {
+                    String existingNotes = report.getAdminNotes() != null ? report.getAdminNotes() : "";
+                    String timestamp = java.time.LocalDateTime.now().toString();
+                    String newNote = existingNotes + (existingNotes.isEmpty() ? "" : "\n---\n") + 
+                                   "[" + timestamp + "] " + comment;
+                    report.setAdminNotes(newNote);
+                    return reportRepo.save(report);
+                })
+                .orElseThrow(() -> new RuntimeException("Report not found with id: " + reportId));
+    }
 }

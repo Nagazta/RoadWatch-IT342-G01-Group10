@@ -15,10 +15,9 @@ const SearchReports = () => {
   const fetchFilteredReports = async (filters) => {
     setLoading(true);
     setError('');
-    // Build params for /api/reports/getAll endpoint (simple approach: fetch all and filter in JS)
-    // For best scale, update backend API to support filtered fetch if needed
+    // Fetch assigned reports for current inspector and filter in JS
     try {
-      const res = await reportService.getAllReports();
+      const res = await reportService.getMyAssignedReports();
       if (res.success) {
         let filtered = res.data;
         if (filters.title) filtered = filtered.filter(r => r.title && r.title.toLowerCase().includes(filters.title.toLowerCase()));
@@ -30,7 +29,7 @@ const SearchReports = () => {
         if (filters.to) filtered = filtered.filter(r => new Date(r.dateSubmitted || r.createdAt) <= new Date(filters.to));
         setReports(filtered);
       } else {
-        setError('Unable to fetch reports');
+        setError(res.error || 'Unable to fetch assigned reports');
         setReports([]);
       }
     } catch {

@@ -6,10 +6,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import road.watch.it_342_g01.RoadWatch.entity.adminEntity;
 import road.watch.it_342_g01.RoadWatch.entity.userEntity;
+import road.watch.it_342_g01.RoadWatch.entity.role;
 import road.watch.it_342_g01.RoadWatch.repository.adminRepo;
 import road.watch.it_342_g01.RoadWatch.repository.userRepo;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -21,6 +23,40 @@ public class adminService {
     
     @Autowired
     private userRepo userRepo;
+    
+    @Autowired
+    private userService userService;
+
+    /**
+     * Create admin from user creation request (Map format)
+     * This method creates a user with ADMIN role and automatically creates the admin record
+     */
+    public adminEntity createAdminUser(Map<String, Object> requestBody) {
+        log.info("🔵 Creating admin user from request body");
+        
+        // Extract user fields
+        String email = (String) requestBody.get("email");
+        String username = (String) requestBody.get("username");
+        String name = (String) requestBody.get("name");
+        String password = (String) requestBody.get("password");
+        String contact = (String) requestBody.get("contact");
+        
+        // Create user entity
+        userEntity user = new userEntity();
+        user.setEmail(email);
+        user.setUsername(username);
+        user.setName(name);
+        user.setPassword(password);
+        user.setContact(contact);
+        user.setRole(role.ADMIN);
+        
+        // Create user (this automatically creates admin record via userService)
+        userEntity savedUser = userService.createUser(user, null, null);
+        
+        // Fetch and return the created admin record
+        Optional<adminEntity> admin = adminRepo.findByUser_Id(savedUser.getId());
+        return admin.orElseThrow(() -> new RuntimeException("Failed to create admin record"));
+    }
 
     public adminEntity createAdmin(adminEntity admin) {
 

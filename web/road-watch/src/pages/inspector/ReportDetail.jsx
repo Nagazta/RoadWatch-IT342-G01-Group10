@@ -1,25 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import reportService from '../../services/api/reportService';
 import '../admin/styles/Dashboard.css';
 import './styles/InspectorStyles.css';
-
-const mockReport = {
-  id: 'RPT-001',
-  title: 'Major pothole on 3rd Avenue',
-  description: 'A large pothole has developed near the 3rd Ave crosswalk.',
-  status: 'Under Review',
-  category: 'Pothole',
-  location: '3rd Ave',
-  reporter: 'Jane Doe',
-  dateReported: '2024-03-16',
-  photos: [],
-  audit: [
-    { ts: '2024-03-16 09:31', event: 'Created', by: 'Citizen Jane Doe' },
-    { ts: '2024-03-16 12:20', event: 'Status changed to Under Review', by: 'Inspector Sam Lee' },
-  ],
-  comments: [
-    { by: 'Inspector Sam Lee', comment: 'Verified. Needs urgent fix.', ts: '2024-03-16 12:21' },
-  ],
-};
 
 const STATUS_LIST = ['Pending', 'Under Review', 'Approved', 'In Progress', 'Resolved', 'Rejected'];
 
@@ -33,17 +16,101 @@ const badgeColors = {
 };
 
 const ReportDetail = () => {
-  const [status, setStatus] = useState(mockReport.status);
-  const [audit, setAudit] = useState(mockReport.audit);
-  const [comments, setComments] = useState(mockReport.comments);
+  const { reportId } = useParams();
+  const [report, setReport] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [status, setStatus] = useState('');
+  const [audit, setAudit] = useState([]);
+  const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
-  const [newStatus, setNewStatus] = useState(mockReport.status);
+  const [newStatus, setNewStatus] = useState('');
   const [rejectionReason, setRejectionReason] = useState('');
   const [success, setSuccess] = useState('');
 
-  const handleStatusChange = () => {
+  useEffect(() => {
+    const fetchReportDetail = async () => {
+      setLoading(true);
+      setError('');
+      const res = await reportService.getReportDetail(reportId);
+      setLoading(false);
+      if (res.success) {
+        setReport(res.data);
+        setStatus(res.data.status || 'Pending');
+        setNewStatus(res.data.status || 'Pending');
+        setAudit(res.data.audit || []);
+        
+        // Parse adminNotes into comments array
+        const parsedComments = parseAdminNotes(res.data.adminNotes);
+        setComments(res.data.comments || parsedComments);
+      } else {
+        setError(res.error || 'Failed to fetch report details');
+      }
+    };
+    fetchReportDetail();
+  }, [reportId]);
+
+  // Helper function to parse adminNotes into comments array
+  const parseAdminNotes = (adminNotes) => {
+    if (!adminNotes || adminNotes.trim() === '') {
+      return [];
+    }
+
+    // Split by the separator "---"
+    const entries = adminNotes.split('\n---\n');
+    return entries.map((entry) => {
+      // Extract timestamp and comment from format: [YYYY-MM-DD HH:MM:SS] comment text
+      const match = entry.match(/^\[(.*?)\]\s(.*)$/s);
+      if (match) {
+        const [, timestamp, comment] = match;
+        return {
+          by: 'Inspector',
+          comment: comment.trim(),
+          ts: timestamp.replace('T', ' '),
+        };
+      }
+      return {
+        by: 'Inspector',
+        comment: entry.trim(),
+        ts: 'Unknown',
+      };
+    });
+  };
+
+  const handleStatusChange = async () => {
     if (newStatus === 'Rejected' && rejectionReason.trim() === '') return;
+    
+    setLoading(true);
+    setError('');
+    
+    // Update status on backend
+    const statusRes = await reportService.updateReportStatus(reportId, newStatus);
+    
+    if (!statusRes.success) {
+      setError(statusRes.error || 'Failed to update status');
+      setLoading(false);
+      return;
+    }
+
+    // Update report with latest data
+    setReport(statusRes.data);
     setStatus(newStatus);
+
+    // If rejected, add rejection reason as comment
+    if (newStatus === 'Rejected') {
+      const commentRes = await reportService.addCommentToReport(reportId, `Rejection Reason: ${rejectionReason}`);
+      if (!commentRes.success) {
+        setError(commentRes.error || 'Failed to add rejection reason');
+        setLoading(false);
+        return;
+      }
+      // Update report and comments with the latest data
+      setReport(commentRes.data);
+      const updatedComments = parseAdminNotes(commentRes.data.adminNotes);
+      setComments(updatedComments);
+    }
+
+    // Update audit history
     setAudit([
       ...audit,
       {
@@ -54,27 +121,34 @@ const ReportDetail = () => {
         by: 'Inspector',
       },
     ]);
-    if (newStatus === 'Rejected') {
-      setComments([
-        ...comments,
-        {
-          by: 'Inspector',
-          comment: rejectionReason,
-          ts: new Date().toISOString().slice(0, 16).replace('T', ' '),
-        },
-      ]);
-    }
     setRejectionReason('');
     setSuccess('Status updated!');
+    setLoading(false);
     setTimeout(() => setSuccess(''), 1500);
   };
 
-  const handleAddComment = () => {
+  const handleAddComment = async () => {
     if (!newComment.trim()) return;
-    setComments([
-      ...comments,
-      { by: 'Inspector', comment: newComment, ts: new Date().toISOString().slice(0, 16).replace('T', ' ') },
-    ]);
+    
+    setLoading(true);
+    setError('');
+    
+    // Add comment on backend
+    const commentRes = await reportService.addCommentToReport(reportId, newComment);
+    
+    if (!commentRes.success) {
+      setError(commentRes.error || 'Failed to add comment');
+      setLoading(false);
+      return;
+    }
+
+    // Update report with latest data from backend
+    setReport(commentRes.data);
+    
+    // Parse updated adminNotes into comments
+    const updatedComments = parseAdminNotes(commentRes.data.adminNotes);
+    setComments(updatedComments);
+    
     setAudit([
       ...audit,
       {
@@ -85,20 +159,41 @@ const ReportDetail = () => {
     ]);
     setNewComment('');
     setSuccess('Comment added!');
+    setLoading(false);
     setTimeout(() => setSuccess(''), 1200);
   };
 
+  if (loading) {
+    return (
+      <div className="dashboard-container inspector-page">
+        <div className="inspector-section">
+          <p>Loading report details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !report) {
+    return (
+      <div className="dashboard-container inspector-page">
+        <div className="inspector-section">
+          <p style={{ color: 'red' }}>{error || 'Report not found'}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="dashboard-container inspector-page">
-      <div className="inspector-section inspector-section--compact">
+      <div className="inspector-section">
         <h1 className="inspector-card-title">Report Details</h1>
         <div className="inspector-detail-grid">
-          <div className="inspector-detail-title">{mockReport.title}</div>
+          <div className="inspector-detail-title">{report.title}</div>
           <div>
-            <b>Category:</b> <span className="inspector-highlight">{mockReport.category}</span>
+            <b>Category:</b> <span className="inspector-highlight">{report.category}</span>
           </div>
           <div>
-            <b>Location:</b> {mockReport.location}
+            <b>Location:</b> {report.location}
           </div>
           <div>
             <b>Status:</b>{' '}
@@ -107,16 +202,33 @@ const ReportDetail = () => {
             </span>
           </div>
           <div>
-            <b>Date Reported:</b> {mockReport.dateReported}
+            <b>Date Reported:</b> {report.dateSubmitted ? new Date(report.dateSubmitted).toLocaleDateString() : 'N/A'}
           </div>
           <div>
-            <b>Reporter:</b> {mockReport.reporter}
+            <b>Reporter:</b> {report.submittedBy}
           </div>
           <div>
             <b>Description:</b>
             <br />
-            <span className="inspector-subtext">{mockReport.description}</span>
+            <span className="inspector-subtext">{report.description}</span>
           </div>
+        </div>
+
+        <h3 className="inspector-section-title">Location Map</h3>
+        <div className="inspector-map-container">
+          {report.latitude && report.longitude ? (
+            <iframe
+              width="100%"
+              height="450"
+              style={{ border: 0 }}
+              loading="lazy"
+              allowFullScreen
+              src={`https://www.google.com/maps?q=${report.latitude},${report.longitude}&hl=en&z=15&output=embed`}
+              title="Report Location Map"
+            />
+          ) : (
+            <p className="inspector-subtext">Location coordinates not available</p>
+          )}
         </div>
 
         <h3 className="inspector-section-title">Update Status</h3>

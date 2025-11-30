@@ -1,4 +1,4 @@
-package road.watch.it_342_g01.RoadWatch.controller;
+package road.watch.it_342_g01.RoadWatch.Controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -25,13 +25,13 @@ public class AuthController {
     /**
      * Login with email and password
      */
-    @PostMapping("/login")
+    @PostMapping(value = "/login", consumes = "application/json", produces = "application/json")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
          System.out.println("Received login request: " + request);
         AuthResponse response = authService.login(request);
         return ResponseEntity.ok(response);
     }
-    @PostMapping("/local-login")
+    @PostMapping(value = "/local-login", consumes = "application/json", produces = "application/json")
     public ResponseEntity<AuthResponse> localLogin(@RequestBody LoginRequest request) {
         System.out.println("Received local login request: " + request);
         AuthResponse response = authService.localLogin(request);

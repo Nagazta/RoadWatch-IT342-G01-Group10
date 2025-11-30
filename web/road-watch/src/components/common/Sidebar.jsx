@@ -19,6 +19,7 @@ import LogoutModal from '../modal/LogoutModal';
 
 const Sidebar = ({ activeItem = 'dashboard', onNavigate, role = 'admin' }) => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
 
@@ -75,9 +76,19 @@ const Sidebar = ({ activeItem = 'dashboard', onNavigate, role = 'admin' }) => {
     console.log('Logged out successfully');
   };
 
+  const handleNavItemClick = (item) => {
+    handleNavClick(item);
+    setIsOpen(false); // Close sidebar on mobile after navigation
+  };
+
   return (
     <>
-      <aside className="sidebar">
+      <button className="sidebar-toggle" onClick={() => setIsOpen(!isOpen)} aria-label="Toggle sidebar">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <aside className={`sidebar ${isOpen ? 'sidebar--open' : ''}`}>
         {/* Logo Section */}
         <div className="sidebar-header">
           <div className="sidebar-logo">
@@ -94,7 +105,7 @@ const Sidebar = ({ activeItem = 'dashboard', onNavigate, role = 'admin' }) => {
               <li key={item.id} className="nav-item">
                 <button
                   className={`nav-link ${activeItem === item.id ? 'active' : ''}`}
-                  onClick={() => handleNavClick(item)}
+                  onClick={() => handleNavItemClick(item)}
                   aria-current={activeItem === item.id ? 'page' : undefined}
                 >
                   <span className="nav-icon">{item.icon}</span>

@@ -1,6 +1,8 @@
-package road.watch.it_342_g01.RoadWatch.controller;
+package road.watch.it_342_g01.RoadWatch.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.Map;
+
 
 
 
@@ -26,11 +30,18 @@ public class inspectorController {
     @Autowired
     private inspectorService inspectorService;
 
-    //CREATE
+    //CREATE - Accept user creation request (Map) instead of inspectorEntity
     @PostMapping("/add")
-    public String addInspector(@RequestBody inspectorEntity inspector) {
-        inspectorService.createInspector(inspector);
-        return "New inspector is added";
+    public ResponseEntity<?> addInspector(@RequestBody Map<String, Object> requestBody) {
+        try {
+            inspectorEntity inspector = inspectorService.createInspectorUser(requestBody);
+            return ResponseEntity.status(HttpStatus.CREATED).body(inspector);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                "success", false,
+                "error", e.getMessage()
+            ));
+        }
     }
 
     //READ ALL

@@ -70,6 +70,144 @@ const reportService =
             console.error(error.message);
             return { success: false };
         }
+    },
+
+    getMyAssignedReports: async () => {
+        try {
+            const accessToken = localStorage.getItem('accessToken');
+            
+            if (!accessToken) {
+                console.error('No access token found in localStorage');
+                return { success: false, error: 'Authentication required' };
+            }
+
+            const response = await axios.get(
+                `${API_URL}/api/reports/getMyAssignedReport`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                }
+            );
+
+            if (response.data && Array.isArray(response.data)) {
+                return { success: true, data: response.data };
+            } else {
+                return { success: false };
+            }
+        } catch (error) {
+            console.error('Error fetching assigned reports:', error.message);
+            if (error.response?.status === 401) {
+                return { success: false, error: 'Token expired or invalid' };
+            } else if (error.response?.status === 403) {
+                return { success: false, error: 'User is not an inspector' };
+            }
+            return { success: false, error: error.message };
+        }
+    },
+
+    getReportDetail: async (reportId) => {
+        try {
+            const accessToken = localStorage.getItem('accessToken');
+            const headers = {};
+            
+            if (accessToken) {
+                headers['Authorization'] = `Bearer ${accessToken}`;
+            }
+
+            const response = await axios.get(
+                `${API_URL}/api/reports/getDetail/${reportId}`,
+                { headers }
+            );
+
+            if (response.data) {
+                return { success: true, data: response.data };
+            } else {
+                return { success: false, error: 'Report not found' };
+            }
+        } catch (error) {
+            console.error('Error fetching report detail:', error.message);
+            if (error.response?.status === 404) {
+                return { success: false, error: 'Report not found' };
+            } else if (error.response?.status === 401) {
+                return { success: false, error: 'Token expired or invalid' };
+            }
+            return { success: false, error: error.message };
+        }
+    },
+
+    updateReportStatus: async (reportId, newStatus) => {
+        try {
+            const accessToken = localStorage.getItem('accessToken');
+            
+            if (!accessToken) {
+                return { success: false, error: 'Authentication required' };
+            }
+
+            const response = await axios.put(
+                `${API_URL}/api/reports/${reportId}/status`,
+                { status: newStatus },
+                {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            if (response.data) {
+                return { success: true, data: response.data };
+            } else {
+                return { success: false, error: 'Failed to update status' };
+            }
+        } catch (error) {
+            console.error('Error updating report status:', error.message);
+            if (error.response?.status === 401) {
+                return { success: false, error: 'Token expired or invalid' };
+            } else if (error.response?.status === 403) {
+                return { success: false, error: 'User is not an inspector' };
+            } else if (error.response?.status === 404) {
+                return { success: false, error: 'Report not found' };
+            }
+            return { success: false, error: error.message };
+        }
+    },
+
+    addCommentToReport: async (reportId, comment) => {
+        try {
+            const accessToken = localStorage.getItem('accessToken');
+            
+            if (!accessToken) {
+                return { success: false, error: 'Authentication required' };
+            }
+
+            const response = await axios.post(
+                `${API_URL}/api/reports/${reportId}/comment`,
+                { comment },
+                {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            if (response.data) {
+                return { success: true, data: response.data };
+            } else {
+                return { success: false, error: 'Failed to add comment' };
+            }
+        } catch (error) {
+            console.error('Error adding comment:', error.message);
+            if (error.response?.status === 401) {
+                return { success: false, error: 'Token expired or invalid' };
+            } else if (error.response?.status === 403) {
+                return { success: false, error: 'User is not an inspector' };
+            } else if (error.response?.status === 404) {
+                return { success: false, error: 'Report not found' };
+            }
+            return { success: false, error: error.message };
+        }
     }
 }
 

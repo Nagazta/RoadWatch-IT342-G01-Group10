@@ -1,12 +1,14 @@
-package road.watch.it_342_g01.RoadWatch.controller;
+package road.watch.it_342_g01.RoadWatch.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import road.watch.it_342_g01.RoadWatch.entity.adminEntity;
 import road.watch.it_342_g01.RoadWatch.service.adminService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -16,11 +18,18 @@ public class adminController {
     @Autowired
     private adminService adminService;
 
-    // CREATE
+    // CREATE - Accept user creation request (Map) instead of adminEntity
     @PostMapping("/add")
-    public String addAdmin(@RequestBody adminEntity admin) {
-        adminService.createAdmin(admin);
-        return "New admin is added";
+    public ResponseEntity<?> addAdmin(@RequestBody Map<String, Object> requestBody) {
+        try {
+            adminEntity admin = adminService.createAdminUser(requestBody);
+            return ResponseEntity.status(HttpStatus.CREATED).body(admin);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                "success", false,
+                "error", e.getMessage()
+            ));
+        }
     }
 
     // READ ALL
