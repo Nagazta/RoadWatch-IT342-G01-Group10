@@ -1,49 +1,91 @@
 package road.watch.it_342_g01.RoadWatch.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import road.watch.it_342_g01.RoadWatch.dto.AuthResponse;
-import road.watch.it_342_g01.RoadWatch.dto.GoogleAuthRequest;
-import road.watch.it_342_g01.RoadWatch.dto.LoginRequest;
-import road.watch.it_342_g01.RoadWatch.dto.UserDTO;
+import road.watch.it_342_g01.RoadWatch.dto.*;
 import road.watch.it_342_g01.RoadWatch.entity.userEntity;
 import road.watch.it_342_g01.RoadWatch.repository.userRepo;
 import road.watch.it_342_g01.RoadWatch.service.AuthService;
 
+import java.util.HashMap;
+import java.util.Map;
+
+@Slf4j
 @RestController
 @RequestMapping("/auth")
 @CrossOrigin
-@RequiredArgsConstructor  // ⭐ IMPORTANT - This must be present
+@RequiredArgsConstructor
 public class AuthController {
 
-    // ⭐ These fields MUST be declared as 'private final'
     private final AuthService authService;
     private final userRepo userRepository;
 
     /**
-     * Login with email and password
+     * 🆕 CITIZEN REGISTRATION - Manual signup with email/password
+     * POST /auth/register
+     * Body: { "username": "john", "name": "John Doe", "email": "john@example.com",
+     * "password": "password123", "contact": "+639123456789" }
+     */
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+        log.info("📥 Received registration request for: {}", request.getEmail());
+        try {
+            AuthResponse response = authService.registerCitizen(request);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("❌ Registration failed: {}", e.getMessage());
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(error);
+        }
+    }
+
+    /**
+     * 🆕 INSPECTOR LOGIN - Email + Password (No Supabase)
+     * Similar to Node.js /login-student endpoint
+     * 
+     * POST /auth/login-inspector
+     * Body: { "email": "inspector@example.com", "password": "password123" }
+     */
+    @PostMapping("/login-inspector")
+    public ResponseEntity<AuthResponse> loginInspector(@RequestBody InspectorLoginRequest request) {
+        log.info("📥 Received inspector login request for: {}", request.getEmail());
+        AuthResponse response = authService.loginInspector(request);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * CITIZEN/ADMIN LOGIN - Hybrid (Supabase or Local)
+     * Handles both Supabase users and local users
      */
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
-         System.out.println("Received login request: " + request);
+        log.info("📥 Received login request for: {}", request.getEmail());
         AuthResponse response = authService.login(request);
         return ResponseEntity.ok(response);
     }
+
+    /**
+     * LOCAL LOGIN - Bypass Supabase (for testing/admin)
+     */
     @PostMapping("/local-login")
     public ResponseEntity<AuthResponse> localLogin(@RequestBody LoginRequest request) {
-        System.out.println("Received local login request: " + request);
+        log.info("📥 Received local login request for: {}", request.getEmail());
         AuthResponse response = authService.localLogin(request);
         return ResponseEntity.ok(response);
     }
 
     /**
-     * Login/Register with Google OAuth
+     * GOOGLE OAUTH - Citizens only
      * Frontend sends Supabase access token after Google OAuth
      */
     @PostMapping("/google")
     public ResponseEntity<AuthResponse> googleLogin(@RequestBody GoogleAuthRequest request) {
+        log.info("📥 Received Google OAuth login request");
         AuthResponse response = authService.loginWithGoogle(request.getAccessToken());
         return ResponseEntity.ok(response);
     }
@@ -53,32 +95,29 @@ public class AuthController {
      */
     @GetMapping("/profile")
     public ResponseEntity<UserDTO> getCurrentUserProfile() {
-        // Get email from security context
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        
+
         userEntity user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found"));
-        
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         UserDTO userDTO = UserDTO.builder()
-            .id(user.getId())
-            .supabaseId(user.getSupabaseId())
-            .username(user.getUsername())
-            .name(user.getName())
-            .email(user.getEmail())
-            .role(user.getRole().toString())
-            .contact(user.getContact())
-            .build();
-        
+                .id(user.getId())
+                .supabaseId(user.getSupabaseId())
+                .username(user.getUsername())
+                .name(user.getName())
+                .email(user.getEmail())
+                .role(user.getRole().toString())
+                .contact(user.getContact())
+                .build();
+
         return ResponseEntity.ok(userDTO);
     }
 
     /**
-     * Logout (optional - mainly handled on frontend)
+     * Logout
      */
     @PostMapping("/logout")
     public ResponseEntity<String> logout() {
-        // In a stateless setup, logout is handled by frontend removing tokens
-        // You can add token blacklisting here if needed
         return ResponseEntity.ok("Logged out successfully");
     }
 }

@@ -1,103 +1,140 @@
-import axios from 'axios';
-import { createClient } from '@supabase/supabase-js';
+// Complete authService.js for RoadWatch
+// Location: src/services/api/authService.js
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+import { supabase } from '../../config/supabaseClient.js';
 
-if (!supabaseUrl || !supabaseAnonKey) {
-    alert('Configuration Error: Missing Supabase keys. Check console for details.');
-}
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const API_URL = 'http://localhost:8080/auth';
 
 const authService = {
-    // -----------------------------
-    // Email/Password login via backend
-    // -----------------------------
-    login: async (email, password, config = {}) => {
-        // 1. DEBUGGING: Check if data is actually arriving here
-        console.log("Attempting login with:", { email, password });
-
-        if (!email || !password) {
-            return { success: false, error: "Email and Password are required" };
-        }
-
+    /**
+     * CITIZEN REGISTRATION - Manual signup
+     */
+    async register(userData) {
         try {
-            const response = await axios.post(
-                `${API_URL}/auth/local-login`,
-                { email, password }, // <--- This is the "Request Body"
-                config
-            );
-
-            localStorage.setItem('accessToken', response.data.accessToken);
-            localStorage.setItem('user', JSON.stringify(response.data.user));
-
-            return { success: true, data: response.data };
-        } catch (error) {
-            console.error('❌ Login failed:', error);
-
-            // 2. UI FIX: Stop the "Required request body..." error from showing to the user
-            // If the backend sends a 400/Bad Request, show a custom message
-            let errorMessage = 'Invalid email or password';
-
-            if (error.response && error.response.data && error.response.data.message) {
-                // If the error is that technical Java string, hide it
-                if (error.response.data.message.includes("Required request body is missing")) {
-                    errorMessage = errorMessage;
-                } else {
-                    // Otherwise, use the backend message
-                    errorMessage = error.response.data.message;
-                }
-            }
-
-            // 3. LOGIC FIX: You had "success: true" here previously.
-            // It MUST be "success: false" so your frontend knows it failed.
-            return {
-                success: false,
-                error: errorMessage,
-            };
-        }
-    },
-
-
-
-
-
-    // -----------------------------
-    // Register new user
-    // -----------------------------
-    register: async (userData) => {
-        try {
-            // Step 1: Send to backend to create user in DB
-            const response = await axios.post(`${API_URL}/api/users/add`, {
-                username: userData.username,
-                name: userData.name,
-                email: userData.email,
-                password: userData.password,
-                role: 'CITIZEN',
-                contact: userData.contact || '',
+            console.log('🔐 Registration attempt:', userData.email);
+            
+            const response = await fetch(`${API_URL}/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(userData),
             });
 
-            return {
-                success: true,
-                message: 'Registration successful!',
-                data: response.data,
-            };
+            const data = await response.json();
+
+            if (data.success && data.accessToken) {
+                // Store JWT token and user data
+                localStorage.setItem('token', data.accessToken);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                localStorage.setItem('roleData', JSON.stringify(data.roleData));
+                localStorage.setItem('userRole', data.user.role);
+                localStorage.setItem('adminId', data.user.id);
+                
+                console.log('✅ Registration successful');
+            }
+
+            return data;
         } catch (error) {
-            console.error('❌ Registration failed:', error);
-            return {
-                success: false,
-                error: error.response?.data?.message || error.message || 'Registration failed',
-            };
+            console.error('❌ Registration error:', error);
+            return { success: false, error: error.message };
         }
     },
 
-    // -----------------------------
-    // Google OAuth login
-    // -----------------------------
-    loginWithGoogle: async () => {
+    /**
+     * GENERAL LOGIN - Email + Password (for Citizens/Admins/Inspectors)
+     */
+    async login(email, password) {
         try {
+            console.log('🔐 Login attempt:', email);
+            
+            const response = await fetch(`${API_URL}/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password }),
+            });
+
+            const data = await response.json();
+
+            if (data.success && data.accessToken) {
+                localStorage.setItem('token', data.accessToken);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                localStorage.setItem('roleData', JSON.stringify(data.roleData));
+                localStorage.setItem('userRole', data.user.role);
+                localStorage.setItem('adminId', data.user.id);
+                
+                console.log('✅ Login successful');
+                console.log('User role:', data.user.role);
+
+                // Return data in expected format for your frontend
+                return {
+                    success: true,
+                    data: {
+                        token: data.accessToken,
+                        user: {
+                            id: data.user.id,
+                            email: data.user.email,
+                            name: data.user.name,
+                            role: data.user.role
+                        },
+                        roleData: data.roleData
+                    }
+                };
+            }
+
+            return { success: false, error: data.message || 'Login failed' };
+        } catch (error) {
+            console.error('❌ Login error:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    /**
+     * INSPECTOR LOGIN - Email + Password (No Supabase)
+     */
+    async loginInspector(email, password) {
+        try {
+            console.log('🔐 Inspector login attempt:', email);
+            
+            const response = await fetch(`${API_URL}/login-inspector`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password }),
+            });
+
+            const data = await response.json();
+
+            if (data.success && data.accessToken) {
+                localStorage.setItem('token', data.accessToken);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                localStorage.setItem('roleData', JSON.stringify(data.roleData));
+                localStorage.setItem('userRole', data.user.role);
+                localStorage.setItem('adminId', data.user.id);
+                
+                console.log('✅ Inspector login successful');
+                console.log('Inspector ID:', data.roleData?.inspector_id);
+                console.log('Area:', data.roleData?.area_assignment);
+            }
+
+            return data;
+        } catch (error) {
+            console.error('❌ Inspector login error:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    /**
+     * GOOGLE OAUTH LOGIN - Citizens only
+     */
+    async loginWithGoogle() {
+        try {
+            console.log('🔐 Starting Google OAuth flow...');
+            
+            // Step 1: Initiate Google OAuth with Supabase
             const { data, error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
@@ -106,83 +143,196 @@ const authService = {
                         access_type: 'offline',
                         prompt: 'consent',
                     }
-                },
+                }
             });
 
             if (error) {
                 console.error('❌ Supabase OAuth error:', error);
-                throw error;
+                return { success: false, error: error.message };
             }
 
-            console.log('✅ Google OAuth initiated successfully');
-            return { success: true, data };
+            // OAuth will redirect, so we return pending state
+            return { success: true, pending: true };
         } catch (error) {
-            console.error('❌ Google login failed:', error);
-            return {
-                success: false,
-                error: error.message || 'Google login failed',
-            };
-        }
-    },
-
-    // -----------------------------
-    // Handle OAuth callback
-    // -----------------------------
-    handleOAuthCallbackWithHash: async (hash) => {
-        try {
-            const hashParams = new URLSearchParams(hash.substring(1));
-            const accessToken = hashParams.get('access_token');
-            const refreshToken = hashParams.get('refresh_token');
-
-            if (!accessToken || !refreshToken) {
-                throw new Error('Missing access_token or refresh_token in callback');
-            }
-
-            // Set session in Supabase
-            const { error: sessionError } = await supabase.auth.setSession({
-                access_token: accessToken,
-                refresh_token: refreshToken,
-            });
-            if (sessionError) throw sessionError;
-
-            // Sync with backend and get JWT
-            const response = await axios.post(`${API_URL}/auth/google`, { accessToken });
-
-            localStorage.setItem('accessToken', response.data.accessToken);
-            localStorage.setItem('user', JSON.stringify(response.data.user));
-            localStorage.setItem('supabaseToken', accessToken);
-
-            return { success: true, data: response.data };
-        } catch (error) {
-            console.error('❌ OAuth callback failed:', error);
-            return { success: false, error: error.message || 'OAuth callback failed' };
-        }
-    },
-
-
-    // -----------------------------
-    // Logout
-    // -----------------------------
-    logout: async () => {
-        try {
-            await supabase.auth.signOut();
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('supabaseToken');
-            localStorage.removeItem('user');
-            return { success: true };
-        } catch (error) {
+            console.error('❌ Google login error:', error);
             return { success: false, error: error.message };
         }
     },
 
-    // -----------------------------
-    // Current user helpers
-    // -----------------------------
-    getCurrentUser: () => {
+    /**
+     * Handle OAuth callback after Google redirect
+     * Call this in your /auth/callback route
+     */
+    async handleOAuthCallback() {
+        try {
+            console.log('🔄 Handling OAuth callback...');
+            
+            // Step 1: Get Supabase session
+            const { data: { session }, error } = await supabase.auth.getSession();
+            
+            if (error || !session) {
+                console.error('❌ No session found:', error);
+                return { success: false, error: 'Authentication failed' };
+            }
+
+            console.log('✅ Supabase session obtained');
+
+            // Step 2: Send Supabase access token to YOUR backend
+            const response = await fetch(`${API_URL}/google`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
+                    accessToken: session.access_token 
+                }),
+            });
+
+            const data = await response.json();
+
+            if (data.success && data.accessToken) {
+                // Store YOUR JWT token (not Supabase token)
+                localStorage.setItem('token', data.accessToken);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                localStorage.setItem('roleData', JSON.stringify(data.roleData));
+                localStorage.setItem('userRole', data.user.role);
+                localStorage.setItem('adminId', data.user.id);
+                
+                console.log('✅ Google OAuth login successful');
+                console.log('Citizen ID:', data.roleData?.citizen_id);
+                console.log('Google ID:', data.roleData?.google_id);
+
+                // Return data in expected format
+                return {
+                    success: true,
+                    data: {
+                        token: data.accessToken,
+                        user: {
+                            id: data.user.id,
+                            email: data.user.email,
+                            name: data.user.name,
+                            role: data.user.role
+                        },
+                        roleData: data.roleData
+                    }
+                };
+            }
+
+            return { success: false, error: data.message || 'Login failed' };
+        } catch (error) {
+            console.error('❌ OAuth callback error:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    /**
+     * ADMIN - Create Inspector Account
+     */
+    async createInspector(inspectorData, adminId) {
+        try {
+            const token = localStorage.getItem('token');
+            
+            const response = await fetch('http://localhost:8080/api/users/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    email: inspectorData.email,
+                    username: inspectorData.username,
+                    name: inspectorData.name,
+                    password: inspectorData.password,
+                    contact: inspectorData.contact,
+                    role: 'INSPECTOR',
+                    assignedArea: inspectorData.assignedArea,
+                    createdByAdminId: adminId,
+                }),
+            });
+
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('❌ Create inspector error:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    /**
+     * Get current user profile
+     */
+    async getProfile() {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) return { success: false, error: 'No token found' };
+
+            const response = await fetch(`${API_URL}/profile`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('❌ Get profile error:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    /**
+     * Logout
+     */
+    async logout() {
+        try {
+            const token = localStorage.getItem('token');
+            
+            await fetch(`${API_URL}/logout`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            // Clear Supabase session too
+            await supabase.auth.signOut();
+
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            localStorage.removeItem('roleData');
+            localStorage.removeItem('userRole');
+            localStorage.removeItem('adminId');
+            
+            console.log('✅ Logged out successfully');
+            return { success: true };
+        } catch (error) {
+            console.error('❌ Logout error:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    /**
+     * Get stored user data
+     */
+    getCurrentUser() {
         const userStr = localStorage.getItem('user');
         return userStr ? JSON.parse(userStr) : null;
     },
-    isAuthenticated: () => !!localStorage.getItem('accessToken'),
+
+    /**
+     * Get stored role data (for inspectors/citizens/admins)
+     */
+    getRoleData() {
+        const roleDataStr = localStorage.getItem('roleData');
+        return roleDataStr ? JSON.parse(roleDataStr) : null;
+    },
+
+    /**
+     * Check if user is authenticated
+     */
+    isAuthenticated() {
+        return !!localStorage.getItem('token');
+    },
 };
 
 export default authService;
