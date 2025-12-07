@@ -24,14 +24,23 @@ const reportService =
             );
 
             if(response.data)
-                return { success: true };
+            {
+                // ✅ FIX: Return the created report data including the ID
+                return { 
+                    success: true, 
+                    data: response.data  // This contains the ReportEntity with id
+                };
+            }
             else
                 throw new Error('Failed to create report');
         }
         catch(error)
         {
-            console.error(error.message);
-            return { success: false };
+            console.error('Create report error:', error);
+            return { 
+                success: false,
+                error: error.response?.data?.message || error.message 
+            };
         }
     },
 
@@ -52,7 +61,7 @@ const reportService =
         } 
         catch (error) 
         {
-            console.error(error.message);
+            console.error('Get reports error:', error);
             return { success: false };
         }
     },
@@ -62,13 +71,33 @@ const reportService =
             const response = await axios.get(`${API_URL}/api/reports/getAll`);
             if(response.data && Array.isArray(response.data)) {
                 // Optionally sort newest to oldest if backend does not
-                return { success: true, data: response.data.sort((a,b)=>new Date(b.dateSubmitted || b.createdAt)-new Date(a.dateSubmitted || a.createdAt)) };
+                return { 
+                    success: true, 
+                    data: response.data.sort((a,b) => 
+                        new Date(b.dateSubmitted || b.createdAt) - 
+                        new Date(a.dateSubmitted || a.createdAt)
+                    ) 
+                };
             } else {
                 return { success: false };
             }
         } catch(error) {
-            console.error(error.message);
+            console.error('Get all reports error:', error);
             return { success: false };
+        }
+    },
+
+    // ✅ NEW: Fetch images for a specific report
+    getReportImages: async (reportId) => {
+        try {
+            const response = await axios.get(`${API_URL}/api/reports/${reportId}/images`);
+            return {
+                success: true,
+                data: response.data
+            };
+        } catch(error) {
+            console.error('Get report images error:', error);
+            return { success: false, data: [] };
         }
     }
 }
