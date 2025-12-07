@@ -15,13 +15,15 @@ function Loginpage() {
     const navigate = useNavigate();
 
     // Helper function to handle successful login
-    const handleLoginSuccess = (token, role, adminId) => {
+    const handleLoginSuccess = (token, role, userId) => {
         localStorage.setItem("token", token);
         localStorage.setItem("userRole", role);
-        localStorage.setItem("adminId", adminId);
-        console.log("Logged in user ID:", adminId); 
+        localStorage.setItem("adminId", userId); // Changed from adminId to userId for consistency
+        console.log("✅ Logged in user ID:", userId); 
+        console.log("✅ User role:", role);
         sessionStorage.removeItem("authInProgress");
 
+        // Redirect based on role
         if (role === 'ADMIN') {
             navigate('/admin/dashboard');
         } else if (role === 'INSPECTOR') {
@@ -38,22 +40,27 @@ function Loginpage() {
         sessionStorage.setItem("authInProgress", "true");
 
         try {
-            const response = await authService.login(email, password, {
-                headers: { 'Content-Type': 'application/json' }
-            });
+            console.log('🔐 Login attempt for:', email);
+            
+            // authService.login returns the formatted response
+            const response = await authService.login(email, password);
 
-            if (response.success) {
-                // ✅ Pass userId to handleLoginSuccess
+            console.log('📥 Login response:', response);
+
+            if (response.success && response.data) {
+                console.log('✅ Login successful');
                 handleLoginSuccess(
                     response.data.token, 
                     response.data.user.role,
-                    response.data.user.id // Add this
+                    response.data.user.id
                 );
             } else {
-                setError(response.error);
+                console.error('❌ Login failed:', response.error);
+                setError(response.error || 'Login failed. Please try again.');
                 sessionStorage.removeItem("authInProgress");
             }
         } catch (err) {
+            console.error('❌ Unexpected error:', err);
             setError(err.message || 'An unexpected error occurred. Please try again.');
             sessionStorage.removeItem("authInProgress");
         } finally {
@@ -67,22 +74,28 @@ function Loginpage() {
         sessionStorage.setItem("authInProgress", "true");
 
         try {
+            console.log('🔐 Starting Google OAuth...');
+            
+            // This will redirect to Google
             const result = await authService.loginWithGoogle();
-
-            if (result.success) {
-                // ✅ Pass userId to handleLoginSuccess
+            
+            // If it returns without redirecting, handle the response
+            if (result.success && !result.pending) {
                 handleLoginSuccess(
                     result.data.token, 
                     result.data.user.role,
-                    result.data.user.id // Add this
+                    result.data.user.id
                 );
-            } else {
-                setError(result.error);
+            } else if (!result.pending) {
+                setError(result.error || 'Google login failed');
                 sessionStorage.removeItem("authInProgress");
+                setLoading(false);
             }
+            // If result.pending is true, user is being redirected to Google
         } catch (err) {
+            console.error('❌ Google login error:', err);
+            setError('Google login failed. Please try again.');
             sessionStorage.removeItem("authInProgress");
-        } finally {
             setLoading(false);
         }
     };
