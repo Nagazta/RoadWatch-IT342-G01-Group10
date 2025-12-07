@@ -8,6 +8,14 @@ import java.util.Optional;
 
 @Repository
 public interface citizenRepo extends JpaRepository<citizenEntity, Long> {
+
+    /**
+     * Find citizen by user ID
+     */
     Optional<citizenEntity> findByUser_Id(Long userId);
+
+    /**
+     * Find citizen by Google ID (for OAuth users)
+     */
     Optional<citizenEntity> findByGoogleId(String googleId);
 }

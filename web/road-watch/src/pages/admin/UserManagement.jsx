@@ -132,38 +132,96 @@ const UserManagement = () => {
 
   const handleConfirmAction = async () => {
     const { type, userId } = confirmationModal;
+    
+    console.log('====================================');
+    console.log('🚀 handleConfirmAction called');
+    console.log('Type:', type);
+    console.log('User ID:', userId);
+    console.log('====================================');
+    
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      alert('You are not authenticated. Please login again.');
+      return;
+    }
+
     try {
+      let payload;
+      let url;
+      let method;
+      
       switch (type) {
         case 'suspend':
-          await fetch(`http://localhost:8080/api/users/updateBy/${userId}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ isActive: false })
-          });
+          payload = { isActive: false };
+          url = `http://localhost:8080/api/users/updateBy/${userId}`;
+          method = 'PUT';
+          console.log('📤 SUSPEND - Sending payload:', JSON.stringify(payload));
           break;
+          
         case 'activate':
-          await fetch(`http://localhost:8080/api/users/updateBy/${userId}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ isActive: true })
-          });
+          payload = { isActive: true };
+          url = `http://localhost:8080/api/users/updateBy/${userId}`;
+          method = 'PUT';
+          console.log('📤 ACTIVATE - Sending payload:', JSON.stringify(payload));
           break;
+          
         case 'revoke':
-          await fetch(`http://localhost:8080/api/users/deleteBy/${userId}`, {
-            method: 'DELETE'
-          });
+          url = `http://localhost:8080/api/users/deleteBy/${userId}`;
+          method = 'DELETE';
+          console.log('📤 REVOKE - Deleting user');
           break;
+          
         default:
-          break;
+          console.error('❌ Unknown action type:', type);
+          return;
       }
+
+      console.log('📡 Making request to:', url);
+      console.log('📡 Method:', method);
+      console.log('📡 Headers:', { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token.substring(0, 20)}...` 
+      });
+
+      const response = await fetch(url, {
+        method: method,
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: payload ? JSON.stringify(payload) : undefined
+      });
+
+      console.log('📥 Response status:', response.status);
+      console.log('📥 Response ok:', response.ok);
+      
+      const responseText = await response.text();
+      console.log('📥 Response body (raw):', responseText);
+      
+      let responseData;
+      try {
+        responseData = responseText ? JSON.parse(responseText) : null;
+        console.log('📥 Response data (parsed):', responseData);
+      } catch (e) {
+        console.log('⚠️ Response is not JSON');
+      }
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${responseText}`);
+      }
+
+      console.log('✅ Action completed successfully');
       await fetchUsers(); // refresh table
+      
     } catch (err) {
-      console.error('Action failed:', err);
+      console.error('❌ Action failed:', err);
+      console.error('❌ Error stack:', err.stack);
+      alert(`Failed to ${type} user: ${err.message}`);
     } finally {
       setConfirmationModal({ isOpen: false, type: '', userId: null, userName: '' });
     }
   };
-
   const handleCloseConfirmation = () => {
     setConfirmationModal({ isOpen: false, type: '', userId: null, userName: '' });
   };
@@ -224,26 +282,49 @@ const UserManagement = () => {
   };
 
   const handleSaveUser = async (updatedUser) => {
+    const token = localStorage.getItem('token');
+    
+    console.log('====================================');
+    console.log('💾 handleSaveUser called');
+    console.log('Updated user data from modal:', updatedUser);
+    console.log('====================================');
+    
     try {
+      // ✅ Only send the fields that the modal provides
       const payload = {
-        username: updatedUser.username,
-        name: updatedUser.fullName || updatedUser.name,
         email: updatedUser.email,
-        contact: updatedUser.contact || updatedUser.contactNumber,
-        role: updatedUser.role
+        name: updatedUser.name,
+        role: updatedUser.role,
+        isActive: updatedUser.isActive
       };
       
-      await fetch(`http://localhost:8080/api/users/updateBy/${updatedUser.id}`, {
+      console.log('📤 Payload to backend:', JSON.stringify(payload, null, 2));
+      
+      const response = await fetch(`http://localhost:8080/api/users/updateBy/${updatedUser.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify(payload)
       });
       
-      await fetchUsers(); // refresh table
+      const responseText = await response.text();
+      console.log('📥 Response status:', response.status);
+      console.log('📥 Response body:', responseText);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${responseText}`);
+      }
+      
+      console.log('✅ User updated successfully');
+      console.log('====================================');
+      
+      await fetchUsers();
       setIsModalOpen(false);
       setSelectedUser(null);
     } catch (err) {
-      console.error('Error updating user:', err);
+      console.error('❌ Error updating user:', err);
       alert(`Failed to update user: ${err.message}`);
     }
   };

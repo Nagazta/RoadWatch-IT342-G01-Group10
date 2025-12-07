@@ -79,7 +79,10 @@ const ReportsManagement = () => {
 
   const handleSaveReport = async (updatedReport) => {
     try {
-      const response = await axios.put(`/api/reports/update/${updatedReport.id}`, updatedReport);
+      const response = await axios.put(
+        `http://localhost:8080/api/reports/update/${updatedReport.id}`, 
+        updatedReport
+      );
       setReports(prev => prev.map(r => r.id === updatedReport.id ? response.data : r));
       handleCloseReportModal();
     } catch (error) {
@@ -100,7 +103,9 @@ const ReportsManagement = () => {
 
   const handleConfirmDelete = async () => {
     try {
-      await axios.delete(`/api/reports/delete/${deleteConfirmation.reportId}`);
+      await axios.delete(
+        `http://localhost:8080/api/reports/delete/${deleteConfirmation.reportId}`
+      );
       setReports(prev => prev.filter(r => r.id !== deleteConfirmation.reportId));
     } catch (error) {
       console.error('Failed to delete report:', error);

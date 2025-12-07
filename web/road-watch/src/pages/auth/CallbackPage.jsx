@@ -2,8 +2,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import authService from '../../services/api/authService';
 
-const capturedHash = window.location.hash;
-
 function CallbackPage() {
     const [status, setStatus] = useState('Processing login...');
     const [details, setDetails] = useState('');
@@ -11,6 +9,7 @@ function CallbackPage() {
     const hasProcessed = useRef(false);
 
     useEffect(() => {
+        // Prevent double execution in React StrictMode
         if (hasProcessed.current) return;
         hasProcessed.current = true;
 
@@ -20,62 +19,66 @@ function CallbackPage() {
 
     const handleCallback = async () => {
         try {
+            console.log('🔄 Processing OAuth callback...');
             setDetails('Verifying authentication...');
-            const result = await authService.handleOAuthCallbackWithHash(capturedHash);
+
+            // Call the handleOAuthCallback from authService
+            const result = await authService.handleOAuthCallback();
 
             if (result.success) {
-                // Save token & role
+                // Save token & role (already saved in authService, but double-check)
                 localStorage.setItem("token", result.data.token);
                 localStorage.setItem("userRole", result.data.user.role);
+                localStorage.setItem("adminId", result.data.user.id); // For consistency
                 sessionStorage.removeItem("authInProgress");
 
-                setStatus('Login successful!');
+                setStatus('Login successful! ✅');
                 setDetails(`Welcome ${result.data.user.name || result.data.user.email}!`);
 
+                console.log('✅ OAuth login successful');
+                console.log('User:', result.data.user);
+                console.log('Role:', result.data.user.role);
+
+                // Redirect based on role
                 const userRole = result.data.user.role;
                 setTimeout(() => {
-                    if (userRole === 'ADMIN') navigate('/admin/dashboard');
-                    else if (userRole === 'INSPECTOR') navigate('/inspector/dashboard');
-                    else navigate('/citizen/dashboard');
+                    if (userRole === 'ADMIN') {
+                        navigate('/admin/dashboard');
+                    } else if (userRole === 'INSPECTOR') {
+                        navigate('/inspector/dashboard');
+                    } else {
+                        navigate('/citizen/dashboard');
+                    }
                 }, 1500);
             } else {
-                console.error('OAuth callback failed:', result.error);
+                console.error('❌ OAuth callback failed:', result.error);
                 sessionStorage.removeItem("authInProgress");
-                setStatus('Login failed');
+                setStatus('Login failed ❌');
                 setDetails(result.error || 'An error occurred during login');
                 setTimeout(() => navigate('/login'), 3000);
             }
         } catch (error) {
-            console.error('Unexpected error in callback:', error);
+            console.error('❌ Unexpected error in callback:', error);
             sessionStorage.removeItem("authInProgress");
-            setStatus('An error occurred');
+            setStatus('An error occurred ❌');
             setDetails(error.message || 'Please try again');
             setTimeout(() => navigate('/login'), 3000);
         }
     };
 
     return (
-        <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100vh',
-            flexDirection: 'column',
-            gap: '20px',
-            backgroundColor: '#f5f5f5',
-            padding: '20px'
-        }}>
-            <div style={{ 
-                fontSize: '64px',
-                animation: status === 'Login successful!' ? 'none' : 'spin 2s linear infinite'
+        <div style={styles.container}>
+            <div style={{
+                ...styles.spinner,
+                animation: status.includes('successful') ? 'none' : 'spin 2s linear infinite'
             }}>
-                {status === 'Login successful!' ? '✅' : '🔄'}
+                {status.includes('successful') ? '✅' : status.includes('failed') || status.includes('error') ? '❌' : '🔄'}
             </div>
-            <h2 style={{ fontSize: '24px', color: '#333', fontWeight: '500', textAlign: 'center' }}>
+            <h2 style={styles.status}>
                 {status}
             </h2>
             {details && (
-                <p style={{ fontSize: '16px', color: '#666', textAlign: 'center', maxWidth: '400px' }}>
+                <p style={styles.details}>
                     {details}
                 </p>
             )}
@@ -88,5 +91,36 @@ function CallbackPage() {
         </div>
     );
 }
+
+const styles = {
+    container: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+        flexDirection: 'column',
+        gap: '20px',
+        backgroundColor: '#f5f5f5',
+        padding: '20px'
+    },
+    spinner: {
+        fontSize: '64px',
+        transition: 'all 0.3s ease'
+    },
+    status: {
+        fontSize: '24px',
+        color: '#333',
+        fontWeight: '500',
+        textAlign: 'center',
+        margin: 0
+    },
+    details: {
+        fontSize: '16px',
+        color: '#666',
+        textAlign: 'center',
+        maxWidth: '400px',
+        margin: 0
+    }
+};
 
 export default CallbackPage;

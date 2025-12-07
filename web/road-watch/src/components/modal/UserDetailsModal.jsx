@@ -1,4 +1,3 @@
-// src/components/modal/UserDetailsModal.jsx
 import React, { useState, useEffect } from 'react';
 import { XIcon } from '../common/Icons';
 import ToggleSwitch from '../settings/ToggleSwitch';
@@ -6,30 +5,31 @@ import '../modal/styles/UserDetailsModal.css';
 
 const UserDetailsModal = ({ user, isOpen, onClose, onSave, mode = 'view' }) => {
   const [formData, setFormData] = useState({
-    role: user?.role || 'Citizen',
-    status: user?.status === 'Active'
+    role: 'CITIZEN',
+    isActive: true
   });
 
-  // Update formData when user or mode changes
   useEffect(() => {
     if (user) {
+      console.log('🔄 UserDetailsModal - Loading user:', user);
       setFormData({
-        role: user.role,
-        status: user.status === 'Active'
+        role: user.role || 'CITIZEN',
+        isActive: user.status === 'Active'
       });
     }
   }, [user, mode]);
 
   if (!isOpen || !user) return null;
 
-  const isEditing = mode === 'edit'; // Use the mode prop directly
+  const isEditing = mode === 'edit';
 
   const handleRoleChange = (e) => {
+    console.log('🔄 Role changed to:', e.target.value);
     setFormData(prev => ({ ...prev, role: e.target.value }));
   };
 
   const handleStatusToggle = () => {
-    setFormData(prev => ({ ...prev, status: !prev.status }));
+    setFormData(prev => ({ ...prev, isActive: !prev.isActive }));
   };
 
   const handleSuspend = () => {
@@ -38,12 +38,21 @@ const UserDetailsModal = ({ user, isOpen, onClose, onSave, mode = 'view' }) => {
   };
 
   const handleSaveChanges = () => {
-    onSave({ 
-      ...user, 
-      role: formData.role, 
-      status: formData.status ? 'Active' : 'Suspended' 
-    });
-    onClose();
+    console.log('💾 Saving user changes');
+    console.log('Original user:', user);
+    console.log('Form data:', formData);
+    
+    // ✅ Create clean payload - don't spread original user
+    const updatedUser = {
+      id: user.id,
+      email: user.email,
+      name: user.fullName,
+      role: formData.role,  // Already uppercase from dropdown
+      isActive: formData.isActive
+    };
+    
+    console.log('📤 Sending to backend:', updatedUser);
+    onSave(updatedUser);
   };
 
   const handleClose = () => {
@@ -53,7 +62,6 @@ const UserDetailsModal = ({ user, isOpen, onClose, onSave, mode = 'view' }) => {
   return (
     <div className="modal-overlay" onClick={handleClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        {/* Modal Header */}
         <div className="modal-header">
           <h2 className="modal-title">User Details - {user.id}</h2>
           <button className="modal-close-btn" onClick={handleClose}>
@@ -61,9 +69,7 @@ const UserDetailsModal = ({ user, isOpen, onClose, onSave, mode = 'view' }) => {
           </button>
         </div>
 
-        {/* Modal Body */}
         <div className="modal-body">
-          {/* User ID and Date Registered */}
           <div className="modal-grid-2">
             <div className="modal-field">
               <label className="modal-label">User ID</label>
@@ -75,19 +81,16 @@ const UserDetailsModal = ({ user, isOpen, onClose, onSave, mode = 'view' }) => {
             </div>
           </div>
 
-          {/* Full Name */}
           <div className="modal-field">
             <label className="modal-label">Full Name</label>
             <div className="modal-value-box">{user.fullName}</div>
           </div>
 
-          {/* Email */}
           <div className="modal-field">
             <label className="modal-label">Email</label>
             <div className="modal-value-box">{user.email}</div>
           </div>
 
-          {/* Reports Submitted and Last Login */}
           <div className="modal-grid-2">
             <div className="modal-field">
               <label className="modal-label">Reports Submitted</label>
@@ -99,10 +102,8 @@ const UserDetailsModal = ({ user, isOpen, onClose, onSave, mode = 'view' }) => {
             </div>
           </div>
 
-          {/* Divider - only show in edit mode */}
           {isEditing && <div className="modal-divider"></div>}
 
-          {/* Role and Status */}
           <div className="modal-grid-2">
             <div className="modal-field">
               <label className="modal-label">
@@ -114,9 +115,9 @@ const UserDetailsModal = ({ user, isOpen, onClose, onSave, mode = 'view' }) => {
                   value={formData.role}
                   onChange={handleRoleChange}
                 >
-                  <option value="Citizen">Citizen</option>
-                  <option value="Inspector">Inspector</option>
-                  <option value="Admin">Admin</option>
+                  <option value="CITIZEN">Citizen</option>
+                  <option value="INSPECTOR">Inspector</option>
+                  <option value="ADMIN">Admin</option>
                 </select>
               ) : (
                 <div className="modal-value-box">{user.role}</div>
@@ -126,19 +127,18 @@ const UserDetailsModal = ({ user, isOpen, onClose, onSave, mode = 'view' }) => {
               <label className="modal-label">Status</label>
               <div className="modal-status-toggle">
                 <ToggleSwitch
-                  checked={formData.status}
+                  checked={formData.isActive}
                   onChange={handleStatusToggle}
                   disabled={!isEditing}
                 />
-                <span className={`modal-status-text ${formData.status ? 'active' : 'inactive'}`}>
-                  {formData.status ? 'Active' : 'Suspended'}
+                <span className={`modal-status-text ${formData.isActive ? 'active' : 'inactive'}`}>
+                  {formData.isActive ? 'Active' : 'Suspended'}
                 </span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Modal Footer */}
         <div className="modal-footer">
           {isEditing ? (
             <>

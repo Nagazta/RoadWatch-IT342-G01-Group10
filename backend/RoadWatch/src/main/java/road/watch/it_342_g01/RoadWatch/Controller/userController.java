@@ -39,7 +39,7 @@ public class userController {
             String assignedArea = (String) requestBody.get("assignedArea");
             String roleStr = (String) requestBody.get("role");
             Object createdByAdminIdObj = requestBody.get("createdByAdminId");
-            
+
             // Parse createdByAdminId
             Long createdByAdminId = null;
             if (createdByAdminIdObj != null) {
@@ -83,7 +83,7 @@ public class userController {
             user.setName(name);
             user.setPassword(password);
             user.setContact(contact);
-            
+
             // Set role
             if (roleStr != null) {
                 try {
@@ -151,12 +151,31 @@ public class userController {
     // UPDATE
     @PutMapping("/updateBy/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody userEntity user) {
+        log.info("========================================");
         log.info("✏️ Updating user with ID: {}", id);
+        log.info("📥 Received user data:");
+        log.info("  - ID from body: {}", user.getId());
+        log.info("  - Username: {}", user.getUsername());
+        log.info("  - Name: {}", user.getName());
+        log.info("  - Email: {}", user.getEmail());
+        log.info("  - Contact: {}", user.getContact());
+        log.info("  - Role: {}", user.getRole());
+        log.info("  - isActive: {}", user.getIsActive());
+        log.info("  - Password: {}", user.getPassword() != null ? "[PRESENT]" : "[NULL]");
+        log.info("========================================");
+
         try {
             userEntity updated = userService.updateUser(id, user);
+
+            log.info("✅ User updated successfully:");
+            log.info("  - ID: {}", updated.getId());
+            log.info("  - isActive: {}", updated.getIsActive());
+            log.info("========================================");
+
             return ResponseEntity.ok(updated);
         } catch (RuntimeException e) {
             log.error("❌ Error updating user: {}", e.getMessage());
+            log.error("❌ Stack trace:", e);
             return ResponseEntity.badRequest().body(createErrorResponse(e.getMessage()));
         }
     }
