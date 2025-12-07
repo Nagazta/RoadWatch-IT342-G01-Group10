@@ -50,19 +50,39 @@ function Registrationpage() {
                 contact: contactNumber,
             });
 
+            console.log('📥 Registration response:', result);
+
             if (result.success) {
                 console.log('✅ Registration successful');
                 setSuccess(true);
-                setTimeout(() => {
-                    navigate('/login');
-                }, 2000);
+
+                // Backend auto-logs in the user and returns a token
+                // Save the token and user info
+                if (result.accessToken) {
+                    localStorage.setItem('token', result.accessToken);
+                    localStorage.setItem('userRole', result.user.role);
+                    localStorage.setItem('adminId', result.user.id);
+                    
+                    console.log('✅ User automatically logged in');
+                    console.log('Citizen ID:', result.roleData?.citizen_id);
+                    
+                    // Redirect to dashboard after 2 seconds
+                    setTimeout(() => {
+                        navigate('/citizen/dashboard');
+                    }, 2000);
+                } else {
+                    // Fallback: redirect to login if no token
+                    setTimeout(() => {
+                        navigate('/login');
+                    }, 2000);
+                }
             } else {
                 console.error('❌ Registration failed:', result.error);
-                setError(result.error);
+                setError(result.error || 'Registration failed. Please try again.');
             }
         } catch (err) {
             console.error('❌ Unexpected error:', err);
-            setError('An unexpected error occurred. Please try again.');
+            setError(err.message || 'An unexpected error occurred. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -73,13 +93,20 @@ function Registrationpage() {
         setLoading(true);
 
         try {
+            console.log('🔐 Starting Google OAuth signup...');
+            
+            // This will redirect to Google
             const result = await authService.loginWithGoogle();
-            if (!result.success) {
-                setError(result.error);
+            
+            // If it returns without redirecting, handle error
+            if (!result.success && !result.pending) {
+                setError(result.error || 'Google signup failed');
+                setLoading(false);
             }
+            // If result.pending is true, user is being redirected to Google
         } catch (err) {
+            console.error('❌ Google signup error:', err);
             setError('Google signup failed. Please try again.');
-        } finally {
             setLoading(false);
         }
     };
@@ -88,7 +115,6 @@ function Registrationpage() {
         <div className="page-wrapper">
             <Navbar />
             
-            {/* --- THIS IS THE 1 CONTAINER WE WILL SPLIT --- */}
             <div className="registration-main-content">
                 {/* --- CHILD 1: THE FORM AREA --- */}
                 <div className="registration-form-area">
@@ -108,7 +134,7 @@ function Registrationpage() {
                         {success && (
                             <div className="success-message">
                                 <span className="success-icon">✅</span>
-                                Registration successful! Redirecting to login...
+                                Registration successful! Logging you in...
                             </div>
                         )}
 
@@ -213,7 +239,7 @@ function Registrationpage() {
                             Already have an account? <Link to="/login">Sign in</Link>
                         </p>
 
-                        <div className="divider"></div>
+                        <div className="divider">Or continue with Google</div>
 
                         <button 
                             className="btn btn-secondary google-btn"

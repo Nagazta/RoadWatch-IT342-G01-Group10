@@ -6,14 +6,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Request DTO for standard email/password login
- * Used by citizens, admins, and general login endpoint
+ * Request DTO for citizen registration (manual signup)
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginRequest {
+public class RegisterRequest {
+    private String username;
+    private String name;
     private String email;
     private String password;
+    private String contact;
 }

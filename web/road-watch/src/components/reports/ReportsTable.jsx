@@ -10,6 +10,7 @@ const ReportsTable = ({
   onView = () => {},
   onEdit = () => {},
   onDelete = () => {},
+  onViewHistory = () => {}, 
   userRole = 'admin'
 }) => {
   if (reports.length === 0) {

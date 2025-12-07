@@ -33,6 +33,43 @@ const AssignedReports = () => {
     fetchAssignedReports();
   }, []);
 
+  // Modal states
+  const [editingReport, setEditingReport] = useState(null);
+  const [viewingHistory, setViewingHistory] = useState(null);
+  const [viewingReport, setViewingReport] = useState(null); // ✅ New state for view modal
+
+  useEffect(() => {
+    fetchAssignedReports();
+  }, []);
+
+  const fetchAssignedReports = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      const inspectorId = localStorage.getItem('adminId');
+      const roleData = JSON.parse(localStorage.getItem('roleData') || '{}');
+      
+      console.log('🔍 Inspector ID:', inspectorId);
+      console.log('🔍 Role Data:', roleData);
+
+      const actualInspectorId = roleData.inspector_id || inspectorId;
+
+      const response = await axios.get(
+        `http://localhost:8080/api/reports/inspector/${actualInspectorId}`,
+        { headers: { 'Authorization': `Bearer ${token}` } }
+      );
+
+      console.log('✅ Fetched reports:', response.data);
+      setReports(response.data);
+      setError(null);
+    } catch (err) {
+      console.error('❌ Failed to fetch reports:', err);
+      setError('Failed to load assigned reports');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const filteredReports = useMemo(() => {
     return allReports.filter((report) => {
       const matchesSearch =
@@ -57,9 +94,59 @@ const AssignedReports = () => {
     setCurrentPage(1);
   };
 
+  // ✅ Implement handleView function
   const handleView = (reportId) => {
     navigate(`/inspector/reports/${reportId}`);
   };
+
+  const handleSaveEdit = async (reportId, updateData) => {
+    try {
+      const token = localStorage.getItem('token');
+      const userId = localStorage.getItem('adminId');
+      
+      const payload = {
+        ...updateData,
+        updatedBy: userId
+      };
+      
+      await axios.put(
+        `http://localhost:8080/api/reports/${reportId}`,
+        payload,
+        { headers: { 'Authorization': `Bearer ${token}` } }
+      );
+
+      await fetchAssignedReports();
+
+      console.log('✅ Report updated successfully');
+      alert('Report updated successfully!');
+    } catch (error) {
+      console.error('❌ Failed to update report:', error);
+      throw error;
+    }
+  };
+
+  const handleViewHistory = (reportId) => {
+    setViewingHistory(reportId);
+  };
+
+  if (loading) {
+    return (
+      <div className="dashboard-container inspector-page">
+        <div className="loading-state">Loading assigned reports...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="dashboard-container inspector-page">
+        <div className="error-state">
+          <p>{error}</p>
+          <button onClick={fetchAssignedReports}>Retry</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="dashboard-container inspector-page">
@@ -99,4 +186,5 @@ const AssignedReports = () => {
     </div>
   );
 };
+
 export default AssignedReports;

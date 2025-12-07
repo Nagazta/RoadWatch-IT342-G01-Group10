@@ -6,14 +6,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Request DTO for standard email/password login
- * Used by citizens, admins, and general login endpoint
+ * Request DTO for Inspector Login
+ * Similar to Node.js loginStudent (studentId + classCode)
+ * But uses email + password since inspectors are created by admin
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginRequest {
+public class InspectorLoginRequest {
     private String email;
     private String password;
 }
