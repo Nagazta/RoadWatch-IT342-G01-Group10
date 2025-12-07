@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "reports", schema = "public")
@@ -20,11 +22,9 @@ public class ReportEntity {
     private String title;
     private String description;
     private String category;
-
     private String location;
     private Double latitude;
     private Double longitude;
-
     private String submittedBy;
 
     @Column(name = "date_submitted")
@@ -33,11 +33,13 @@ public class ReportEntity {
     private String status;
     private String adminNotes;
 
-    // --- ⬇️ ADD THIS SECTION ⬇️ ---
-    @ManyToOne // This means One Inspector can have Many Reports
-    @JoinColumn(name = "assigned_inspector_id") // Creates a column in DB to store Inspector ID
+    @ManyToOne
+    @JoinColumn(name = "assigned_inspector_id")
     private inspectorEntity assignedInspector;
-    // ------------------------------
+
+    // ✅ ADD THIS: One Report can have Many Images
+    @OneToMany(mappedBy = "report", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReportImageEntity> images = new ArrayList<>();
 
     @PrePersist
     public void onCreate() {

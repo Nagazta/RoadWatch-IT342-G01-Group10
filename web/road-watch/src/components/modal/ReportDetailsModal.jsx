@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { XIcon, ImageIcon } from '../common/Icons';
+import reportService from '../../services/api/reportService';
 import '../modal/styles/ReportDetailsModal.css';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 const ReportDetailsModal = ({ report, isOpen, onClose, onSave, mode = 'view' }) => {
   const [formData, setFormData] = useState({
     status: report?.status || 'Pending',
     adminNotes: ''
   });
+  const [images, setImages] = useState([]);
+  const [loadingImages, setLoadingImages] = useState(false);
 
   useEffect(() => {
     if (report) {
@@ -14,8 +19,28 @@ const ReportDetailsModal = ({ report, isOpen, onClose, onSave, mode = 'view' }) 
         status: report.status,
         adminNotes: report.adminNotes || ''
       });
+      
+      // Fetch images when modal opens
+      fetchImages();
     }
   }, [report, mode]);
+
+  const fetchImages = async () => {
+    if (!report?.id) return;
+    
+    setLoadingImages(true);
+    try {
+      const response = await reportService.getReportImages(report.id);
+      if (response.success) {
+        console.log('✅ Fetched images:', response.data);
+        setImages(response.data);
+      }
+    } catch (error) {
+      console.error('❌ Failed to fetch images:', error);
+    } finally {
+      setLoadingImages(false);
+    }
+  };
 
   if (!isOpen || !report) return null;
 
@@ -35,6 +60,7 @@ const ReportDetailsModal = ({ report, isOpen, onClose, onSave, mode = 'view' }) 
   };
 
   const handleClose = () => {
+    setImages([]); // Clear images when closing
     onClose();
   };
 
@@ -97,14 +123,50 @@ const ReportDetailsModal = ({ report, isOpen, onClose, onSave, mode = 'view' }) 
 
           {/* Photos */}
           <div className="modal-field">
-            <label className="modal-label">Photos</label>
-            <div className="report-photos-grid">
-              {[1, 2, 3].map((_, index) => (
-                <div key={index} className="report-photo-placeholder">
-                  <ImageIcon />
-                </div>
-              ))}
-            </div>
+            <label className="modal-label">Photos ({images.length})</label>
+            {loadingImages ? (
+              <div style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
+                Loading images...
+              </div>
+            ) : images.length > 0 ? (
+              <div className="report-photos-grid">
+                {images.map((image) => (
+                  <div key={image.id} style={{ 
+                    width: '150px', 
+                    height: '150px', 
+                    border: '1px solid #ddd', 
+                    borderRadius: '8px',
+                    overflow: 'hidden'
+                  }}>
+                    <img 
+                      src={`${API_URL}${image.imageUrl}`} 
+                      alt={`Report ${report.id} - Image ${image.id}`}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover'
+                      }}
+                      onError={(e) => {
+                        console.error('Failed to load image:', image.imageUrl);
+                        e.target.onerror = null;
+                        e.target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150"><rect fill="%23f0f0f0" width="150" height="150"/><text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="%23999" font-size="14">Image not found</text></svg>';
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div style={{ 
+                padding: '40px', 
+                textAlign: 'center', 
+                background: '#f9f9f9', 
+                borderRadius: '8px',
+                color: '#999'
+              }}>
+                <ImageIcon />
+                <p style={{ marginTop: '10px' }}>No photos uploaded</p>
+              </div>
+            )}
           </div>
 
           {/* Divider */}

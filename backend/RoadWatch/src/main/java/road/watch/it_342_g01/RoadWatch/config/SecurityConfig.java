@@ -34,6 +34,7 @@ public class SecurityConfig {
                         // Public endpoints - MOST SPECIFIC FIRST!
                         .requestMatchers(
                                 "/error",
+                                "/uploads/**",
                                 "/auth/**",
                                 "/auth/login",
                                 "/auth/local-login",
@@ -45,8 +46,9 @@ public class SecurityConfig {
                                 "/api/admin/add",
                                 "/api/citizen/add",
                                 "/api/inspector/add",
-                                "/api/reports/**",
-                                "/api/reports/getAll",
+                                "/api/reports/**", // ✅ All report endpoints including image uploads
+                                "/api/reports/*/images", // ✅ Explicit image upload endpoint
+                                "/api/reports/images/*", // ✅ Explicit image operations
                                 "/actuator/**")
                         .permitAll()
 
@@ -75,6 +77,7 @@ public class SecurityConfig {
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
+        configuration.setExposedHeaders(Arrays.asList("Authorization")); // ✅ Expose auth headers
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

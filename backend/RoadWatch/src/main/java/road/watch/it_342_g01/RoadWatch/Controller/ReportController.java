@@ -1,21 +1,29 @@
 package road.watch.it_342_g01.RoadWatch.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import road.watch.it_342_g01.RoadWatch.entity.ReportEntity;
+import road.watch.it_342_g01.RoadWatch.entity.ReportImageEntity;
+import road.watch.it_342_g01.RoadWatch.service.ImageUploadService;
 import road.watch.it_342_g01.RoadWatch.service.ReportService;
 import road.watch.it_342_g01.RoadWatch.service.ReportService2;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+@Slf4j // ✅ Add this annotation
 @RestController
 @RequestMapping("/api/reports")
 @RequiredArgsConstructor
 public class ReportController {
 
-    private final ReportService reportService; // <-- CamelCase
+    private final ReportService reportService;
+    private final ImageUploadService imageUploadService;
 
     @Autowired
     private ReportService2 reportService2;
@@ -79,5 +87,56 @@ public class ReportController {
     public ResponseEntity<List<ReportEntity>> getReportsByEmail(@RequestParam String email) {
         List<ReportEntity> reports = reportService.getReportsByEmail(email);
         return ResponseEntity.ok(reports);
+    }
+
+    /**
+     * Upload images for a report
+     * POST /api/reports/{id}/images
+     */
+    @PostMapping("/{id}/images")
+    public ResponseEntity<?> uploadReportImages(
+            @PathVariable Long id,
+            @RequestParam("images") MultipartFile[] files) {
+
+        log.info("📸 Received {} images for report ID: {}", files.length, id);
+
+        try {
+            List<ReportImageEntity> images = imageUploadService.uploadReportImages(id, files);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Images uploaded successfully");
+            response.put("images", images);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("❌ Failed to upload images", e);
+
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("error", e.getMessage());
+
+            return ResponseEntity.badRequest().body(error);
+        }
+    }
+
+    /**
+     * Get images for a report
+     * GET /api/reports/{id}/images
+     */
+    @GetMapping("/{id}/images")
+    public ResponseEntity<List<ReportImageEntity>> getReportImages(@PathVariable Long id) {
+        List<ReportImageEntity> images = imageUploadService.getReportImages(id);
+        return ResponseEntity.ok(images);
+    }
+
+    /**
+     * Delete an image
+     * DELETE /api/reports/images/{imageId}
+     */
+    @DeleteMapping("/images/{imageId}")
+    public ResponseEntity<Void> deleteImage(@PathVariable Long imageId) {
+        imageUploadService.deleteImage(imageId);
+        return ResponseEntity.noContent().build();
     }
 }

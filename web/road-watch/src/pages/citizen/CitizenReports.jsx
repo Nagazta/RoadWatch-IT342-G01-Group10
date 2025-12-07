@@ -3,6 +3,7 @@ import reportService from '../../services/api/reportService';
 import ReportsFilters from '../../components/reports/ReportsFilter';
 import ReportsTable from '../../components/reports/ReportsTable';
 import ReportsPagination from '../../components/reports/ReportsPagination';
+import ReportDetailsModal from '../../components/modal/ReportDetailsModal';  // ✅ Import modal
 import axios from 'axios';
 import '../admin/styles/ReportsManagement.css';
 
@@ -13,8 +14,9 @@ const CitizenReports = () => {
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
   const [selectedStatus, setSelectedStatus] = useState('All Statuses');
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  // Modal
+  // Modal state
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
 
@@ -37,12 +39,15 @@ const CitizenReports = () => {
       }
 
       if (response.success) {
-        // 3️⃣ Map submittedBy email to full name using allUsers
+        // 3️⃣ Map submittedBy email to full name and format dates
         const mappedReports = response.data.map((report) => {
           const matchedUser = allUsers.find(u => u.email === report.submittedBy);
           return {
             ...report,
-            submittedByName: matchedUser ? matchedUser.name : report.submittedBy
+            submittedByName: matchedUser ? matchedUser.name : report.submittedBy,
+            dateSubmitted: report.dateSubmitted 
+              ? new Date(report.dateSubmitted).toLocaleDateString() 
+              : 'N/A'
           };
         });
 
@@ -71,14 +76,36 @@ const CitizenReports = () => {
     return matchesSearch && matchesCategory && matchesStatus;
   });
 
-  // Modal handlers
+  // Pagination
+  const totalPages = Math.ceil(filteredReports.length / rowsPerPage);
+  const paginatedReports = filteredReports.slice(
+    (currentPage - 1) * rowsPerPage,
+    currentPage * rowsPerPage
+  );
+
+  // ✅ Modal handlers
   const handleView = (reportId) => {
+    console.log('📋 Opening report modal for ID:', reportId);
     const report = reports.find((r) => r.id === reportId);
-    setSelectedReport(report);
-    setIsReportModalOpen(true);
+    
+    if (report) {
+      // Format the report data for the modal
+      const formattedReport = {
+        ...report,
+        submittedBy: report.submittedByName || report.submittedBy,
+        dateSubmitted: report.dateSubmitted || new Date(report.createdAt).toLocaleDateString()
+      };
+      
+      console.log('📋 Report data:', formattedReport);
+      setSelectedReport(formattedReport);
+      setIsReportModalOpen(true);
+    } else {
+      console.error('❌ Report not found:', reportId);
+    }
   };
 
   const handleCloseReportModal = () => {
+    console.log('✖️ Closing report modal');
     setIsReportModalOpen(false);
     setSelectedReport(null);
   };
@@ -96,7 +123,7 @@ const CitizenReports = () => {
       />
 
       <ReportsTable
-        reports={filteredReports}
+        reports={paginatedReports}
         onView={handleView}
         userRole="citizen"
       />
@@ -104,9 +131,17 @@ const CitizenReports = () => {
       <ReportsPagination
         rowsPerPage={rowsPerPage}
         onRowsPerPageChange={setRowsPerPage}
-        currentPage={1}
-        totalPages={1}
-        onPageChange={() => {}}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
+
+      {/* ✅ Report Details Modal */}
+      <ReportDetailsModal
+        report={selectedReport}
+        isOpen={isReportModalOpen}
+        onClose={handleCloseReportModal}
+        mode="view"  // Citizens can only view, not edit
       />
     </div>
   );
