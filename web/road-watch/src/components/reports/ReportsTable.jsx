@@ -8,6 +8,7 @@ const ReportsTable = ({
   onView = () => {},
   onEdit = () => {},
   onDelete = () => {},
+  onViewHistory = () => {}, 
   userRole = 'admin'
 }) => {
   return (
@@ -22,6 +23,7 @@ const ReportsTable = ({
               onView={onView}
               onEdit={onEdit}
               onDelete={onDelete}
+              onViewHistory={onViewHistory} 
               userRole={userRole}
             />
           ))}

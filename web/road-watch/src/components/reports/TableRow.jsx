@@ -8,6 +8,7 @@ const TableRow = ({
   onView,
   onEdit,
   onDelete,
+  onViewHistory, // ✅ Add this prop
   userRole = 'admin'
 }) => {
   return (
@@ -30,6 +31,7 @@ const TableRow = ({
           onView={onView}
           onEdit={onEdit}
           onDelete={onDelete}
+          onViewHistory={onViewHistory} 
           userRole={userRole}
         />
       </td>

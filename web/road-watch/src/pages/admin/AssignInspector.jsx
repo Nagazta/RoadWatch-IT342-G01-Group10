@@ -20,7 +20,25 @@ const AssignInspector = () => {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const token = localStorage.getItem('accessToken');
+            
+            // 🔍 DEBUG: Check what tokens exist
+            const token1 = localStorage.getItem('token');
+            const token2 = localStorage.getItem('accessToken');
+            const userRole = localStorage.getItem('userRole');
+            
+            console.log('🔍 DEBUG TOKEN CHECK:');
+            console.log('token:', token1 ? '✅ EXISTS' : '❌ MISSING');
+            console.log('accessToken:', token2 ? '✅ EXISTS' : '❌ MISSING');
+            console.log('userRole:', userRole);
+            
+            // Use the correct token
+            const token = token1 || token2; // Try both
+            
+            if (!token) {
+                console.error('❌ NO TOKEN FOUND!');
+                return;
+            }
+            
             const config = { headers: { 'Authorization': `Bearer ${token}` } };
 
             const [reportsRes, inspectorsRes] = await Promise.all([
@@ -32,6 +50,7 @@ const AssignInspector = () => {
             setInspectors(inspectorsRes.data);
         } catch (error) {
             console.error("Error fetching data:", error);
+            console.error("Error response:", error.response?.data);
         } finally {
             setLoading(false);
         }
