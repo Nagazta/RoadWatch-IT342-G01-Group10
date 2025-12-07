@@ -103,7 +103,9 @@ const ReportsManagement = () => {
 
   const handleConfirmDelete = async () => {
     try {
-      await axios.delete(`/api/reports/delete/${deleteConfirmation.reportId}`);
+      await axios.delete(
+        `http://localhost:8080/api/reports/delete/${deleteConfirmation.reportId}`
+      );
       setReports(prev => prev.filter(r => r.id !== deleteConfirmation.reportId));
     } catch (error) {
       console.error('Failed to delete report:', error);
