@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -29,8 +29,10 @@ const CreateReport = () => {
     latitude: null,
     longitude: null
   });
-
   const [mapPosition, setMapPosition] = useState(null);
+  const [reportList, setReportList] = useState([]);
+  const [loadingReports, setLoadingReports] = useState(false);
+  const [errorReports, setErrorReports] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -41,134 +43,182 @@ const CreateReport = () => {
     navigate('/inspector/dashboard');
   };
 
+  const fetchInspectorReports = async (email) => {
+    setLoadingReports(true);
+    setErrorReports('');
+    const response = await reportService.getReportsByEmail(email);
+    setLoadingReports(false);
+    if (response.success) {
+      setReportList(Array.isArray(response.data) ? response.data : []);
+    } else {
+      setErrorReports('Failed to fetch reports.');
+    }
+  };
+
+  useEffect(() => {
+    const user = localStorage.getItem('user');
+    if (!user) return;
+    const email = JSON.parse(user).email;
+    fetchInspectorReports(email);
+  }, []);
+
   const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        const user = localStorage.getItem('user');
-        const parsedUser = JSON.parse(user);
-
-        // Use email instead of full name
-        const email = parsedUser.email;
-
-        // Include lat/lng in the report
-        const payload = {
-            ...formData,
-            latitude: mapPosition?.lat,
-            longitude: mapPosition?.lng,
-            submittedBy: email  // <-- send email
-        };
-
-        const response = await reportService.createReport(payload, email);
-
-        if (response.success) {
-            console.log('Report submitted!');
-            alert('Report submitted!');
-            navigate('/inspector/dashboard');
-        }
+    e.preventDefault();
+    const user = localStorage.getItem('user');
+    const parsedUser = JSON.parse(user);
+    const email = parsedUser.email;
+    const payload = {
+      ...formData,
+      latitude: mapPosition?.lat,
+      longitude: mapPosition?.lng,
+      submittedBy: email
     };
-
+    const response = await reportService.createReport(payload, email);
+    if (response.success) {
+      alert('Report submitted!');
+      setFormData({
+        title: '',
+        description: '',
+        category: '',
+        location: '',
+        latitude: null,
+        longitude: null
+      });
+      setMapPosition(null);
+      fetchInspectorReports(email);
+    }
+  };
 
   return (
-    <form className="citizen-submit" onSubmit={handleSubmit}>
-      <div className="cs-header">
-        <h2> Submit a New Report </h2>
-        <p> Help improve road safety in your community by reporting damage or hazards </p>
-      </div>
-
-      {/* Report Title */}
-      <div className="cs-input">
-        <h4> Report Title </h4>
-        <input
-          id="title"
-          name="title"
-          type="text"
-          placeholder="Brief description of the issue (e.g., Large pothole on Main Street)"
-          value={formData.title}
-          onChange={handleChange}
-          required
-        />
-      </div>
-
-      {/* Report Description */}
-      <div className="cs-input">
-        <h4> Description </h4>
-        <input
-          id="description"
-          name="description"
-          type="text"
-          value={formData.description}
-          onChange={handleChange}
-          required
-        />
-      </div>
-
-      {/* Report Category */}
-      <div className="cs-input">
-        <h4> Category </h4>
-        <select
-          id="category"
-          name="category"
-          value={formData.category}
-          onChange={(e) => setFormData((prev) => ({ ...prev, category: e.target.value }))}
-          required
-        >
-          <option value=""> </option>
-          <option value="Pothole"> Pothole </option>
-          <option value="Flooding"> Flooding </option>
-          <option value="Debris"> Debris </option>
-          <option value="Crack"> Crack </option>
-          <option value="Other"> Other </option>
-        </select>
-      </div>
-
-      {/* Report Location */}
-      <div className="cs-input">
-        <h4> Location </h4>
-        <input
-          id="location"
-          name="location"
-          type="text"
-          value={formData.location}
-          onChange={handleChange}
-          placeholder="Enter street address or landmark"
-          required
-        />
-
-        <p>Click on the map to pick the exact location:</p>
-        <div className="map-wrapper" style={{ height: '300px', marginBottom: '16px' }}>
-          <MapContainer
-            center={[10.3157, 123.8854]}
-            zoom={13}
-            style={{ height: '100%', width: '100%' }}
-          >
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            />
-            <LocationPicker position={mapPosition} setPosition={setMapPosition} />
-          </MapContainer>
+    <>
+      <form className="citizen-submit" onSubmit={handleSubmit}>
+        <div className="cs-header">
+          <h2> Submit a New Report </h2>
+          <p> Help improve road safety in your community by reporting damage or hazards </p>
         </div>
-
-        {mapPosition && (
-          <p>
-            Selected Coordinates: Latitude {mapPosition.lat.toFixed(6)}, Longitude {mapPosition.lng.toFixed(6)}
-          </p>
+        {/* Report Title */}
+        <div className="cs-input">
+          <h4> Report Title </h4>
+          <input
+            id="title"
+            name="title"
+            type="text"
+            placeholder="Brief description of the issue (e.g., Large pothole on Main Street)"
+            value={formData.title}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        {/* Report Description */}
+        <div className="cs-input">
+          <h4> Description </h4>
+          <input
+            id="description"
+            name="description"
+            type="text"
+            value={formData.description}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        {/* Report Category */}
+        <div className="cs-input">
+          <h4> Category </h4>
+          <select
+            id="category"
+            name="category"
+            value={formData.category}
+            onChange={(e) => setFormData((prev) => ({ ...prev, category: e.target.value }))}
+            required
+          >
+            <option value=""> </option>
+            <option value="Pothole"> Pothole </option>
+            <option value="Flooding"> Flooding </option>
+            <option value="Debris"> Debris </option>
+            <option value="Crack"> Crack </option>
+            <option value="Other"> Other </option>
+          </select>
+        </div>
+        {/* Report Location */}
+        <div className="cs-input">
+          <h4> Location </h4>
+          <input
+            id="location"
+            name="location"
+            type="text"
+            value={formData.location}
+            onChange={handleChange}
+            placeholder="Enter street address or landmark"
+            required
+          />
+          <p>Click on the map to pick the exact location:</p>
+          <div className="map-wrapper" style={{ height: '300px', marginBottom: '16px' }}>
+            <MapContainer
+              center={[10.3157, 123.8854]}
+              zoom={13}
+              style={{ height: '100%', width: '100%' }}
+            >
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              />
+              <LocationPicker position={mapPosition} setPosition={setMapPosition} />
+            </MapContainer>
+          </div>
+          {mapPosition && (
+            <p>
+              Selected Coordinates: Latitude {mapPosition.lat.toFixed(6)}, Longitude {mapPosition.lng.toFixed(6)}
+            </p>
+          )}
+        </div>
+        {/* Report Images */}
+        <div className="cs-input">
+          <h4> Photos </h4>
+          <p> Upload up to 5 photos (JPEG/PNG, max 5MB each) </p>
+          <input type="file" accept="image/*" multiple />
+        </div>
+        {/* Buttons */}
+        <div className="cs-buttons">
+          <button type="submit"> Submit </button>
+          <button type="button" onClick={handleCancel}> Cancel </button>
+        </div>
+      </form>
+      <div style={{ maxWidth: '950px', margin: '32px auto', padding: '0 1vw' }}>
+        <h3>Submitted Reports</h3>
+        {loadingReports ? (
+          <p>Loading reports...</p>
+        ) : errorReports ? (
+          <p style={{ color: 'red' }}>{errorReports}</p>
+        ) : !reportList.length ? (
+          <p>No reports submitted yet.</p>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', background: '#fff', borderCollapse: 'collapse', border: '1px solid #d6dcf0' }}>
+              <thead style={{ background: '#f5f8fc' }}>
+                <tr>
+                  <th style={{ padding: '10px 16px', borderBottom: '1px solid #e3e7f1' }}>Title</th>
+                  <th style={{ padding: '10px 16px', borderBottom: '1px solid #e3e7f1' }}>Category</th>
+                  <th style={{ padding: '10px 16px', borderBottom: '1px solid #e3e7f1' }}>Location</th>
+                  <th style={{ padding: '10px 12px', borderBottom: '1px solid #e3e7f1' }}>Status</th>
+                  <th style={{ padding: '10px 12px', borderBottom: '1px solid #e3e7f1' }}>Date Submitted</th>
+                </tr>
+              </thead>
+              <tbody>
+                {reportList.map((rep, i) => (
+                  <tr key={rep.id || i}>
+                    <td style={{ padding: '6px 16px', borderBottom: '1px solid #e3e7f1' }}>{rep.title}</td>
+                    <td style={{ padding: '6px 16px', borderBottom: '1px solid #e3e7f1' }}>{rep.category}</td>
+                    <td style={{ padding: '6px 16px', borderBottom: '1px solid #e3e7f1' }}>{rep.location || '-'}</td>
+                    <td style={{ padding: '6px 12px', borderBottom: '1px solid #e3e7f1' }}>{rep.status || '-'}</td>
+                    <td style={{ padding: '6px 12px', borderBottom: '1px solid #e3e7f1' }}>{rep.dateSubmitted || rep.createdAt || '-'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
-
-      {/* Report Images */}
-      <div className="cs-input">
-        <h4> Photos </h4>
-        <p> Upload up to 5 photos (JPEG/PNG, max 5MB each) </p>
-        <input type="file" accept="image/*" multiple />
-      </div>
-
-      {/* Buttons */}
-      <div className="cs-buttons">
-        <button type="submit"> Submit </button>
-        <button type="button" onClick={handleCancel}> Cancel </button>
-      </div>
-    </form>
+    </>
   );
 };
 

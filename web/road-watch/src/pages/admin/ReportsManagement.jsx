@@ -31,7 +31,10 @@ const ReportsManagement = () => {
     try {
       const response = await axios.get('http://localhost:8080/api/reports/getAll');
       console.log('API response:', response.data); // should log the JSON array
-      setReports(Array.isArray(response.data) ? response.data : []);
+      const data = Array.isArray(response.data) ? response.data : [];
+      // Sort by ID in descending order (highest ID first)
+      const sortedData = data.sort((a, b) => b.id - a.id);
+      setReports(sortedData);
     } catch (error) {
       console.error('Failed to fetch reports:', error);
     }
@@ -79,10 +82,7 @@ const ReportsManagement = () => {
 
   const handleSaveReport = async (updatedReport) => {
     try {
-      const response = await axios.put(
-        `http://localhost:8080/api/reports/update/${updatedReport.id}`, 
-        updatedReport
-      );
+      const response = await axios.put(`http://localhost:8080/api/reports/update/${updatedReport.id}`, updatedReport);
       setReports(prev => prev.map(r => r.id === updatedReport.id ? response.data : r));
       handleCloseReportModal();
     } catch (error) {
