@@ -3,7 +3,12 @@
 
 import { supabase } from '../../config/supabaseClient.js';
 
-const API_URL = 'http://localhost:8080/auth';
+const API_URL = import.meta.env.VITE_API_URL;
+
+if (!API_URL) {
+  throw new Error('VITE_API_URL environment variable is not set');
+}
+
 
 const authService = {
     /**

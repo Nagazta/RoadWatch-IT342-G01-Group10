@@ -1,7 +1,11 @@
 // src/services/auditLogService.js
 // API service for audit logs (Vite version)
 
-const API_BASE_URL = import.meta.env.VITE_AUDIT_API_URL || 'http://localhost:8080/api/audit';
+const API_BASE_URL = import.meta.env.VITE_AUDIT_API_URL;
+
+if (!API_BASE_URL) {
+  throw new Error('VITE_AUDIT_API_URL environment variable is not set');
+}
 
 /**
  * Get auth token from storage
