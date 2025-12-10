@@ -47,10 +47,10 @@ function Loginpage() {
             
             let response;
             if (isInspector) {
-                console.log('🔍 Using inspector login endpoint');
+                console.log('🔍 Detected INSPECTOR - Using /api/auth/login-inspector');
                 response = await authService.loginInspector(email, password);
             } else {
-                console.log('🔍 Using standard login endpoint');
+                console.log('🔍 Detected CITIZEN/ADMIN - Using /api/auth/login');
                 response = await authService.login(email, password);
             }
 
@@ -76,6 +76,7 @@ function Loginpage() {
             setLoading(false);
         }
     };
+    
     const handleGoogleLogin = async () => {
         setError('');
         setLoading(true);
