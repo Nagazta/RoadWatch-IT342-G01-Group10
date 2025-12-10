@@ -9,6 +9,8 @@ import road.watch.it_342_g01.RoadWatch.dto.*;
 import road.watch.it_342_g01.RoadWatch.entity.userEntity;
 import road.watch.it_342_g01.RoadWatch.repository.userRepo;
 import road.watch.it_342_g01.RoadWatch.service.AuthService;
+import road.watch.it_342_g01.RoadWatch.service.AuditLogService;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,21 +24,41 @@ public class AuthController {
 
     private final AuthService authService;
     private final userRepo userRepository;
+    private final AuditLogService auditLogService;
 
     /**
-     * 🆕 CITIZEN REGISTRATION - Manual signup with email/password
-     * POST /auth/register
-     * Body: { "username": "john", "name": "John Doe", "email": "john@example.com",
-     * "password": "password123", "contact": "+639123456789" }
+     * CITIZEN REGISTRATION - Manual signup with email/password
      */
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<?> register(
+            @RequestBody RegisterRequest request,
+            HttpServletRequest httpRequest) {
         log.info("📥 Received registration request for: {}", request.getEmail());
         try {
             AuthResponse response = authService.registerCitizen(request);
+
+            // ✅ Audit log: User registration
+            if (response.getUser() != null) {
+                auditLogService.logActionWithIp(
+                        response.getUser().getId(),
+                        "User Registration",
+                        "Citizen registered: " + request.getEmail(),
+                        httpRequest.getRemoteAddr());
+            }
+
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("❌ Registration failed: {}", e.getMessage());
+
+            // ✅ Audit log: Failed registration
+            auditLogService.createAuditLog(
+                    "User Registration",
+                    "Failed registration attempt for: " + request.getEmail() + " - " + e.getMessage(),
+                    null,
+                    "Failed",
+                    httpRequest.getRemoteAddr(),
+                    null, null, null, null);
+
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
             error.put("error", e.getMessage());
@@ -45,53 +67,143 @@ public class AuthController {
     }
 
     /**
-     * 🆕 INSPECTOR LOGIN - Email + Password (No Supabase)
-     * Similar to Node.js /login-student endpoint
-     * 
-     * POST /auth/login-inspector
-     * Body: { "email": "inspector@example.com", "password": "password123" }
+     * INSPECTOR LOGIN - Email + Password
      */
     @PostMapping("/login-inspector")
-    public ResponseEntity<AuthResponse> loginInspector(@RequestBody InspectorLoginRequest request) {
+    public ResponseEntity<AuthResponse> loginInspector(
+            @RequestBody InspectorLoginRequest request,
+            HttpServletRequest httpRequest) {
         log.info("📥 Received inspector login request for: {}", request.getEmail());
-        AuthResponse response = authService.loginInspector(request);
-        return ResponseEntity.ok(response);
+        try {
+            AuthResponse response = authService.loginInspector(request);
+
+            // ✅ Audit log: Inspector login
+            if (response.getUser() != null) {
+                auditLogService.logActionWithIp(
+                        response.getUser().getId(),
+                        "Login",
+                        "Inspector logged in: " + request.getEmail(),
+                        httpRequest.getRemoteAddr());
+            }
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            // ✅ Audit log: Failed login
+            auditLogService.createAuditLog(
+                    "Login",
+                    "Failed inspector login attempt: " + request.getEmail() + " - " + e.getMessage(),
+                    null,
+                    "Failed",
+                    httpRequest.getRemoteAddr(),
+                    null, null, null, null);
+            throw e;
+        }
     }
 
     /**
      * CITIZEN/ADMIN LOGIN - Hybrid (Supabase or Local)
-     * Handles both Supabase users and local users
      */
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<AuthResponse> login(
+            @RequestBody LoginRequest request,
+            HttpServletRequest httpRequest) {
         log.info("📥 Received login request for: {}", request.getEmail());
-        AuthResponse response = authService.login(request);
-        return ResponseEntity.ok(response);
+        try {
+            AuthResponse response = authService.login(request);
+
+            // ✅ Audit log: User login
+            if (response.getUser() != null) {
+                auditLogService.logActionWithIp(
+                        response.getUser().getId(),
+                        "Login",
+                        response.getUser().getRole() + " logged in: " + request.getEmail(),
+                        httpRequest.getRemoteAddr());
+            }
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            // ✅ Audit log: Failed login
+            auditLogService.createAuditLog(
+                    "Login",
+                    "Failed login attempt: " + request.getEmail() + " - " + e.getMessage(),
+                    null,
+                    "Failed",
+                    httpRequest.getRemoteAddr(),
+                    null, null, null, null);
+            throw e;
+        }
     }
 
     /**
-     * LOCAL LOGIN - Bypass Supabase (for testing/admin)
+     * LOCAL LOGIN - Bypass Supabase
      */
     @PostMapping("/local-login")
-    public ResponseEntity<AuthResponse> localLogin(@RequestBody LoginRequest request) {
+    public ResponseEntity<AuthResponse> localLogin(
+            @RequestBody LoginRequest request,
+            HttpServletRequest httpRequest) {
         log.info("📥 Received local login request for: {}", request.getEmail());
-        AuthResponse response = authService.localLogin(request);
-        return ResponseEntity.ok(response);
+        try {
+            AuthResponse response = authService.localLogin(request);
+
+            // ✅ Audit log: Local login
+            if (response.getUser() != null) {
+                auditLogService.logActionWithIp(
+                        response.getUser().getId(),
+                        "Login",
+                        "Local login: " + request.getEmail(),
+                        httpRequest.getRemoteAddr());
+            }
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            // ✅ Audit log: Failed login
+            auditLogService.createAuditLog(
+                    "Login",
+                    "Failed local login: " + request.getEmail() + " - " + e.getMessage(),
+                    null,
+                    "Failed",
+                    httpRequest.getRemoteAddr(),
+                    null, null, null, null);
+            throw e;
+        }
     }
 
     /**
      * GOOGLE OAUTH - Citizens only
-     * Frontend sends Supabase access token after Google OAuth
      */
     @PostMapping("/google")
-    public ResponseEntity<AuthResponse> googleLogin(@RequestBody GoogleAuthRequest request) {
+    public ResponseEntity<AuthResponse> googleLogin(
+            @RequestBody GoogleAuthRequest request,
+            HttpServletRequest httpRequest) {
         log.info("📥 Received Google OAuth login request");
-        AuthResponse response = authService.loginWithGoogle(request.getAccessToken());
-        return ResponseEntity.ok(response);
+        try {
+            AuthResponse response = authService.loginWithGoogle(request.getAccessToken());
+
+            // ✅ Audit log: Google login
+            if (response.getUser() != null) {
+                auditLogService.logActionWithIp(
+                        response.getUser().getId(),
+                        "Login",
+                        "Google OAuth login: " + response.getUser().getEmail(),
+                        httpRequest.getRemoteAddr());
+            }
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            // ✅ Audit log: Failed Google login
+            auditLogService.createAuditLog(
+                    "Login",
+                    "Failed Google OAuth login - " + e.getMessage(),
+                    null,
+                    "Failed",
+                    httpRequest.getRemoteAddr(),
+                    null, null, null, null);
+            throw e;
+        }
     }
 
     /**
-     * Get current user profile (protected endpoint)
+     * Get current user profile
      */
     @GetMapping("/profile")
     public ResponseEntity<UserDTO> getCurrentUserProfile() {
@@ -117,7 +229,23 @@ public class AuthController {
      * Logout
      */
     @PostMapping("/logout")
-    public ResponseEntity<String> logout() {
+    public ResponseEntity<String> logout(HttpServletRequest httpRequest) {
+        try {
+            String email = SecurityContextHolder.getContext().getAuthentication().getName();
+            userEntity user = userRepository.findByEmail(email).orElse(null);
+
+            // ✅ Audit log: Logout
+            if (user != null) {
+                auditLogService.logActionWithIp(
+                        user.getId(),
+                        "Logout",
+                        "User logged out: " + email,
+                        httpRequest.getRemoteAddr());
+            }
+        } catch (Exception e) {
+            log.warn("Could not log logout action: {}", e.getMessage());
+        }
+
         return ResponseEntity.ok("Logged out successfully");
     }
 }

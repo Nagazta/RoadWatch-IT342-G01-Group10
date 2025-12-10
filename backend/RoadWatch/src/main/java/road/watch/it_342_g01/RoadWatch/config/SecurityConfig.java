@@ -59,6 +59,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/feedback/all").hasRole("ADMIN") // Get all feedback
                         .requestMatchers("/api/feedback/stats").hasRole("ADMIN") // Get feedback stats
                         .requestMatchers("/api/feedback/*/status").hasRole("ADMIN") // Update feedback status
+
+                        // ✅ AUDIT LOGS - Admin only (ADD THIS!)
+                        .requestMatchers("/api/audit/**").hasRole("ADMIN")
+
                         .requestMatchers("/api/users/profile").authenticated() // Profile (any authenticated user)
 
                         // Authenticated endpoints
