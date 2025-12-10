@@ -1,5 +1,5 @@
 import React from 'react';
-import '../feedback/styles/FeedbackStatusBadge.css';
+import './styles/FeedbackStatusBadge.css';
 
 const FeedbackStatusBadge = ({ status }) => {
   const getStatusClass = (status) => {
