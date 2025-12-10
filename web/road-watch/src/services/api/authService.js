@@ -2,6 +2,7 @@
 // Location: src/services/api/authService.js
 
 import { supabase } from '../../config/supabaseClient.js';
+import axios from "axios";
 
 // ✅ FIXED: Use VITE_API_BASE_URL to match Dockerfile
 const API_URL = import.meta.env.VITE_API_BASE_URL;
@@ -342,6 +343,24 @@ const authService = {
     isAuthenticated() {
         return !!localStorage.getItem('token');
     },
+
+    updateCitizen: async(id, updatedUser) =>
+    {
+        try
+        {
+            const response = await axios.put(`http://localhost:8080/api/users/profile?userId=${id}`, updatedUser)
+
+            if(response.data)
+                return { success: true, data: response.data };
+            else
+                throw new Error('Failed to update citizen profile');
+        }
+        catch(error)
+        {
+            console.error('Error:', error);
+            return { success: false };
+        }
+    }
 };
 
 export default authService;
