@@ -2,12 +2,39 @@
 {
     display: flex;
     flex-direction: column;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2vw;
 }
 
-.citizensupport-container h3
-{
-    color: #005F56;
+.support-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5vw;
     margin-bottom: 2vw;
+    padding: 2vw;
+    background: linear-gradient(135deg, #005F56 0%, #00867a 100%);
+    border-radius: 1vw;
+    color: white;
+}
+
+.support-header svg {
+    width: 3vw;
+    height: 3vw;
+    flex-shrink: 0;
+}
+
+.support-header h3 {
+    margin: 0;
+    font-size: 1.5vw;
+    font-weight: 600;
+    color: white;
+}
+
+.support-header p {
+    margin: 0.5vw 0 0 0;
+    font-size: 0.9vw;
+    opacity: 0.95;
 }
 
 .citizensupport-container form
@@ -19,11 +46,13 @@
     background-color: white;
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
     gap: 2vw;
+    margin-bottom: 2vw;
 }
 
 .citizensupport-container form h4
 {
     color: #005F56;
+    margin: 0;
 }
 
 .citizensupport-input
@@ -36,11 +65,17 @@
 .citizensupport-input label
 {
     font-weight: 500;
+    color: #333;
+}
+
+.required {
+    color: #dc3545;
+    margin-left: 0.3vw;
 }
 
 .citizensupport-input select
 {
-    width: 40%;
+    width: 50%;
 }
 
 .citizensupport-input input, .citizensupport-input select, .citizensupport-input textarea
@@ -49,22 +84,46 @@
     border: 1px solid lightblue;
     border-radius: 0.5vw;
     background-color: #EEE;
+    font-family: inherit;
+    transition: all 0.2s ease;
 }
 
 .citizensupport-input input:focus, .citizensupport-input select:focus, .citizensupport-input textarea:focus
 {
     background-color: white;
+    outline: none;
+    border-color: #005F56;
+}
+
+.citizensupport-input textarea {
+    resize: vertical;
+    min-height: 10vw;
 }
 
 .support-info
 {
     display: flex;
+    align-items: flex-start;
     padding: 1vw;
     border: 1px solid #005F56;
     border-radius: 1vw;
     background-color: lightcyan;
-    font-size: 1vw;
+    font-size: 0.9vw;
     gap: 1vw;
+    line-height: 1.6;
+}
+
+.support-info svg {
+    width: 1.5vw;
+    height: 1.5vw;
+    flex-shrink: 0;
+    margin-top: 0.2vw;
+}
+
+.citizensupport-container hr {
+    border: none;
+    border-top: 1px solid #e5e7eb;
+    margin: 1vw 0;
 }
 
 .citizensupport-buttons
@@ -81,16 +140,195 @@
     border-radius: 1vw;
     font-weight: 600;
     cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-.citizensupport-buttons button:first-child
+.btn-cancel
 {
     color: #005F56;
+    background: white;
     border: 1px solid #005F56;
 }
 
-.citizensupport-buttons button:last-child
+.btn-cancel:hover {
+    background-color: #f0f0f0;
+}
+
+.btn-submit
 {
     color: white;
     background-color: #005F56;
+}
+
+.btn-submit:hover {
+    background-color: #004a43;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 95, 86, 0.3);
+}
+
+/* Help Section */
+.support-help-section {
+    background: white;
+    padding: 2vw;
+    border-radius: 1vw;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.support-help-section h4 {
+    margin: 0 0 1.5vw 0;
+    font-size: 1.2vw;
+    font-weight: 600;
+    color: #005F56;
+}
+
+.help-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5vw;
+}
+
+.help-card {
+    padding: 1.5vw;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75vw;
+    transition: all 0.2s ease;
+}
+
+.help-card:hover {
+    border-color: #005F56;
+    box-shadow: 0 4px 12px rgba(0, 95, 86, 0.1);
+    transform: translateY(-2px);
+}
+
+.help-card h5 {
+    margin: 0 0 0.5vw 0;
+    font-size: 1vw;
+    font-weight: 600;
+    color: #005F56;
+}
+
+.help-card p {
+    margin: 0 0 1vw 0;
+    font-size: 0.85vw;
+    color: #6b7280;
+    line-height: 1.5;
+}
+
+.help-card a {
+    font-size: 0.85vw;
+    color: #005F56;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.help-card a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .citizensupport-container {
+        padding: 4vw;
+    }
+
+    .support-header {
+        flex-direction: column;
+        text-align: center;
+        padding: 4vw;
+    }
+
+    .support-header svg {
+        width: 8vw;
+        height: 8vw;
+    }
+
+    .support-header h3 {
+        font-size: 4vw;
+    }
+
+    .support-header p {
+        font-size: 2.5vw;
+    }
+
+    .citizensupport-container form {
+        padding: 4vw;
+        gap: 4vw;
+    }
+
+    .citizensupport-container form h4 {
+        font-size: 3.5vw;
+    }
+
+    .citizensupport-input label {
+        font-size: 3vw;
+    }
+
+    .citizensupport-input select {
+        width: 100%;
+    }
+
+    .citizensupport-input input, 
+    .citizensupport-input select, 
+    .citizensupport-input textarea {
+        padding: 2vw 3vw;
+        font-size: 3vw;
+    }
+
+    .citizensupport-input textarea {
+        min-height: 25vw;
+    }
+
+    .support-info {
+        font-size: 2.5vw;
+        padding: 3vw;
+    }
+
+    .support-info svg {
+        width: 4vw;
+        height: 4vw;
+    }
+
+    .citizensupport-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .citizensupport-buttons button {
+        width: 100%;
+        padding: 3vw 4vw;
+        font-size: 3vw;
+    }
+
+    .support-help-section {
+        padding: 4vw;
+    }
+
+    .support-help-section h4 {
+        font-size: 3.5vw;
+        margin-bottom: 3vw;
+    }
+
+    .help-cards {
+        grid-template-columns: 1fr;
+        gap: 3vw;
+    }
+
+    .help-card {
+        padding: 4vw;
+    }
+
+    .help-card h5 {
+        font-size: 3vw;
+        margin-bottom: 2vw;
+    }
+
+    .help-card p {
+        font-size: 2.5vw;
+        margin-bottom: 2vw;
+    }
+
+    .help-card a {
+        font-size: 2.5vw;
+    }
 }

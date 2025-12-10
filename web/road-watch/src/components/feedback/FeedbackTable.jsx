@@ -3,7 +3,7 @@ import FeedbackTableHeader from './FeedbackTableHeader';
 import FeedbackTableRow from './FeedbackTableRow';
 import '../reports/styles/ReportsTable.css';
 
-const FeedbackTable = ({ feedbackData, onView }) => {
+const FeedbackTable = ({ feedbackData, onView, onEdit }) => { // <- ADDED onEdit
   return (
     <div className="table-container">
       <table className="reports-table">
@@ -14,6 +14,7 @@ const FeedbackTable = ({ feedbackData, onView }) => {
               key={`${feedback.id}-${index}`}
               feedback={feedback}
               onView={onView}
+              onEdit={onEdit} // <- ADDED
             />
           ))}
         </tbody>

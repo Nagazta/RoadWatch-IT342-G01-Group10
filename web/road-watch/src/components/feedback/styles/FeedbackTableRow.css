@@ -1,23 +1,54 @@
-.feedback-view-btn {
+/* Action buttons container */
+.action-buttons-group {
+  display: flex;
+  gap: 0.5vw;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Base icon button style */
+.feedback-view-btn,
+.feedback-edit-btn {
   background-color: transparent;
-  color: #00695c;
-  padding: 8px 12px;
   border: none;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 500;
+  border-radius: 0.4vw;
+  padding: 0.5vw;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+}
+
+/* View button - Teal icon */
+.feedback-view-btn {
+  color: #005F56;
 }
 
 .feedback-view-btn:hover {
-  background-color: #e0f2f1;
+  background-color: rgba(0, 95, 86, 0.1);
+  transform: scale(1.1);
 }
 
-.feedback-view-btn svg {
-  width: 16px;
-  height: 16px;
+/* Edit button - Green icon */
+.feedback-edit-btn {
+  color: #4CAF50;
+}
+
+.feedback-edit-btn:hover {
+  background-color: rgba(76, 175, 80, 0.1);
+  transform: scale(1.1);
+}
+
+/* Active state for both */
+.feedback-view-btn:active,
+.feedback-edit-btn:active {
+  transform: scale(0.95);
+}
+
+/* Icon sizing */
+.feedback-view-btn svg,
+.feedback-edit-btn svg {
+  width: 1.2vw;
+  height: 1.2vw;
 }

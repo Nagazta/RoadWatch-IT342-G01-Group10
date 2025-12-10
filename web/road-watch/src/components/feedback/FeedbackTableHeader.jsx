@@ -10,7 +10,7 @@ const FeedbackTableHeader = () => {
         <th>Category</th>
         <th>Date Submitted</th>
         <th>Status</th>
-        <th>Action</th>
+        <th>Actions</th> {/* Changed from "Action" to "Actions" */}
       </tr>
     </thead>
   );

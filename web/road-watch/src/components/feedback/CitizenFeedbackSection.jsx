@@ -17,6 +17,7 @@ const CitizenFeedbackSection = ({
   onCategoryChange,
   onDateRange,
   onView,
+  onEdit, // <- ADDED
   rowsPerPage,
   onRowsPerPageChange
 }) => {
@@ -44,6 +45,7 @@ const CitizenFeedbackSection = ({
       <FeedbackTable
         feedbackData={feedbackData}
         onView={onView}
+        onEdit={onEdit} // <- ADDED
       />
 
       <ReportsPagination
