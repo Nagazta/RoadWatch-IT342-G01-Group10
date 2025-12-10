@@ -16,7 +16,7 @@ const ReportsByStatus = () => {
   const [pending, setPending] = useState(0);
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/reports/getAll")
+    fetch("${import.meta.env.VITE_API_BASE_URL}/api/reports/getAll")
       .then(res => res.json())
       .then(reports => {
         setResolved(reports.filter(r => r.status === "Resolved").length);

@@ -16,7 +16,7 @@ const ViewHistoryModal = ({ reportId, onClose }) => {
       setLoading(true);
       const token = localStorage.getItem('token');
       const response = await axios.get(
-        `http://localhost:8080/api/reports/${reportId}/history`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/reports/${reportId}/history`,
         { headers: { 'Authorization': `Bearer ${token}` } }
       );
       

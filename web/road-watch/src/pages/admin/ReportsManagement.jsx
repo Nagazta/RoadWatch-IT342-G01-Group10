@@ -29,7 +29,7 @@ const ReportsManagement = () => {
   // Fetch reports from backend
   const fetchReports = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/reports/getAll');
+      const response = await axios.get('${import.meta.env.VITE_API_BASE_URL}/api/reports/getAll');
       console.log('API response:', response.data); // should log the JSON array
       const data = Array.isArray(response.data) ? response.data : [];
       // Sort by ID in descending order (highest ID first)
@@ -82,7 +82,7 @@ const ReportsManagement = () => {
 
   const handleSaveReport = async (updatedReport) => {
     try {
-      const response = await axios.put(`http://localhost:8080/api/reports/update/${updatedReport.id}`, updatedReport);
+      const response = await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/reports/update/${updatedReport.id}`, updatedReport);
       setReports(prev => prev.map(r => r.id === updatedReport.id ? response.data : r));
       handleCloseReportModal();
     } catch (error) {
@@ -104,7 +104,7 @@ const ReportsManagement = () => {
   const handleConfirmDelete = async () => {
     try {
       await axios.delete(
-        `http://localhost:8080/api/reports/delete/${deleteConfirmation.reportId}`
+        `${import.meta.env.VITE_API_BASE_URL}/api/reports/delete/${deleteConfirmation.reportId}`
       );
       setReports(prev => prev.filter(r => r.id !== deleteConfirmation.reportId));
     } catch (error) {
