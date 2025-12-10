@@ -1,19 +1,16 @@
 package road.watch.it_342_g01.RoadWatch.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.lang.NonNull; // ✅ Add this import
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import road.watch.it_342_g01.RoadWatch.entity.*;
 import road.watch.it_342_g01.RoadWatch.repository.*;
 
-import java.io.IOException;
 import java.util.List;
+import java.util.Objects; // ✅ Add this import
 import java.util.Optional;
 
 @Slf4j
@@ -30,32 +27,24 @@ public class userService {
     private adminRepo adminRepo;
 
     @Autowired
-    private citizenRepo citizenRepo; // 🆕 Add citizen repo
-
-    private final OkHttpClient httpClient = new OkHttpClient();
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
-    @Value("${SUPABASE_URL}")
-    private String supabaseUrl;
-
-    @Value("${SUPABASE_SERVICE_ROLE_KEY}")
-    private String supabaseServiceRoleKey;
+    private citizenRepo citizenRepo;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Transactional
-    public userEntity createUser(userEntity user) {
+    public userEntity createUser(@NonNull userEntity user) { // ✅ Add @NonNull
         return createUser(user, null, null, null);
     }
 
     @Transactional
-    public userEntity createUser(userEntity user, Long createdByAdminId) {
+    public userEntity createUser(@NonNull userEntity user, Long createdByAdminId) { // ✅ Add @NonNull
         return createUser(user, createdByAdminId, null, null);
     }
 
     @Transactional
-    public userEntity createUser(userEntity user, Long createdByAdminId, String assignedArea) {
+    public userEntity createUser(@NonNull userEntity user, Long createdByAdminId, String assignedArea) { // ✅ Add
+                                                                                                         // @NonNull
         return createUser(user, createdByAdminId, assignedArea, null);
     }
 
@@ -63,8 +52,12 @@ public class userService {
      * 🆕 Updated createUser with googleId parameter for OAuth citizens
      */
     @Transactional
-    public userEntity createUser(userEntity user, Long createdByAdminId, String assignedArea, String googleId) {
+    @NonNull // ✅ Add @NonNull
+    public userEntity createUser(@NonNull userEntity user, Long createdByAdminId, String assignedArea,
+            String googleId) { // ✅ Add @NonNull
         try {
+            Objects.requireNonNull(user, "User cannot be null"); // ✅ Validate
+
             log.info("🔵 Starting user creation process...");
             log.info("🔵 User role: {}", user.getRole());
             log.info("🔵 Created by admin ID: {}", createdByAdminId);
@@ -98,7 +91,7 @@ public class userService {
             } else if (role.ADMIN.equals(savedUser.getRole())) {
                 createAdminRecord(savedUser);
             } else if (role.CITIZEN.equals(savedUser.getRole())) {
-                createCitizenRecord(savedUser, googleId); // 🆕 Create citizen record
+                createCitizenRecord(savedUser, googleId);
             }
 
             return savedUser;
@@ -111,7 +104,8 @@ public class userService {
     /**
      * 🆕 Create Inspector Record
      */
-    private void createInspectorRecord(userEntity user, Long createdByAdminId, String assignedArea) {
+    private void createInspectorRecord(@NonNull userEntity user, Long createdByAdminId, String assignedArea) { // ✅ Add
+                                                                                                               // @NonNull
         log.info("🔵 User is INSPECTOR - creating inspector record...");
         try {
             Optional<inspectorEntity> existingInspector = inspectorRepo.findByUser_Id(user.getId());
@@ -146,7 +140,7 @@ public class userService {
     /**
      * 🆕 Create Admin Record
      */
-    private void createAdminRecord(userEntity user) {
+    private void createAdminRecord(@NonNull userEntity user) { // ✅ Add @NonNull
         log.info("🔵 User is ADMIN - creating admin record...");
         try {
             Optional<adminEntity> existingAdmin = adminRepo.findByUser_Id(user.getId());
@@ -177,7 +171,7 @@ public class userService {
     /**
      * 🆕 Create Citizen Record
      */
-    private void createCitizenRecord(userEntity user, String googleId) {
+    private void createCitizenRecord(@NonNull userEntity user, String googleId) { // ✅ Add @NonNull
         log.info("🔵 User is CITIZEN - creating citizen record...");
         try {
             Optional<citizenEntity> existingCitizen = citizenRepo.findByUser_Id(user.getId());
@@ -188,7 +182,7 @@ public class userService {
 
             citizenEntity citizen = new citizenEntity();
             citizen.setUser(user);
-            citizen.setGoogleId(googleId); // Set Google ID if OAuth login
+            citizen.setGoogleId(googleId);
             citizen.setTotalReports(0);
 
             log.info("🔵 Citizen object created, saving to database...");
@@ -207,7 +201,7 @@ public class userService {
         }
     }
 
-    private void validateUser(userEntity user) {
+    private void validateUser(@NonNull userEntity user) { // ✅ Add @NonNull
         if (user.getEmail() == null || user.getEmail().trim().isEmpty()) {
             throw new IllegalArgumentException("Email is required");
         }
@@ -227,87 +221,100 @@ public class userService {
         }
     }
 
+    @NonNull // ✅ Add @NonNull
     public List<userEntity> getAllUsers() {
         return userRepo.findAll();
     }
 
-    public Optional<userEntity> getUserById(Long id) {
-        return userRepo.findById(id);
+    @NonNull // ✅ Add @NonNull
+    public Optional<userEntity> getUserById(@NonNull Long id) { // ✅ Add @NonNull
+        return Objects.requireNonNull(userRepo.findById(Objects.requireNonNull(id))); // ✅ Fix line 235
     }
 
-    public Optional<userEntity> getUserByEmail(String email) {
-        return userRepo.findByEmail(email);
+    @NonNull // ✅ Add @NonNull
+    public Optional<userEntity> getUserByEmail(@NonNull String email) { // ✅ Add @NonNull
+        return Objects.requireNonNull(userRepo.findByEmail(Objects.requireNonNull(email))); // ✅ Fix line 247
     }
 
     @Transactional
-    public userEntity updateUser(Long id, userEntity updatedUser) {
+    @NonNull
+    public userEntity updateUser(@NonNull Long id, @NonNull userEntity updatedUser) {
+        Objects.requireNonNull(id, "User ID cannot be null");
+        Objects.requireNonNull(updatedUser, "Updated user cannot be null");
+
         log.info("🔧 userService.updateUser called for ID: {}", id);
         log.info("📋 Updated user isActive value: {}", updatedUser.getIsActive());
 
-        return userRepo.findById(id).map(user -> {
-            role oldRole = user.getRole();
+        // ✅ Wrap the entire return statement with Objects.requireNonNull()
+        return Objects.requireNonNull(
+                userRepo.findById(id).map(user -> {
+                    role oldRole = user.getRole();
 
-            if (updatedUser.getUsername() != null) {
-                user.setUsername(updatedUser.getUsername());
-            }
-            if (updatedUser.getName() != null) {
-                user.setName(updatedUser.getName());
-            }
-            if (updatedUser.getEmail() != null) {
-                user.setEmail(updatedUser.getEmail());
-            }
-            if (updatedUser.getContact() != null) {
-                user.setContact(updatedUser.getContact());
-            }
-            if (updatedUser.getRole() != null) {
-                user.setRole(updatedUser.getRole());
-            }
+                    if (updatedUser.getUsername() != null) {
+                        user.setUsername(updatedUser.getUsername());
+                    }
+                    if (updatedUser.getName() != null) {
+                        user.setName(updatedUser.getName());
+                    }
+                    if (updatedUser.getEmail() != null) {
+                        user.setEmail(updatedUser.getEmail());
+                    }
+                    if (updatedUser.getContact() != null) {
+                        user.setContact(updatedUser.getContact());
+                    }
+                    if (updatedUser.getRole() != null) {
+                        user.setRole(updatedUser.getRole());
+                    }
 
-            // ✅ ADD THIS: Handle isActive field
-            if (updatedUser.getIsActive() != null) {
-                log.info("✅ Updating isActive from {} to {}",
-                        user.getIsActive(), updatedUser.getIsActive());
-                user.setIsActive(updatedUser.getIsActive());
-            }
+                    // ✅ Handle isActive field
+                    if (updatedUser.getIsActive() != null) {
+                        log.info("✅ Updating isActive from {} to {}",
+                                user.getIsActive(), updatedUser.getIsActive());
+                        user.setIsActive(updatedUser.getIsActive());
+                    }
 
-            // ✅ ADD THIS: Handle password updates (only if provided)
-            if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
-                log.info("🔒 Updating password for user: {}", user.getEmail());
-                user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
-            }
+                    // ✅ Handle password updates (only if provided)
+                    if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
+                        log.info("🔒 Updating password for user: {}", user.getEmail());
+                        user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+                    }
 
-            log.info("💾 Saving user with isActive: {}", user.getIsActive());
-            userEntity savedUser = userRepo.save(user);
+                    log.info("💾 Saving user with isActive: {}", user.getIsActive());
+                    userEntity savedUser = userRepo.save(user);
 
-            // ✅ Handle role changes
-            role newRole = savedUser.getRole();
-            if (oldRole != newRole) {
-                handleRoleChange(id, savedUser, oldRole, newRole);
-            }
+                    // ✅ Handle role changes
+                    role newRole = savedUser.getRole();
+                    if (oldRole != newRole) {
+                        handleRoleChange(id, savedUser, oldRole, newRole);
+                    }
 
-            log.info("✅ User updated successfully. Final isActive: {}", savedUser.getIsActive());
-            return savedUser;
-        }).orElseThrow(() -> new RuntimeException("User not found with id " + id));
+                    log.info("✅ User updated successfully. Final isActive: {}", savedUser.getIsActive());
+                    return savedUser;
+                }).orElseThrow(() -> new RuntimeException("User not found with id " + id)));
     }
 
     /**
      * 🆕 Handle role changes when updating user
      */
-    private void handleRoleChange(Long userId, userEntity user, role oldRole, role newRole) {
+    private void handleRoleChange(@NonNull Long userId, @NonNull userEntity user, role oldRole, role newRole) { // ✅ Add
+                                                                                                                // @NonNull
+        Objects.requireNonNull(userId, "User ID cannot be null"); // ✅ Validate
+        Objects.requireNonNull(user, "User cannot be null"); // ✅ Validate
+
         // Remove old role record
         if (role.INSPECTOR.equals(oldRole)) {
             inspectorRepo.findByUser_Id(userId).ifPresent(inspector -> {
-                inspectorRepo.delete(inspector);
+                inspectorRepo.delete(Objects.requireNonNull(inspector)); // ✅ Fix line 300
                 log.info("🗑️ Deleted inspector record for user ID: {}", userId);
             });
         } else if (role.ADMIN.equals(oldRole)) {
             adminRepo.findByUser_Id(userId).ifPresent(admin -> {
-                adminRepo.delete(admin);
+                adminRepo.delete(Objects.requireNonNull(admin)); // ✅ Fix line 305
                 log.info("🗑️ Deleted admin record for user ID: {}", userId);
             });
         } else if (role.CITIZEN.equals(oldRole)) {
             citizenRepo.findByUser_Id(userId).ifPresent(citizen -> {
-                citizenRepo.delete(citizen);
+                citizenRepo.delete(Objects.requireNonNull(citizen)); // ✅ Fix line 310
                 log.info("🗑️ Deleted citizen record for user ID: {}", userId);
             });
         }
@@ -323,31 +330,33 @@ public class userService {
     }
 
     @Transactional
-    public void deleteUser(Long id) {
+    public void deleteUser(@NonNull Long id) { // ✅ Add @NonNull
+        Objects.requireNonNull(id, "User ID cannot be null"); // ✅ Fix line 327
+
         if (!userRepo.existsById(id)) {
             throw new RuntimeException("User not found with id " + id);
         }
 
-        userEntity user = userRepo.findById(id).orElseThrow();
+        userEntity user = userRepo.findById(Objects.requireNonNull(id)).orElseThrow(); // ✅ Fix line 331
 
         // ✅ Delete role-specific records first
         if (role.INSPECTOR.equals(user.getRole())) {
             inspectorRepo.findByUser_Id(id).ifPresent(inspector -> {
-                inspectorRepo.delete(inspector);
+                inspectorRepo.delete(Objects.requireNonNull(inspector)); // ✅ Fix line 336
                 log.info("🗑️ Deleted inspector record for user ID: {}", id);
             });
         } else if (role.ADMIN.equals(user.getRole())) {
             adminRepo.findByUser_Id(id).ifPresent(admin -> {
-                adminRepo.delete(admin);
+                adminRepo.delete(Objects.requireNonNull(admin)); // ✅ Fix line 341
                 log.info("🗑️ Deleted admin record for user ID: {}", id);
             });
         } else if (role.CITIZEN.equals(user.getRole())) {
             citizenRepo.findByUser_Id(id).ifPresent(citizen -> {
-                citizenRepo.delete(citizen);
+                citizenRepo.delete(Objects.requireNonNull(citizen)); // ✅ Fix line 346
                 log.info("🗑️ Deleted citizen record for user ID: {}", id);
             });
         }
 
-        userRepo.deleteById(id);
+        userRepo.deleteById(Objects.requireNonNull(id)); // ✅ Fix line 351
     }
 }

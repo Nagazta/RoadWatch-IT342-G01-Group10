@@ -84,39 +84,26 @@
   font-family: inherit;
 }
 
-.btn-primary {
-  background: #007bff;
-  color: white;
-  padding: 0.75rem 1.5rem;
+.btn-primary.submit {
+  width: 120px;
+  height: 36px;
+  border-radius: 8px;
+  color: #ffffff;
   border: none;
-  border-radius: 6px;
-  font-size: 0.95rem;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
-.btn-primary:hover:not(:disabled) {
-  background: #0056b3;
+.btn-primary.submit:hover {
+  background-color: #1d4ed8;
 }
 
-.btn-primary:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.btn-primary.submit:active {
+  transform: scale(0.97);
 }
 
-.btn-secondary {
-  background: #6c757d;
-  color: white;
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
 
-.btn-secondary:hover {
-  background: #5a6268;
-}
+
+

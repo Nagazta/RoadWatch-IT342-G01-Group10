@@ -164,6 +164,7 @@ const AssignedReports = () => {
           onEdit={handleEdit}
           onViewHistory={handleViewHistory}
           userRole="inspector"
+          viewMode="assigned"
         />
 
         <ReportsPagination

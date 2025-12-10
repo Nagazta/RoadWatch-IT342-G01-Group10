@@ -20,7 +20,7 @@ const ViewHistoryModal = ({ reportId, onClose }) => {
         { headers: { 'Authorization': `Bearer ${token}` } }
       );
       
-      console.log('📜 History data:', response.data);
+      console.log('History data:', response.data);
       setHistory(response.data || []);
       setError(null);
     } catch (error) {
@@ -48,15 +48,53 @@ const ViewHistoryModal = ({ reportId, onClose }) => {
     }
   };
 
+  // ✅ Use SVG icons instead of emojis
   const getChangeIcon = (action) => {
+    const iconStyle = { width: '20px', height: '20px' };
+    
     switch (action?.toUpperCase()) {
-      case 'CREATED': return '📝';
-      case 'UPDATED': return '✏️';
-      case 'STATUS_CHANGED': return '🔄';
-      case 'ASSIGNED': return '👤';
-      case 'RESOLVED': return '✅';
-      case 'REJECTED': return '❌';
-      default: return '📌';
+      case 'CREATED':
+        return (
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={iconStyle}>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+        );
+      case 'UPDATED':
+        return (
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={iconStyle}>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+        );
+      case 'STATUS_CHANGED':
+        return (
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={iconStyle}>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+        );
+      case 'ASSIGNED':
+        return (
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={iconStyle}>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+        );
+      case 'RESOLVED':
+        return (
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={iconStyle}>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        );
+      case 'REJECTED':
+        return (
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={iconStyle}>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        );
+      default:
+        return (
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={iconStyle}>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        );
     }
   };
 
@@ -72,11 +110,31 @@ const ViewHistoryModal = ({ reportId, onClose }) => {
     }
   };
 
+  // ✅ Format field name to be more readable
+  const formatFieldName = (fieldName) => {
+    if (!fieldName) return '';
+    
+    const fieldNameMap = {
+      'status': 'Status',
+      'priority': 'Priority',
+      'inspectorNotes': 'Inspector Notes',
+      'adminNotes': 'Admin Notes',
+      'estimatedCompletionDate': 'Estimated Completion Date'
+    };
+    
+    return fieldNameMap[fieldName] || fieldName;
+  };
+
+  // ✅ Check if field is a long text field (notes)
+  const isLongTextField = (fieldName) => {
+    return fieldName === 'inspectorNotes' || fieldName === 'adminNotes';
+  };
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content history-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>📋 Report History - {reportId}</h2>
+          <h2>Report History - {reportId}</h2>
           <button className="close-btn" onClick={onClose}>×</button>
         </div>
 
@@ -106,7 +164,10 @@ const ViewHistoryModal = ({ reportId, onClose }) => {
                 >
                   <div 
                     className="entry-icon"
-                    style={{ borderColor: getActionColor(entry.action) }}
+                    style={{ 
+                      borderColor: getActionColor(entry.action),
+                      color: getActionColor(entry.action)
+                    }}
                   >
                     {getChangeIcon(entry.action)}
                   </div>
@@ -133,27 +194,63 @@ const ViewHistoryModal = ({ reportId, onClose }) => {
                         </p>
                       )}
                       
+                      {/* ✅ Updated field change display with template literals */}
                       {entry.fieldName && (
                         <div className="entry-change">
                           <strong>Changed:</strong>
                           <div className="change-detail">
-                            <span className="field-name">{entry.fieldName}:</span>
-                            {' '}
-                            <span className="old-value">"{entry.oldValue || 'empty'}"</span>
-                            {' → '}
-                            <span className="new-value">"{entry.newValue}"</span>
+                            <span className="field-name">{formatFieldName(entry.fieldName)}</span>
+                            
+                            {/* ✅ Handle long text fields differently */}
+                            {isLongTextField(entry.fieldName) ? (
+                              <div style={{ marginTop: '8px' }}>
+                                <div style={{ 
+                                  padding: '10px', 
+                                  background: '#fff3cd', 
+                                  borderRadius: '6px',
+                                  marginBottom: '8px',
+                                  fontSize: '13px',
+                                  border: '1px solid #ffc107',
+                                  lineHeight: '1.5'
+                                }}>
+                                  <strong style={{ color: '#856404' }}>Previous:</strong>
+                                  <div style={{ marginTop: '4px', color: '#333' }}>
+                                    {entry.oldValue || '(empty)'}
+                                  </div>
+                                </div>
+                                <div style={{ 
+                                  padding: '10px', 
+                                  background: '#d1e7dd', 
+                                  borderRadius: '6px',
+                                  fontSize: '13px',
+                                  border: '1px solid #28a745',
+                                  lineHeight: '1.5'
+                                }}>
+                                  <strong style={{ color: '#0f5132' }}>Updated to:</strong>
+                                  <div style={{ marginTop: '4px', color: '#333' }}>
+                                    {entry.newValue}
+                                  </div>
+                                </div>
+                              </div>
+                            ) : (
+                              <div style={{ marginTop: '4px' }}>
+                                <span className="old-value">{`"${entry.oldValue || '(empty)'}"`}</span>
+                                {' → '} 
+                                <span className="new-value">{`"${entry.newValue}"`}</span>
+                              </div>
+                            )}
                           </div>
                         </div>
                       )}
                       
-                     {entry.notes && (
+                      {entry.notes && (
                         <div className="entry-changes">
-                            <strong>Changes:</strong>
-                            <div className="change-detail">
+                          <strong>Changes:</strong>
+                          <div className="change-detail">
                             {entry.notes}
-                            </div>
+                          </div>
                         </div>
-                        )}
+                      )}
                     </div>
                   </div>
                 </div>

@@ -3,6 +3,7 @@ package road.watch.it_342_g01.RoadWatch.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import road.watch.it_342_g01.RoadWatch.entity.ReportEntity;
@@ -16,6 +17,7 @@ import road.watch.it_342_g01.RoadWatch.repository.userRepo;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -33,25 +35,29 @@ public class ReportService {
 
     private final inspectorRepo inspectorRepo;
 
+    @NonNull
     public List<ReportEntity> getAllReports() {
         return reportRepo.findAll();
     }
 
-    public Optional<ReportEntity> getReportById(Long id) {
-        return reportRepo.findById(id);
+    @NonNull
+    public Optional<ReportEntity> getReportById(@NonNull Long id) {
+        return Objects.requireNonNull(reportRepo.findById(Objects.requireNonNull(id)));
     }
 
-    public ReportEntity createReport(ReportEntity report) {
-        return reportRepo.save(report);
+    @NonNull
+    public ReportEntity createReport(@NonNull ReportEntity report) {
+        return reportRepo.save(Objects.requireNonNull(report));
     }
 
-    public ReportEntity assignInspectorToReport(Long reportId, Long inspectorId) {
+    @NonNull
+    public ReportEntity assignInspectorToReport(@NonNull Long reportId, @NonNull Long inspectorId) {
         // 1. Find the Report
-        ReportEntity report = reportRepo.findById(reportId)
+        ReportEntity report = reportRepo.findById(Objects.requireNonNull(reportId))
                 .orElseThrow(() -> new RuntimeException("Report not found with id: " + reportId));
 
         // 2. Find the Inspector
-        inspectorEntity inspector = inspectorRepo.findById(inspectorId)
+        inspectorEntity inspector = inspectorRepo.findById(Objects.requireNonNull(inspectorId))
                 .orElseThrow(() -> new RuntimeException("Inspector not found with id: " + inspectorId));
 
         // 3. Link them together
@@ -62,38 +68,41 @@ public class ReportService {
         return reportRepo.save(report);
     }
 
-    public ReportEntity updateReport(Long id, ReportEntity updatedReport) {
-        return reportRepo.findById(id)
-                .map(existingReport -> {
+    @NonNull
+    public ReportEntity updateReport(@NonNull Long id, @NonNull ReportEntity updatedReport) {
+        return Objects.requireNonNull(
+                reportRepo.findById(Objects.requireNonNull(id))
+                        .map(existingReport -> {
+                            existingReport.setTitle(updatedReport.getTitle());
+                            existingReport.setDescription(updatedReport.getDescription());
+                            existingReport.setCategory(updatedReport.getCategory());
+                            existingReport.setLocation(updatedReport.getLocation());
 
-                    existingReport.setTitle(updatedReport.getTitle());
-                    existingReport.setDescription(updatedReport.getDescription());
-                    existingReport.setCategory(updatedReport.getCategory());
-                    existingReport.setLocation(updatedReport.getLocation());
+                            // NEW
+                            existingReport.setLatitude(updatedReport.getLatitude());
+                            existingReport.setLongitude(updatedReport.getLongitude());
 
-                    // NEW
-                    existingReport.setLatitude(updatedReport.getLatitude());
-                    existingReport.setLongitude(updatedReport.getLongitude());
+                            existingReport.setSubmittedBy(updatedReport.getSubmittedBy());
+                            existingReport.setStatus(updatedReport.getStatus());
+                            existingReport.setAdminNotes(updatedReport.getAdminNotes());
 
-                    existingReport.setSubmittedBy(updatedReport.getSubmittedBy());
-                    existingReport.setStatus(updatedReport.getStatus());
-                    existingReport.setAdminNotes(updatedReport.getAdminNotes());
-
-                    return reportRepo.save(existingReport);
-                })
-                .orElseThrow(() -> new RuntimeException("Report not found with id " + id));
+                            return reportRepo.save(existingReport);
+                        })
+                        .orElseThrow(() -> new RuntimeException("Report not found with id " + id)));
     }
 
-    public void deleteReport(Long id) {
-        reportRepo.deleteById(id);
+    public void deleteReport(@NonNull Long id) {
+        reportRepo.deleteById(Objects.requireNonNull(id));
     }
 
-    public List<ReportEntity> getReportsByEmail(String email) {
-        return reportRepo.findBySubmittedBy(email);
+    @NonNull
+    public List<ReportEntity> getReportsByEmail(@NonNull String email) {
+        return Objects.requireNonNull(reportRepo.findBySubmittedBy(Objects.requireNonNull(email)));
     }
 
-    public List<ReportEntity> getReportsByInspector(Long inspectorId) {
-        return reportRepo.findByAssignedInspector_Id(inspectorId);
+    @NonNull
+    public List<ReportEntity> getReportsByInspector(@NonNull Long inspectorId) {
+        return Objects.requireNonNull(reportRepo.findByAssignedInspector_Id(Objects.requireNonNull(inspectorId)));
     }
 
     // ========================================
@@ -104,7 +113,16 @@ public class ReportService {
      * Update report with history tracking
      */
     @Transactional
-    public ReportEntity updateReportWithHistory(Long reportId, Map<String, Object> updates, Long updatedBy) {
+    @NonNull
+    public ReportEntity updateReportWithHistory(
+            @NonNull Long reportId,
+            @NonNull Map<String, Object> updates,
+            @NonNull Long updatedBy) {
+
+        Objects.requireNonNull(reportId, "Report ID cannot be null");
+        Objects.requireNonNull(updates, "Updates cannot be null");
+        Objects.requireNonNull(updatedBy, "Updated by user ID cannot be null");
+
         log.info("📝 Updating report ID: {} by user: {}", reportId, updatedBy);
 
         ReportEntity report = reportRepo.findById(reportId)
@@ -135,7 +153,7 @@ public class ReportService {
             }
         }
 
-        // Update inspector notes
+        // Update inspector notes - ✅ WITH TRUNCATION
         if (updates.containsKey("inspectorNotes")) {
             String oldNotes = report.getInspectorNotes();
             String newNotes = (String) updates.get("inspectorNotes");
@@ -143,8 +161,22 @@ public class ReportService {
                 report.setInspectorNotes(newNotes);
                 logChange(reportId, "UPDATED", updatedBy, updatedByName,
                         "inspectorNotes",
-                        oldNotes != null ? "Previous notes" : "No notes",
-                        "Notes updated",
+                        truncateForHistory(oldNotes, 200), // ✅ Truncate to 200 chars
+                        truncateForHistory(newNotes, 200), // ✅ Truncate to 200 chars
+                        changeReason);
+            }
+        }
+
+        // Update admin notes - ✅ WITH TRUNCATION
+        if (updates.containsKey("adminNotes")) {
+            String oldNotes = report.getAdminNotes();
+            String newNotes = (String) updates.get("adminNotes");
+            if (newNotes != null && !newNotes.equals(oldNotes)) {
+                report.setAdminNotes(newNotes);
+                logChange(reportId, "UPDATED", updatedBy, updatedByName,
+                        "adminNotes",
+                        truncateForHistory(oldNotes, 200), // ✅ Truncate to 200 chars
+                        truncateForHistory(newNotes, 200), // ✅ Truncate to 200 chars
                         changeReason);
             }
         }
@@ -173,16 +205,39 @@ public class ReportService {
     /**
      * Get report history
      */
-    public List<ReportHistoryEntity> getReportHistory(Long reportId) {
+    @NonNull
+    public List<ReportHistoryEntity> getReportHistory(@NonNull Long reportId) {
+        Objects.requireNonNull(reportId, "Report ID cannot be null");
         log.info("📜 Fetching history for report ID: {}", reportId);
-        return historyRepository.findByReportIdOrderByTimestampDesc(reportId);
+        return Objects.requireNonNull(historyRepository.findByReportIdOrderByTimestampDesc(reportId));
+    }
+
+    /**
+     * Truncate text for history display (optional, for very long notes)
+     */
+    private String truncateForHistory(String text, int maxLength) {
+        if (text == null || text.isEmpty()) {
+            return "(empty)";
+        }
+        if (text.length() <= maxLength) {
+            return text;
+        }
+        return text.substring(0, maxLength) + "...";
     }
 
     /**
      * Log a change to report history
      */
-    private void logChange(Long reportId, String action, Long updatedBy, String updatedByName,
-            String fieldName, String oldValue, String newValue, String changeReason) {
+    private void logChange(
+            @NonNull Long reportId,
+            @NonNull String action,
+            @NonNull Long updatedBy,
+            String updatedByName,
+            String fieldName,
+            String oldValue,
+            String newValue,
+            String changeReason) {
+
         ReportHistoryEntity history = new ReportHistoryEntity();
         history.setReportId(reportId);
         history.setAction(action);
@@ -201,9 +256,11 @@ public class ReportService {
     /**
      * Get user name by ID
      */
-    private String getUserName(Long userId) {
-        return userRepository.findById(userId)
-                .map(user -> user.getName())
-                .orElse("Unknown User");
+    @NonNull
+    private String getUserName(@NonNull Long userId) {
+        return Objects.requireNonNull(
+                userRepository.findById(Objects.requireNonNull(userId))
+                        .map(user -> user.getName())
+                        .orElse("Unknown User"));
     }
 }

@@ -63,6 +63,23 @@
   color: #999999;
 }
 
+.modal-btn.close-btn{
+  width: 120px;
+  height: 36px;
+  border-radius: 8px;
+  background-color: #eb2525;     /* Professional blue */
+  color: #ffffff;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+.modal-btn.close-btn:hover{
+   background-color:#004d40;
+   color: #ffffff;
+}
+
 @media (max-width: 768px) {
   .report-photos-grid {
     grid-template-columns: repeat(2, 1fr);

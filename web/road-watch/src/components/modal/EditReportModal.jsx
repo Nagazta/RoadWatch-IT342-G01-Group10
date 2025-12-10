@@ -153,7 +153,7 @@ const EditReportModal = ({ report, onClose, onSave }) => {
             <button type="button" className="btn-secondary" onClick={onClose}>
               Cancel
             </button>
-            <button type="submit" className="btn-primary" disabled={loading}>
+            <button type="submit" className="btn-primary submit" disabled={loading}>
               {loading ? 'Saving...' : 'Save Changes'}
             </button>
           </div>

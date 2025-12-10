@@ -213,7 +213,7 @@ const ReportDetailsModal = ({ report, isOpen, onClose, onSave, mode = 'view' }) 
         </div>
 
         {/* Modal Footer */}
-        <div className="modal-footer">
+       <div className="modal-footer">
           {isEditing ? (
             <div className="modal-actions-right" style={{ marginLeft: 'auto' }}>
               <button className="modal-btn close-btn" onClick={handleClose}>
@@ -223,7 +223,13 @@ const ReportDetailsModal = ({ report, isOpen, onClose, onSave, mode = 'view' }) 
                 Save Changes
               </button>
             </div>
-          ) : null}
+          ) : (
+            <div className="modal-actions-right" style={{ marginLeft: 'auto' }}>
+              <button className="modal-btn close-btn" onClick={handleClose}>
+                Close
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
