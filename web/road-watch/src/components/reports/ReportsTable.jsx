@@ -9,7 +9,8 @@ const ReportsTable = ({
   onEdit = () => {},
   onDelete = () => {},
   onViewHistory = () => {}, 
-  userRole = 'admin'
+  userRole = 'admin',
+  viewMode = 'all'  // ✅ Add viewMode prop
 }) => {
   return (
     <div className="table-container">
@@ -23,8 +24,9 @@ const ReportsTable = ({
               onView={onView}
               onEdit={onEdit}
               onDelete={onDelete}
-              onViewHistory={onViewHistory} 
+              onViewHistory={onViewHistory}
               userRole={userRole}
+              viewMode={viewMode}  // ✅ Pass viewMode
             />
           ))}
         </tbody>

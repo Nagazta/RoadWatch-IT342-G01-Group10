@@ -2,15 +2,14 @@ import React from 'react';
 import { EyeIcon, EditIcon, TrashIcon, HistoryIcon } from '../common/Icons';
 import './styles/ActionsButton.css';
 
-
-
 const ActionButtons = ({
   reportId,
   onView,
   onEdit,
   onDelete,
-  onViewHistory, // ✅ New prop
-  userRole = 'admin'
+  onViewHistory,
+  userRole = 'admin',
+  viewMode = 'all'  // ✅ Add viewMode prop
 }) => {
   return (
     <div className="action-buttons">
@@ -25,8 +24,19 @@ const ActionButtons = ({
         </button>
       )}
 
-      {/* Edit Button - Inspector and Admin */}
-      {(userRole === 'inspector' || userRole === 'admin') && onEdit && (
+      {/* Edit Button - Inspector only in "assigned" view, Admin always */}
+      {userRole === 'admin' && onEdit && (
+        <button
+          className="action-btn edit-btn"
+          onClick={() => onEdit(reportId)}
+          title="Edit Report"
+        >
+          <EditIcon />
+        </button>
+      )}
+      
+      {/* ✅ Inspector can only edit in "assigned" view */}
+      {userRole === 'inspector' && viewMode === 'assigned' && onEdit && (
         <button
           className="action-btn edit-btn"
           onClick={() => onEdit(reportId)}

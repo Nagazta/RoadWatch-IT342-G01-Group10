@@ -2,6 +2,8 @@ package road.watch.it_342_g01.RoadWatch.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import road.watch.it_342_g01.RoadWatch.entity.adminEntity;
@@ -11,6 +13,7 @@ import road.watch.it_342_g01.RoadWatch.repository.userRepo;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -18,74 +21,104 @@ public class adminService {
 
     @Autowired
     private adminRepo adminRepo;
-    
+
     @Autowired
     private userRepo userRepo;
 
-    public adminEntity createAdmin(adminEntity admin) {
+    public adminEntity createAdmin(@NonNull adminEntity admin) {
+        userEntity adminUser = admin.getUser();
+        if (adminUser == null) {
+            throw new IllegalArgumentException("User is required");
+        }
 
-        Long userId = admin.getUser().getId();  // extract ID from JSON
+        Long userId = adminUser.getId();
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID is required");
+        }
 
-        userEntity user = userRepo.findById(userId)
+        userEntity user = userRepo.findById(Objects.requireNonNull(userId))
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
 
-        admin.setUser(user); // link
+        admin.setUser(user);
 
         return adminRepo.save(admin);
     }
 
+    @NonNull
     public List<adminEntity> getAllAdmins() {
         return adminRepo.findAll();
     }
 
-    public Optional<adminEntity> getAdminById(Long id) {
-        return adminRepo.findById(id);
+    @NonNull
+    public Optional<adminEntity> getAdminById(@NonNull Long id) {
+        return Objects.requireNonNull(adminRepo.findById(id));
     }
 
-    public Optional<adminEntity> getAdminByUserId(Long userId) {
-        return adminRepo.findByUser_Id(userId);
+    @NonNull
+    public Optional<adminEntity> getAdminByUserId(@NonNull Long userId) {
+        return Objects.requireNonNull(adminRepo.findByUser_Id(userId));
     }
 
     @Transactional
-    public adminEntity updateAdmin(Long id, adminEntity updatedAdmin) {
+    @Nullable
+    public adminEntity updateAdmin(@NonNull Long id, @NonNull adminEntity updatedAdmin) {
         return adminRepo.findById(id).map(admin -> {
+            userEntity existingUser = admin.getUser();
+            if (existingUser == null) {
+                throw new IllegalStateException("Admin has no associated user");
+            }
+
             // Update user fields
-            if (updatedAdmin.getUser() != null) {
-                userEntity user = admin.getUser();
-                if (updatedAdmin.getUser().getName() != null) {
-                    user.setName(updatedAdmin.getUser().getName());
+            userEntity updatedUser = updatedAdmin.getUser();
+            if (updatedUser != null) {
+                // ✅ Remove @NonNull annotation, just use the variable directly
+                userEntity user = Objects.requireNonNull(existingUser);
+
+                if (updatedUser.getName() != null) {
+                    user.setName(updatedUser.getName());
                 }
-                if (updatedAdmin.getUser().getUsername() != null) {
-                    user.setUsername(updatedAdmin.getUser().getUsername());
+                if (updatedUser.getUsername() != null) {
+                    user.setUsername(updatedUser.getUsername());
                 }
-                if (updatedAdmin.getUser().getEmail() != null) {
-                    user.setEmail(updatedAdmin.getUser().getEmail());
+                if (updatedUser.getEmail() != null) {
+                    user.setEmail(updatedUser.getEmail());
                 }
-                if (updatedAdmin.getUser().getContact() != null) {
-                    user.setContact(updatedAdmin.getUser().getContact());
+                if (updatedUser.getContact() != null) {
+                    user.setContact(updatedUser.getContact());
                 }
-                if (updatedAdmin.getUser().getIsActive() != null) {
-                    user.setIsActive(updatedAdmin.getUser().getIsActive());
+                if (updatedUser.getIsActive() != null) {
+                    user.setIsActive(updatedUser.getIsActive());
                 }
                 userRepo.save(user);
             }
-            
+
             // Update admin-specific fields
             if (updatedAdmin.getDepartment() != null) {
                 admin.setDepartment(updatedAdmin.getDepartment());
             }
-            
+
             return adminRepo.save(admin);
         }).orElseThrow(() -> new RuntimeException("Admin not found with id " + id));
     }
 
     @Transactional
-    public void deleteAdmin(Long id) {
+    public void deleteAdmin(@NonNull Long id) {
         adminRepo.findById(id).ifPresent(admin -> {
-            // Delete admin record
+            userEntity user = admin.getUser();
+            if (user == null) {
+                log.warn("Admin {} has no associated user to delete", id);
+                adminRepo.delete(admin);
+                return;
+            }
+
+            // ✅ Remove @NonNull annotation, just use the variable directly
+            userEntity userToDelete = Objects.requireNonNull(user);
+
+            // Delete admin record first (foreign key constraint)
             adminRepo.delete(admin);
-            // Optionally delete user record too
-            userRepo.delete(admin.getUser());
+
+            // Then delete user record
+            userRepo.delete(userToDelete);
         });
     }
 }

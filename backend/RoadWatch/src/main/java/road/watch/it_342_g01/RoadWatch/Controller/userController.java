@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull; // ✅ Add this import
 import org.springframework.web.bind.annotation.*;
 import road.watch.it_342_g01.RoadWatch.entity.userEntity;
 import road.watch.it_342_g01.RoadWatch.service.userService;
@@ -11,6 +12,7 @@ import road.watch.it_342_g01.RoadWatch.service.userService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects; // ✅ Add this import
 
 @Slf4j
 @RestController
@@ -23,13 +25,15 @@ public class userController {
 
     // CREATE - Updated to accept Map to handle createdByAdminId
     @PostMapping("/add")
-    public ResponseEntity<?> addUser(@RequestBody Map<String, Object> requestBody) {
+    public ResponseEntity<?> addUser(@RequestBody @NonNull Map<String, Object> requestBody) { // ✅ Add @NonNull
         log.info("========================================");
         log.info("📥 Received user creation request");
         log.info("Request body: {}", requestBody);
         log.info("========================================");
 
         try {
+            Objects.requireNonNull(requestBody, "Request body cannot be null"); // ✅ Validate
+
             // Extract fields from request body
             String email = (String) requestBody.get("email");
             String username = (String) requestBody.get("username");
@@ -57,7 +61,7 @@ public class userController {
             log.info("Email: {}", email);
             log.info("Username: {}", username);
             log.info("Role: {}", roleStr);
-            log.info("Assigned Area: {}", assignedArea); // Add this log
+            log.info("Assigned Area: {}", assignedArea);
             log.info("Created by admin ID: {}", createdByAdminId);
 
             // Validate input
@@ -141,16 +145,18 @@ public class userController {
 
     // READ ONE
     @GetMapping("/getBy/{id}")
-    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+    public ResponseEntity<?> getUserById(@PathVariable @NonNull Long id) { // ✅ Add @NonNull
         log.info("🔍 Fetching user with ID: {}", id);
-        return userService.getUserById(id)
+        return userService.getUserById(Objects.requireNonNull(id)) // ✅ Fix line 146
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     // UPDATE
     @PutMapping("/updateBy/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody userEntity user) {
+    public ResponseEntity<?> updateUser(
+            @PathVariable @NonNull Long id, // ✅ Add @NonNull
+            @RequestBody @NonNull userEntity user) { // ✅ Add @NonNull
         log.info("========================================");
         log.info("✏️ Updating user with ID: {}", id);
         log.info("📥 Received user data:");
@@ -165,7 +171,9 @@ public class userController {
         log.info("========================================");
 
         try {
-            userEntity updated = userService.updateUser(id, user);
+            userEntity updated = userService.updateUser(
+                    Objects.requireNonNull(id), // ✅ Fix line 168
+                    Objects.requireNonNull(user));
 
             log.info("✅ User updated successfully:");
             log.info("  - ID: {}", updated.getId());
@@ -182,10 +190,10 @@ public class userController {
 
     // DELETE
     @DeleteMapping("/deleteBy/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<?> deleteUser(@PathVariable @NonNull Long id) { // ✅ Add @NonNull
         log.info("🗑️ Deleting user with ID: {}", id);
         try {
-            userService.deleteUser(id);
+            userService.deleteUser(Objects.requireNonNull(id)); // ✅ Fix line 188
             return ResponseEntity.noContent().build();
         } catch (RuntimeException e) {
             log.error("❌ Error deleting user: {}", e.getMessage());
@@ -223,17 +231,22 @@ public class userController {
     }
 
     @GetMapping("/profile")
-    public ResponseEntity<?> getProfile(@RequestParam Long userId) {
-        return userService.getUserById(userId)
+    public ResponseEntity<?> getProfile(@RequestParam @NonNull Long userId) { // ✅ Add @NonNull
+        return userService.getUserById(Objects.requireNonNull(userId)) // ✅ Fix line 227
                 .<ResponseEntity<?>>map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(Map.of("success", false, "message", "User not found")));
     }
 
     @PutMapping("/profile")
-    public ResponseEntity<?> updateProfile(@RequestParam Long userId, @RequestBody userEntity updatedUser) {
+    public ResponseEntity<?> updateProfile(
+            @RequestParam @NonNull Long userId, // ✅ Add @NonNull
+            @RequestBody @NonNull userEntity updatedUser) { // ✅ Add @NonNull
         try {
-            userEntity updated = userService.updateUser(userId, updatedUser);
+            userEntity updated = userService.updateUser(
+                    Objects.requireNonNull(userId), // ✅ Fix line 236
+                    Objects.requireNonNull(updatedUser) // ✅ Fix line 236
+            );
             return ResponseEntity.ok(Map.of("success", true, "data", updated));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

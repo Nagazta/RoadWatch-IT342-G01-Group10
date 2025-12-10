@@ -8,8 +8,9 @@ const TableRow = ({
   onView,
   onEdit,
   onDelete,
-  onViewHistory, // ✅ Add this prop
-  userRole = 'admin'
+  onViewHistory,
+  userRole = 'admin',
+  viewMode = 'all'  // ✅ Add viewMode prop
 }) => {
   return (
     <tr className="table-row">
@@ -31,8 +32,9 @@ const TableRow = ({
           onView={onView}
           onEdit={onEdit}
           onDelete={onDelete}
-          onViewHistory={onViewHistory} 
+          onViewHistory={onViewHistory}
           userRole={userRole}
+          viewMode={viewMode}  // ✅ Pass viewMode
         />
       </td>
     </tr>

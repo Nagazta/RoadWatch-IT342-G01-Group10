@@ -3,7 +3,8 @@ import reportService from '../../services/api/reportService';
 import ReportsFilters from '../../components/reports/ReportsFilter';
 import ReportsTable from '../../components/reports/ReportsTable';
 import ReportsPagination from '../../components/reports/ReportsPagination';
-import ReportDetailsModal from '../../components/modal/ReportDetailsModal';  // ✅ Import modal
+import ReportDetailsModal from '../../components/modal/ReportDetailsModal';
+import ViewHistoryModal from '../../components/modal/ViewHistoryModal';  // ✅ Import history modal
 import axios from 'axios';
 import '../admin/styles/ReportsManagement.css';
 
@@ -16,9 +17,13 @@ const CitizenReports = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Modal state
+  // Report Details Modal state
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
+
+  // ✅ History Modal state
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+  const [selectedReportId, setSelectedReportId] = useState(null);
 
   const [reports, setReports] = useState([]);
 
@@ -83,13 +88,12 @@ const CitizenReports = () => {
     currentPage * rowsPerPage
   );
 
-  // ✅ Modal handlers
+  // Report Details Modal handlers
   const handleView = (reportId) => {
     console.log('📋 Opening report modal for ID:', reportId);
     const report = reports.find((r) => r.id === reportId);
     
     if (report) {
-      // Format the report data for the modal
       const formattedReport = {
         ...report,
         submittedBy: report.submittedByName || report.submittedBy,
@@ -110,6 +114,19 @@ const CitizenReports = () => {
     setSelectedReport(null);
   };
 
+  // ✅ History Modal handlers
+  const handleViewHistory = (reportId) => {
+    console.log('📜 Opening history modal for report ID:', reportId);
+    setSelectedReportId(reportId);
+    setIsHistoryModalOpen(true);
+  };
+
+  const handleCloseHistoryModal = () => {
+    console.log('✖️ Closing history modal');
+    setIsHistoryModalOpen(false);
+    setSelectedReportId(null);
+  };
+
   return (
     <div className="reports-management-container">
       <ReportsFilters
@@ -125,6 +142,7 @@ const CitizenReports = () => {
       <ReportsTable
         reports={paginatedReports}
         onView={handleView}
+        onViewHistory={handleViewHistory}  // ✅ Add this prop
         userRole="citizen"
       />
 
@@ -136,13 +154,21 @@ const CitizenReports = () => {
         onPageChange={setCurrentPage}
       />
 
-      {/* ✅ Report Details Modal */}
+      {/* Report Details Modal */}
       <ReportDetailsModal
         report={selectedReport}
         isOpen={isReportModalOpen}
         onClose={handleCloseReportModal}
-        mode="view"  // Citizens can only view, not edit
+        mode="view"
       />
+
+      {/* ✅ History Modal */}
+      {isHistoryModalOpen && (
+        <ViewHistoryModal
+          reportId={selectedReportId}
+          onClose={handleCloseHistoryModal}
+        />
+      )}
     </div>
   );
 };

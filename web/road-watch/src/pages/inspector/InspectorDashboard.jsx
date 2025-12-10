@@ -5,6 +5,7 @@ import ReportsTable from '../../components/reports/ReportsTable';
 import ReportsPagination from '../../components/reports/ReportsPagination';
 import InspectorDashboardStats from '../../components/dashboard/InspectorDashboardStats';
 import ReportDetailsModal from '../../components/modal/ReportDetailsModal';
+import ViewHistoryModal from '../../components/modal/ViewHistoryModal';  // ✅ Import history modal
 import reportService from '../../services/api/reportService';
 import '../admin/styles/Dashboard.css';
 import '../admin/styles/ReportsManagement.css';
@@ -24,6 +25,10 @@ const InspectorDashboard = () => {
   
   // Modal state
   const [viewingReport, setViewingReport] = useState(null);
+  
+  // ✅ History Modal state
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+  const [selectedReportId, setSelectedReportId] = useState(null);
 
   useEffect(() => {
     fetchAllReports();
@@ -105,6 +110,19 @@ const InspectorDashboard = () => {
       console.log('👁️ Viewing report:', report);
       setViewingReport(report);
     }
+  };
+
+  // ✅ History Modal handlers
+  const handleViewHistory = (reportId) => {
+    console.log('📜 Opening history modal for report ID:', reportId);
+    setSelectedReportId(reportId);
+    setIsHistoryModalOpen(true);
+  };
+
+  const handleCloseHistoryModal = () => {
+    console.log('✖️ Closing history modal');
+    setIsHistoryModalOpen(false);
+    setSelectedReportId(null);
   };
 
   return (
@@ -219,7 +237,9 @@ const InspectorDashboard = () => {
           <ReportsTable
             reports={paginatedReports}
             onView={handleView}
+            onViewHistory={handleViewHistory}
             userRole="inspector"
+            viewMode={viewMode}  
           />
         )}
         
@@ -237,7 +257,15 @@ const InspectorDashboard = () => {
             report={viewingReport}
             isOpen={!!viewingReport}
             onClose={() => setViewingReport(null)}
-            mode="view"
+            mode="view"  // ✅ Inspectors can only view (not edit) from "All Reports"
+          />
+        )}
+
+        {/* ✅ History Modal */}
+        {isHistoryModalOpen && (
+          <ViewHistoryModal
+            reportId={selectedReportId}
+            onClose={handleCloseHistoryModal}
           />
         )}
       </div>
