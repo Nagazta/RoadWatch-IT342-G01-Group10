@@ -42,8 +42,17 @@ function Loginpage() {
         try {
             console.log('🔐 Login attempt for:', email);
             
-            // authService.login returns the formatted response
-            const response = await authService.login(email, password);
+            // ✅ AUTO-DETECT: Check if it's an inspector email
+            const isInspector = email.toLowerCase().includes('@inspector');
+            
+            let response;
+            if (isInspector) {
+                console.log('🔍 Using inspector login endpoint');
+                response = await authService.loginInspector(email, password);
+            } else {
+                console.log('🔍 Using standard login endpoint');
+                response = await authService.login(email, password);
+            }
 
             console.log('📥 Login response:', response);
 
@@ -67,7 +76,6 @@ function Loginpage() {
             setLoading(false);
         }
     };
-
     const handleGoogleLogin = async () => {
         setError('');
         setLoading(true);
