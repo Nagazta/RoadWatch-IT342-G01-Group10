@@ -1,42 +1,143 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AuditLogsFilters from '../../components/audit/AuditLogsFilters';
 import AuditLogsTable from '../../components/audit/AuditLogsTable';
 import ReportsPagination from '../../components/reports/ReportsPagination';
+import { fetchAuditLogs, exportAuditLogsCSV } from '../../services/api/auditLogService.js';
 import '../admin/styles/AuditLogs.css';
 
 const AuditLogs = () => {
+  // State
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedActivity, setSelectedActivity] = useState('All Activities');
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [auditLogs, setAuditLogs] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [dateRange, setDateRange] = useState({ start: null, end: null });
 
-  // Mock data
-  const auditLogs = [
-    { id: 'AL-1001', user: 'Adrian Lopez', userRole: 'Admin', action: 'User Modification', description: 'Updated role of Kyle Sumucad from Citizen to Moderator', dateTime: 'Oct 20, 2025 • 08:34 AM', status: 'Success' },
-    { id: 'AL-1002', user: 'Kyle Sumucad', userRole: 'Moderator', action: 'Report Update', description: 'Changed status of RW-00126 to "Resolved"', dateTime: 'Oct 20, 2025 • 09:15 AM', status: 'Success' },
-    { id: 'AL-1003', user: 'Maria Santos', userRole: 'Citizen', action: 'Login', description: 'Logged in via web portal', dateTime: 'Oct 20, 2025 • 09:25 AM', status: 'Success' },
-    { id: 'AL-1004', user: 'John Dela Cruz', userRole: 'Citizen', action: 'Report Submission', description: 'Submitted a new report: Deep Pothole on Osmeña Blvd', dateTime: 'Oct 20, 2025 • 09:30 AM', status: 'Success' },
-    { id: 'AL-1005', user: 'System', userRole: 'System', action: 'Automated Process', description: 'Cleaned up expired sessions', dateTime: 'Oct 20, 2025 • 09:45 AM', status: 'System' },
-    { id: 'AL-1006', user: 'Gab Saniel', userRole: 'Citizen', action: 'Login', description: 'Failed login attempt – incorrect password', dateTime: 'Oct 20, 2025 • 10:05 AM', status: 'Failed' },
-    { id: 'AL-1007', user: 'Adrian Lopez', userRole: 'Admin', action: 'System Change', description: 'Updated site configuration (SMTP settings)', dateTime: 'Oct 20, 2025 • 10:25 AM', status: 'Success' },
-    { id: 'AL-1008', user: 'Robert Tan', userRole: 'Moderator', action: 'Report Update', description: 'Marked report RW-00128 as "In Progress"', dateTime: 'Oct 20, 2025 • 10:40 AM', status: 'Success' },
-    { id: 'AL-1009', user: 'System', userRole: 'System', action: 'Notification', description: 'Sent email summary to admin team', dateTime: 'Oct 20, 2025 • 10:50 AM', status: 'System' },
-    { id: 'AL-1010', user: 'Nina Velasquez', userRole: 'Citizen', action: 'Account Update', description: 'Updated profile picture and contact info', dateTime: 'Oct 20, 2025 • 11:00 AM', status: 'Success' },
-  ];
+  // Fetch audit logs
+  const loadAuditLogs = async () => {
+    setLoading(true);
+    setError(null);
 
+    try {
+      const result = await fetchAuditLogs({
+        search: searchQuery,
+        activity: selectedActivity,
+        startDate: dateRange.start,
+        endDate: dateRange.end,
+        page: currentPage,
+        size: rowsPerPage
+      });
+
+      setAuditLogs(result.logs);
+      setTotalPages(result.totalPages);
+    } catch (err) {
+      console.error('Error loading audit logs:', err);
+      setError(err.message);
+      setAuditLogs([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load logs on component mount and filter changes
+  useEffect(() => {
+    loadAuditLogs();
+  }, [currentPage, rowsPerPage, selectedActivity, dateRange]);
+
+  // Debounced search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (currentPage !== 0) {
+        setCurrentPage(0); // Reset to first page on search
+      } else {
+        loadAuditLogs();
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Handle date range selection
   const handleDateRange = () => {
-    console.log('Open date range picker');
+    // Simple implementation - you can replace with a proper date picker
+    const start = prompt('Enter start date (YYYY-MM-DDTHH:mm:ss) or leave empty:');
+    const end = prompt('Enter end date (YYYY-MM-DDTHH:mm:ss) or leave empty:');
+    
+    setDateRange({
+      start: start || null,
+      end: end || null
+    });
+    setCurrentPage(0);
   };
 
-  const handleExportCSV = () => {
-    console.log('Export CSV');
+  // Handle CSV export
+  const handleExportCSV = async () => {
+    try {
+      await exportAuditLogsCSV({
+        search: searchQuery,
+        activity: selectedActivity,
+        startDate: dateRange.start,
+        endDate: dateRange.end
+      });
+    } catch (err) {
+      console.error('Error exporting CSV:', err);
+      alert('Failed to export CSV: ' + err.message);
+    }
   };
 
+  // Handle PDF export
   const handleExportPDF = () => {
-    console.log('Export PDF');
+    alert('PDF export is not yet implemented. Please use CSV export.');
+  };
+
+  // Handle pagination
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
+  const handleRowsPerPageChange = (newRowsPerPage) => {
+    setRowsPerPage(newRowsPerPage);
+    setCurrentPage(0);
   };
 
   return (
-    <div className="audit-logs-container">      
+    <div className="audit-logs-container">
+      {/* Error Banner */}
+      {error && (
+        <div style={{
+          padding: '12px 16px',
+          marginBottom: '16px',
+          backgroundColor: '#fee',
+          color: '#c00',
+          borderRadius: '8px',
+          border: '1px solid #fcc',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px'
+        }}>
+          <span>⚠️</span>
+          <span>{error}</span>
+          <button
+            onClick={() => setError(null)}
+            style={{
+              marginLeft: 'auto',
+              background: 'none',
+              border: 'none',
+              fontSize: '18px',
+              cursor: 'pointer',
+              color: '#c00'
+            }}
+          >
+            ×
+          </button>
+        </div>
+      )}
+
+      {/* Filters */}
       <AuditLogsFilters
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
@@ -47,14 +148,63 @@ const AuditLogs = () => {
         onExportPDF={handleExportPDF}
       />
 
-      <AuditLogsTable logs={auditLogs} />
+      {/* Loading State */}
+      {loading ? (
+        <div style={{
+          padding: '64px',
+          textAlign: 'center',
+          color: '#666'
+        }}>
+          <div style={{
+            border: '4px solid #f3f3f3',
+            borderTop: '4px solid #3498db',
+            borderRadius: '50%',
+            width: '48px',
+            height: '48px',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 16px'
+          }} />
+          <p>Loading audit logs...</p>
+        </div>
+      ) : auditLogs.length === 0 ? (
+        /* Empty State */
+        <div style={{
+          padding: '64px',
+          textAlign: 'center',
+          backgroundColor: '#f9f9f9',
+          borderRadius: '8px',
+          margin: '16px 0'
+        }}>
+          <div style={{ fontSize: '48px', marginBottom: '16px' }}>📋</div>
+          <h3 style={{ color: '#666', marginBottom: '8px' }}>No audit logs found</h3>
+          <p style={{ color: '#999' }}>
+            {searchQuery || selectedActivity !== 'All Activities' || dateRange.start
+              ? 'Try adjusting your filters'
+              : 'No audit logs have been recorded yet'}
+          </p>
+        </div>
+      ) : (
+        /* Audit Logs Table */
+        <AuditLogsTable logs={auditLogs} />
+      )}
 
-      <ReportsPagination
-        rowsPerPage={rowsPerPage}
-        onRowsPerPageChange={setRowsPerPage}
-        currentPage={1}
-        totalPages={1}
-      />
+      {/* Pagination */}
+      {!loading && auditLogs.length > 0 && (
+        <ReportsPagination
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={handleRowsPerPageChange}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
+      )}
+
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 };
