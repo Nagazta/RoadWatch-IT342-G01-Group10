@@ -17,8 +17,19 @@ export const useLogin = () => {
         setLoading(true);
 
         try {
-            console.log('🔵 Login form submitted');
-            const result = await authService.login(email, password);
+            console.log('🔵 Login form submitted for:', email);
+            
+            // ✅ AUTO-DETECT: Check if it's an inspector email
+            const isInspector = email.toLowerCase().includes('@inspector');
+            
+            let result;
+            if (isInspector) {
+                console.log('🔍 Detected INSPECTOR - Using /api/auth/login-inspector');
+                result = await authService.loginInspector(email, password);
+            } else {
+                console.log('🔍 Detected CITIZEN/ADMIN - Using /api/auth/login');
+                result = await authService.login(email, password);
+            }
 
             if (result.success) {
                 console.log('✅ Login successful, redirecting...');
