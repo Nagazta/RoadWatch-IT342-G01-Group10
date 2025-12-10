@@ -6,6 +6,9 @@ import AvailableInspectors from '../../components/assign/AvailableInspectors';
 import AssignReportsSection from '../../components/assign/AssignReportsSection';
 import '../admin/styles/AssignInspector.css';
 
+// ✅ Define API URL at the top (like authService.js)
+const API_URL = import.meta.env.VITE_API_BASE_URL;
+
 const AssignInspector = () => {
     const [reports, setReports] = useState([]);
     const [inspectors, setInspectors] = useState([]);
@@ -42,15 +45,22 @@ const AssignInspector = () => {
             const config = { headers: { 'Authorization': `Bearer ${token}` } };
 
             const [reportsRes, inspectorsRes] = await Promise.all([
-                axios.get('${import.meta.env.VITE_API_BASE_URL}/api/reports/getAll', config),
-                axios.get('${import.meta.env.VITE_API_BASE_URL}/api/inspector/getAll', config)
+                axios.get(`${API_URL}/api/reports/getAll`, config),
+                axios.get(`${API_URL}/api/inspector/getAll`, config)
             ]);
+
+            console.log('📊 Reports fetched:', reportsRes.data);
+            console.log('👮 Inspectors fetched:', inspectorsRes.data);
 
             setReports(reportsRes.data);
             setInspectors(inspectorsRes.data);
         } catch (error) {
-            console.error("Error fetching data:", error);
-            console.error("Error response:", error.response?.data);
+            console.error("❌ Error fetching data:", error);
+            console.error("❌ Error response:", error.response?.data);
+            
+            // Set empty arrays on error to prevent map errors
+            setReports([]);
+            setInspectors([]);
         } finally {
             setLoading(false);
         }
@@ -88,11 +98,11 @@ const AssignInspector = () => {
         }
 
         try {
-            const token = localStorage.getItem('accessToken');
+            const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
             const config = { headers: { 'Authorization': `Bearer ${token}` } };
 
             await axios.put(
-                `${import.meta.env.VITE_API_BASE_URL}/api/reports/${reportId}/assign/${inspectorId}`,
+                `${API_URL}/api/reports/${reportId}/assign/${inspectorId}`,
                 {},
                 config
             );
@@ -100,7 +110,7 @@ const AssignInspector = () => {
             alert("Inspector assigned successfully!");
             fetchData();
         } catch (error) {
-            console.error("Failed to assign:", error);
+            console.error("❌ Failed to assign:", error);
             alert("Failed to assign inspector.");
         }
     };
@@ -114,15 +124,11 @@ const AssignInspector = () => {
                 <AvailableInspectors availableInspectors={availableInspectorsList} />
             </div>
 
-            {/* ✅ THIS IS THE CRITICAL PART
-          This forces the app to look at 'src/components/assign/AssignReportsSection.jsx'
-          It sends the data there. It does NOT render a table here.
-      */}
             <AssignReportsSection
                 reports={reports}
                 inspectors={processedInspectors}
                 searchQuery={searchQuery}
-                onSearchChange={setSearchQuery} // Note: You need to pass the setter if the search bar is inside the child
+                onSearchChange={setSearchQuery}
                 selectedCategory={selectedCategory}
                 selectedStatus={selectedStatus}
                 onAssign={handleAssign}
