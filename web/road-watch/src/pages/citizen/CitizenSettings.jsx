@@ -1,9 +1,58 @@
 import './styles/CitizenSettings.css';
+import { useState, useEffect } from 'react';
 import { UserCircleIcon, UploadIcon } from '../../components/common/Icons';
+import authService from '../../services/api/authService';
 import ToggleSwitch from '../../components/settings/ToggleSwitch';
 
 const CitizenSettings = () =>
 {
+    const [originalUser, setOriginalUser] = useState({});
+    const [currentUser, setCurrentUser] = useState
+    ({
+        contact: '',
+        email: '',
+        id: 0,
+        name: '',
+        role: '',
+        supabaseId: '',
+        username: ''
+    });
+
+    useEffect(() =>
+    {
+        const user = authService.getCurrentUser();
+        setOriginalUser(user);
+        setCurrentUser(user);
+        
+    }, []);
+
+    const handleSave = async() =>
+    {
+        if(currentUser.name && currentUser.contact)
+        {
+            if(JSON.stringify(currentUser) === JSON.stringify(originalUser))
+            {
+                alert('No changes made');
+                return;
+            }
+            else if(window.confirm('Are you sure you want to save changes?'))
+            {
+                const response = await authService.updateCitizen(currentUser.id, currentUser);
+
+                if(response.success)
+                {
+                    alert('Profile updated!');
+                    localStorage.setItem('user', JSON.stringify(currentUser));
+                    window.location.reload();
+                }
+            }
+        }   
+        else
+        {
+            alert('Fields cannot be blank');
+        }
+    };
+
     return (
         <div className="citizen-settings">
             <div className="profile-info">
@@ -15,20 +64,33 @@ const CitizenSettings = () =>
                     <button> <UploadIcon/> Change </button>
                 </div>
 
-                <label htmlFor="fullname"> Full Name </label>
-                <input type="text" placeholder="Maria Santos"/>
+                <label htmlFor="name"> Full Name </label>
+                <input
+                    id="name" 
+                    name="name"
+                    type="text" 
+                    placeholder="Maria Santos"
+                    value={currentUser.name}
+                    onChange={(e) => setCurrentUser({...currentUser, name: e.target.value})}
+                    onBlur={() => setCurrentUser(prev => ({...prev, name: prev.name.trimEnd()}))}
+                />
 
                 <label htmlFor="email"> Email </label>
-                <input type="email" placeholder="maria.santos@example.com" disabled/>
+                <input type="email" placeholder="maria.santos@example.com" value={currentUser.email} disabled/>
                 <p className="cannot-change"> Email cannot be changed </p>
 
-                <label htmlFor="contactnum"> Contact Number </label>
-                <input type="text" placeholder="09123456789"/>
+                <label htmlFor="contact"> Contact Number </label>
+                <input 
+                    id="contact"
+                    name="contact"
+                    type="text" 
+                    placeholder="09123456789"
+                    value={currentUser.contact}
+                    onChange={(e) => setCurrentUser({...currentUser, contact: e.target.value})}
+                    onBlur={() => setCurrentUser(prev => ({...prev, contact: prev.contact.trimEnd()}))}
+                />
 
-                <label htmlFor="address"> Address </label>
-                <input type="text" placeholder="Enter your complete address"/>
-
-                <button className="save-changes"> Save Changes </button>
+                <button className="save-changes" onClick={handleSave}> Save Changes </button>
             </div>
 
             <div className="notification-preferences">
