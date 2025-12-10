@@ -1,11 +1,16 @@
-// src/services/auditLogService.js
+// src/services/auditLogService.js - FIXED FOR PRODUCTION
 // API service for audit logs (Vite version)
 
+// ✅ FIXED: Use VITE_AUDIT_API_URL from Dockerfile
 const API_BASE_URL = import.meta.env.VITE_AUDIT_API_URL;
 
+// Validate environment variable
 if (!API_BASE_URL) {
-  throw new Error('VITE_AUDIT_API_URL environment variable is not set');
+  console.error('❌ VITE_AUDIT_API_URL is not set!');
+  throw new Error('Audit API URL configuration is missing. Please set VITE_AUDIT_API_URL environment variable.');
 }
+
+console.log('🔗 Audit API URL configured:', API_BASE_URL);
 
 /**
  * Get auth token from storage

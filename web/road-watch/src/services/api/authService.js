@@ -1,14 +1,18 @@
-// Complete authService.js for RoadWatch
+// Complete authService.js for RoadWatch - FIXED FOR PRODUCTION
 // Location: src/services/api/authService.js
 
 import { supabase } from '../../config/supabaseClient.js';
 
-const API_URL = import.meta.env.VITE_API_URL;
+// ✅ FIXED: Use VITE_API_BASE_URL to match Dockerfile
+const API_URL = import.meta.env.VITE_API_BASE_URL;
 
+// Validate environment variable
 if (!API_URL) {
-  throw new Error('VITE_API_URL environment variable is not set');
+    console.error('❌ VITE_API_BASE_URL is not set!');
+    throw new Error('API URL configuration is missing. Please set VITE_API_BASE_URL environment variable.');
 }
 
+console.log('🔗 API URL configured:', API_URL);
 
 const authService = {
     /**
@@ -18,7 +22,7 @@ const authService = {
         try {
             console.log('🔐 Registration attempt:', userData.email);
             
-            const response = await fetch(`${API_URL}/register`, {
+            const response = await fetch(`${API_URL}/auth/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -53,7 +57,7 @@ const authService = {
         try {
             console.log('🔐 Login attempt:', email);
             
-            const response = await fetch(`${API_URL}/login`, {
+            const response = await fetch(`${API_URL}/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -103,7 +107,7 @@ const authService = {
         try {
             console.log('🔐 Inspector login attempt:', email);
             
-            const response = await fetch(`${API_URL}/login-inspector`, {
+            const response = await fetch(`${API_URL}/auth/login-inspector`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -183,7 +187,7 @@ const authService = {
             console.log('✅ Supabase session obtained');
 
             // Step 2: Send Supabase access token to YOUR backend
-            const response = await fetch(`${API_URL}/google`, {
+            const response = await fetch(`${API_URL}/auth/google`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -237,7 +241,7 @@ const authService = {
         try {
             const token = localStorage.getItem('token');
             
-            const response = await fetch('http://localhost:8080/api/users/add', {
+            const response = await fetch(`${API_URL}/api/users/add`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -271,7 +275,7 @@ const authService = {
             const token = localStorage.getItem('token');
             if (!token) return { success: false, error: 'No token found' };
 
-            const response = await fetch(`${API_URL}/profile`, {
+            const response = await fetch(`${API_URL}/auth/profile`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
@@ -292,7 +296,7 @@ const authService = {
         try {
             const token = localStorage.getItem('token');
             
-            await fetch(`${API_URL}/logout`, {
+            await fetch(`${API_URL}/auth/logout`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
