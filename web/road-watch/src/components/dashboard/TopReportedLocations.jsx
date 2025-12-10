@@ -40,7 +40,7 @@ const TopReportedLocations = () => {
     const role = parsedUser?.role;
 
     axios
-      .get("${import.meta.env.VITE_API_BASE_URL}/api/reports/getAll")
+      .get(`${import.meta.env.VITE_API_BASE_URL}/api/reports/getAll`)
       .then((res) => {
         console.log("Reports fetched:", res.data);
 
