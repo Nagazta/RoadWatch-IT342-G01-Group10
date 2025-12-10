@@ -23,7 +23,7 @@ const authService = {
         try {
             console.log('🔐 Registration attempt:', userData.email);
             
-            const response = await fetch(`${API_URL}/auth/register`, {
+            const response = await fetch(`${API_URL}/api/auth/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -32,6 +32,7 @@ const authService = {
             });
 
             const data = await response.json();
+            console.log('📥 Register response:', data);
 
             if (data.success && data.accessToken) {
                 // Store JWT token and user data
@@ -39,6 +40,7 @@ const authService = {
                 localStorage.setItem('user', JSON.stringify(data.user));
                 localStorage.setItem('roleData', JSON.stringify(data.roleData));
                 localStorage.setItem('userRole', data.user.role);
+                localStorage.setItem('userId', data.user.id);
                 localStorage.setItem('adminId', data.user.id);
                 
                 console.log('✅ Registration successful');
@@ -58,7 +60,7 @@ const authService = {
         try {
             console.log('🔐 Login attempt:', email);
             
-            const response = await fetch(`${API_URL}/auth/login`, {
+            const response = await fetch(`${API_URL}/api/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -66,17 +68,21 @@ const authService = {
                 body: JSON.stringify({ email, password }),
             });
 
+            console.log('📡 Response status:', response.status);
             const data = await response.json();
+            console.log('📥 Login response:', data);
 
             if (data.success && data.accessToken) {
                 localStorage.setItem('token', data.accessToken);
                 localStorage.setItem('user', JSON.stringify(data.user));
                 localStorage.setItem('roleData', JSON.stringify(data.roleData));
                 localStorage.setItem('userRole', data.user.role);
+                localStorage.setItem('userId', data.user.id);
                 localStorage.setItem('adminId', data.user.id);
                 
                 console.log('✅ Login successful');
                 console.log('User role:', data.user.role);
+                console.log('User ID:', data.user.id);
 
                 // Return data in expected format for your frontend
                 return {
@@ -108,7 +114,7 @@ const authService = {
         try {
             console.log('🔐 Inspector login attempt:', email);
             
-            const response = await fetch(`${API_URL}/auth/login-inspector`, {
+            const response = await fetch(`${API_URL}/api/auth/login-inspector`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -116,21 +122,39 @@ const authService = {
                 body: JSON.stringify({ email, password }),
             });
 
+            console.log('📡 Inspector login response status:', response.status);
             const data = await response.json();
+            console.log('📥 Inspector login response:', data);
 
             if (data.success && data.accessToken) {
                 localStorage.setItem('token', data.accessToken);
                 localStorage.setItem('user', JSON.stringify(data.user));
                 localStorage.setItem('roleData', JSON.stringify(data.roleData));
                 localStorage.setItem('userRole', data.user.role);
+                localStorage.setItem('userId', data.user.id);
                 localStorage.setItem('adminId', data.user.id);
                 
                 console.log('✅ Inspector login successful');
                 console.log('Inspector ID:', data.roleData?.inspector_id);
                 console.log('Area:', data.roleData?.area_assignment);
+
+                // Return in same format as regular login
+                return {
+                    success: true,
+                    data: {
+                        token: data.accessToken,
+                        user: {
+                            id: data.user.id,
+                            email: data.user.email,
+                            name: data.user.name,
+                            role: data.user.role
+                        },
+                        roleData: data.roleData
+                    }
+                };
             }
 
-            return data;
+            return { success: false, error: data.message || 'Inspector login failed' };
         } catch (error) {
             console.error('❌ Inspector login error:', error);
             return { success: false, error: error.message };
@@ -161,6 +185,7 @@ const authService = {
                 return { success: false, error: error.message };
             }
 
+            console.log('✅ Google OAuth redirect initiated');
             // OAuth will redirect, so we return pending state
             return { success: true, pending: true };
         } catch (error) {
@@ -186,9 +211,10 @@ const authService = {
             }
 
             console.log('✅ Supabase session obtained');
+            console.log('📧 User email:', session.user.email);
 
             // Step 2: Send Supabase access token to YOUR backend
-            const response = await fetch(`${API_URL}/auth/google`, {
+            const response = await fetch(`${API_URL}/api/auth/google`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -198,7 +224,9 @@ const authService = {
                 }),
             });
 
+            console.log('📡 Backend response status:', response.status);
             const data = await response.json();
+            console.log('📥 Backend response:', data);
 
             if (data.success && data.accessToken) {
                 // Store YOUR JWT token (not Supabase token)
@@ -206,6 +234,7 @@ const authService = {
                 localStorage.setItem('user', JSON.stringify(data.user));
                 localStorage.setItem('roleData', JSON.stringify(data.roleData));
                 localStorage.setItem('userRole', data.user.role);
+                localStorage.setItem('userId', data.user.id);
                 localStorage.setItem('adminId', data.user.id);
                 
                 console.log('✅ Google OAuth login successful');
@@ -276,7 +305,7 @@ const authService = {
             const token = localStorage.getItem('token');
             if (!token) return { success: false, error: 'No token found' };
 
-            const response = await fetch(`${API_URL}/auth/profile`, {
+            const response = await fetch(`${API_URL}/api/auth/profile`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
@@ -297,7 +326,7 @@ const authService = {
         try {
             const token = localStorage.getItem('token');
             
-            await fetch(`${API_URL}/auth/logout`, {
+            await fetch(`${API_URL}/api/auth/logout`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -311,6 +340,7 @@ const authService = {
             localStorage.removeItem('user');
             localStorage.removeItem('roleData');
             localStorage.removeItem('userRole');
+            localStorage.removeItem('userId');
             localStorage.removeItem('adminId');
             
             console.log('✅ Logged out successfully');
@@ -344,21 +374,28 @@ const authService = {
         return !!localStorage.getItem('token');
     },
 
-    updateCitizen: async(id, updatedUser) =>
-    {
-        try
-        {
-            const response = await axios.put(`http://localhost:8080/api/users/profile?userId=${id}`, updatedUser)
+    /**
+     * Update citizen profile
+     */
+    updateCitizen: async (id, updatedUser) => {
+        try {
+            console.log('📝 Updating citizen profile:', id);
+            
+            const response = await axios.put(
+                `${API_URL}/api/users/profile?userId=${id}`, 
+                updatedUser
+            );
 
-            if(response.data)
+            console.log('✅ Profile updated:', response.data);
+            
+            if (response.data) {
                 return { success: true, data: response.data };
-            else
+            } else {
                 throw new Error('Failed to update citizen profile');
-        }
-        catch(error)
-        {
-            console.error('Error:', error);
-            return { success: false };
+            }
+        } catch (error) {
+            console.error('❌ Update profile error:', error);
+            return { success: false, error: error.message };
         }
     }
 };
