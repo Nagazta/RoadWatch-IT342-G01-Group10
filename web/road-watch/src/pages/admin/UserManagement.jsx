@@ -8,6 +8,7 @@ import ConfirmationModal from '../../components/modal/ConfirmationModal';
 import AddUserModal from '../../components/modal/AddUserModal';
 import '../admin/styles/UserManagement.css';
 
+const baseUrl = `${import.meta.env.VITE_API_URL}/api`;
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -34,7 +35,7 @@ const UserManagement = () => {
   const getAdminId = () => {
     const userId = localStorage.getItem('userId');
     const userRole = localStorage.getItem('userRole');
-    
+
     console.log('🔍 getAdminId Debug:');
     console.log('  - Raw userId from localStorage:', userId);
     console.log('  - Raw userRole from localStorage:', userRole);
@@ -42,7 +43,7 @@ const UserManagement = () => {
     console.log('  - userId type:', typeof userId);
     console.log('  - Is ADMIN?', userRole === 'ADMIN');
     console.log('  - Has userId?', !!userId);
-    
+
     // Only return userId if the current user is an ADMIN
     if (userRole === 'ADMIN' && userId) {
       const parsedId = parseInt(userId, 10);
@@ -58,7 +59,7 @@ const UserManagement = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('http://localhost:8080/api/users/getAll');
+      const response = await fetch(`${baseUrl}/users/getAll`);
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
 
@@ -132,15 +133,15 @@ const UserManagement = () => {
 
   const handleConfirmAction = async () => {
     const { type, userId } = confirmationModal;
-    
+
     console.log('====================================');
     console.log('🚀 handleConfirmAction called');
     console.log('Type:', type);
     console.log('User ID:', userId);
     console.log('====================================');
-    
+
     const token = localStorage.getItem('token');
-    
+
     if (!token) {
       alert('You are not authenticated. Please login again.');
       return;
@@ -150,7 +151,7 @@ const UserManagement = () => {
       let payload;
       let url;
       let method;
-      
+
       switch (type) {
         case 'suspend':
           payload = { isActive: false };
@@ -158,20 +159,20 @@ const UserManagement = () => {
           method = 'PUT';
           console.log('📤 SUSPEND - Sending payload:', JSON.stringify(payload));
           break;
-          
+
         case 'activate':
           payload = { isActive: true };
           url = `http://localhost:8080/api/users/updateBy/${userId}`;
           method = 'PUT';
           console.log('📤 ACTIVATE - Sending payload:', JSON.stringify(payload));
           break;
-          
+
         case 'revoke':
           url = `http://localhost:8080/api/users/deleteBy/${userId}`;
           method = 'DELETE';
           console.log('📤 REVOKE - Deleting user');
           break;
-          
+
         default:
           console.error('❌ Unknown action type:', type);
           return;
@@ -179,14 +180,14 @@ const UserManagement = () => {
 
       console.log('📡 Making request to:', url);
       console.log('📡 Method:', method);
-      console.log('📡 Headers:', { 
+      console.log('📡 Headers:', {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token.substring(0, 20)}...` 
+        'Authorization': `Bearer ${token.substring(0, 20)}...`
       });
 
       const response = await fetch(url, {
         method: method,
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
@@ -195,10 +196,10 @@ const UserManagement = () => {
 
       console.log('📥 Response status:', response.status);
       console.log('📥 Response ok:', response.ok);
-      
+
       const responseText = await response.text();
       console.log('📥 Response body (raw):', responseText);
-      
+
       let responseData;
       try {
         responseData = responseText ? JSON.parse(responseText) : null;
@@ -213,7 +214,7 @@ const UserManagement = () => {
 
       console.log('✅ Action completed successfully');
       await fetchUsers(); // refresh table
-      
+
     } catch (err) {
       console.error('❌ Action failed:', err);
       console.error('❌ Error stack:', err.stack);
@@ -234,13 +235,13 @@ const UserManagement = () => {
     console.log('====================================');
     console.log('🚀 handleSaveNewUser called');
     console.log('====================================');
-    
+
     try {
       const adminId = getAdminId(); // Get logged-in admin's ID
-      
+
       console.log('📦 New User Data:', newUser);
       console.log('👤 Admin ID:', adminId);
-      
+
       const payload = {
         username: newUser.email.split('@')[0],
         name: newUser.name || newUser.fullName,
@@ -248,7 +249,7 @@ const UserManagement = () => {
         contact: newUser.contactNumber,
         role: newUser.role.toUpperCase(),
         password: newUser.password,
-        assignedArea: newUser.assignedArea, 
+        assignedArea: newUser.assignedArea,
         createdByAdminId: adminId
       };
 
@@ -263,7 +264,7 @@ const UserManagement = () => {
       });
 
       console.log('📥 Response status:', response.status);
-      
+
       const data = await response.json();
       console.log('📥 Response data:', data);
 
@@ -283,12 +284,12 @@ const UserManagement = () => {
 
   const handleSaveUser = async (updatedUser) => {
     const token = localStorage.getItem('token');
-    
+
     console.log('====================================');
     console.log('💾 handleSaveUser called');
     console.log('Updated user data from modal:', updatedUser);
     console.log('====================================');
-    
+
     try {
       // ✅ Only send the fields that the modal provides
       const payload = {
@@ -297,29 +298,29 @@ const UserManagement = () => {
         role: updatedUser.role,
         isActive: updatedUser.isActive
       };
-      
+
       console.log('📤 Payload to backend:', JSON.stringify(payload, null, 2));
-      
+
       const response = await fetch(`http://localhost:8080/api/users/updateBy/${updatedUser.id}`, {
         method: 'PUT',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(payload)
       });
-      
+
       const responseText = await response.text();
       console.log('📥 Response status:', response.status);
       console.log('📥 Response body:', responseText);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${responseText}`);
       }
-      
+
       console.log('✅ User updated successfully');
       console.log('====================================');
-      
+
       await fetchUsers();
       setIsModalOpen(false);
       setSelectedUser(null);
@@ -333,25 +334,25 @@ const UserManagement = () => {
     const { type, userName } = confirmationModal;
     switch (type) {
       case 'suspend':
-        return { 
-          title: 'Suspend User?', 
-          message: `Are you sure you want to suspend ${userName}?`, 
-          confirmText: 'Suspend', 
-          type: 'warning' 
+        return {
+          title: 'Suspend User?',
+          message: `Are you sure you want to suspend ${userName}?`,
+          confirmText: 'Suspend',
+          type: 'warning'
         };
       case 'activate':
-        return { 
-          title: 'Activate User?', 
-          message: `Are you sure you want to activate ${userName}?`, 
-          confirmText: 'Activate', 
-          type: 'warning' 
+        return {
+          title: 'Activate User?',
+          message: `Are you sure you want to activate ${userName}?`,
+          confirmText: 'Activate',
+          type: 'warning'
         };
       case 'revoke':
-        return { 
-          title: 'Revoke Access?', 
-          message: `Are you sure you want to permanently delete ${userName}?`, 
-          confirmText: 'Revoke', 
-          type: 'danger' 
+        return {
+          title: 'Revoke Access?',
+          message: `Are you sure you want to permanently delete ${userName}?`,
+          confirmText: 'Revoke',
+          type: 'danger'
         };
       default:
         return { title: '', message: '', confirmText: '', type: 'warning' };

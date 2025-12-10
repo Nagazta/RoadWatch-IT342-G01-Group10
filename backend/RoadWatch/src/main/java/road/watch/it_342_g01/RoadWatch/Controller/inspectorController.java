@@ -1,4 +1,4 @@
-package road.watch.it_342_g01.RoadWatch.controller;
+package road.watch.it_342_g01.RoadWatch.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
@@ -14,86 +14,90 @@ import java.util.Objects;
 @CrossOrigin
 public class inspectorController {
 
-    @Autowired
-    private inspectorService inspectorService;
+        @Autowired
+        private inspectorService inspectorService;
 
-    @Autowired
-    private AuditLogService auditLogService;
+        @Autowired
+        private AuditLogService auditLogService;
 
-    @PostMapping("/add")
-    public String addInspector(@RequestBody @NonNull inspectorEntity inspector) {
-        Objects.requireNonNull(inspector);
-        inspectorEntity created = inspectorService.createInspector(inspector);
+        @PostMapping("/add")
+        public String addInspector(@RequestBody @NonNull inspectorEntity inspector) {
+                Objects.requireNonNull(inspector);
+                inspectorEntity created = inspectorService.createInspector(inspector);
 
-        // ✅ Audit log: Inspector created
-        auditLogService.logEntityChange(
-                null,
-                "User Creation",
-                "New inspector added: " +
-                        (created.getUser() != null ? created.getUser().getEmail() : "N/A") +
-                        " - Area: " + (created.getAreaAssignment() != null ? created.getAreaAssignment() : "N/A"),
-                "INSPECTOR",
-                created.getId(),
-                null,
-                "INSPECTOR");
+                // ✅ Audit log: Inspector created
+                auditLogService.logEntityChange(
+                                null,
+                                "User Creation",
+                                "New inspector added: " +
+                                                (created.getUser() != null ? created.getUser().getEmail() : "N/A") +
+                                                " - Area: "
+                                                + (created.getAreaAssignment() != null ? created.getAreaAssignment()
+                                                                : "N/A"),
+                                "INSPECTOR",
+                                created.getId(),
+                                null,
+                                "INSPECTOR");
 
-        return "New inspector is added";
-    }
+                return "New inspector is added";
+        }
 
-    @GetMapping("/getAll")
-    public java.util.List<inspectorEntity> getAllInspectors() {
-        return inspectorService.getAllInspectors();
-    }
+        @GetMapping("/getAll")
+        public java.util.List<inspectorEntity> getAllInspectors() {
+                return inspectorService.getAllInspectors();
+        }
 
-    @GetMapping("/getBy/{id}")
-    public inspectorEntity getInspectorById(@PathVariable @NonNull Long id) {
-        Objects.requireNonNull(id);
-        return inspectorService.getInspectorById(id).orElse(null);
-    }
+        @GetMapping("/getBy/{id}")
+        public inspectorEntity getInspectorById(@PathVariable @NonNull Long id) {
+                Objects.requireNonNull(id);
+                return inspectorService.getInspectorById(id).orElse(null);
+        }
 
-    @PutMapping("/update/{id}")
-    public inspectorEntity updateInspector(
-            @PathVariable @NonNull Long id,
-            @RequestBody @NonNull inspectorEntity inspector) {
-        Objects.requireNonNull(id);
-        Objects.requireNonNull(inspector);
+        @PutMapping("/update/{id}")
+        public inspectorEntity updateInspector(
+                        @PathVariable @NonNull Long id,
+                        @RequestBody @NonNull inspectorEntity inspector) {
+                Objects.requireNonNull(id);
+                Objects.requireNonNull(inspector);
 
-        inspectorEntity updated = inspectorService.createInspector(inspector);
+                inspectorEntity updated = inspectorService.createInspector(inspector);
 
-        // ✅ Audit log: Inspector updated
-        auditLogService.logEntityChange(
-                null,
-                "User Modification",
-                "Inspector profile updated: #" + id +
-                        " - Area: " + (updated.getAreaAssignment() != null ? updated.getAreaAssignment() : "N/A"),
-                "INSPECTOR",
-                id,
-                null,
-                null);
+                // ✅ Audit log: Inspector updated
+                auditLogService.logEntityChange(
+                                null,
+                                "User Modification",
+                                "Inspector profile updated: #" + id +
+                                                " - Area: "
+                                                + (updated.getAreaAssignment() != null ? updated.getAreaAssignment()
+                                                                : "N/A"),
+                                "INSPECTOR",
+                                id,
+                                null,
+                                null);
 
-        return updated;
-    }
+                return updated;
+        }
 
-    @DeleteMapping("/delete/{id}")
-    public String deleteInspector(@PathVariable @NonNull Long id) {
-        Objects.requireNonNull(id);
+        @DeleteMapping("/delete/{id}")
+        public String deleteInspector(@PathVariable @NonNull Long id) {
+                Objects.requireNonNull(id);
 
-        // Get inspector info before deletion
-        inspectorEntity inspector = inspectorService.getInspectorById(id).orElse(null);
-        String email = inspector != null && inspector.getUser() != null
-                ? inspector.getUser().getEmail()
-                : "Unknown";
+                // Get inspector info before deletion
+                inspectorEntity inspector = inspectorService.getInspectorById(id).orElse(null);
+                String email = inspector != null && inspector.getUser() != null
+                                ? inspector.getUser().getEmail()
+                                : "Unknown";
 
-        // ✅ Audit log: Inspector deleted
-        auditLogService.logEntityChange(
-                null,
-                "User Deletion",
-                "Inspector deleted: #" + id + " (" + email + ")",
-                "INSPECTOR",
-                id,
-                null,
-                null);
+                // ✅ Audit log: Inspector deleted
+                auditLogService.logEntityChange(
+                                null,
+                                "User Deletion",
+                                "Inspector deleted: #" + id + " (" + email + ")",
+                                "INSPECTOR",
+                                id,
+                                null,
+                                null);
 
-        return "Inspector with ID " + id + " has been deleted";
-    }
+                return "Inspector with ID " + id + " has been deleted";
+        }
 }

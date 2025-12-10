@@ -1,4 +1,4 @@
-package road.watch.it_342_g01.RoadWatch.controller;
+package road.watch.it_342_g01.RoadWatch.Controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -247,5 +247,74 @@ public class AuthController {
         }
 
         return ResponseEntity.ok("Logged out successfully");
+    }
+
+    /**
+     * Change Password - Requires current password validation
+     */
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(
+            @RequestBody ChangePasswordRequest request,
+            HttpServletRequest httpRequest) {
+        log.info("📥 Received password change request for user ID: {}", request.getUserId());
+
+        try {
+            // Get the user
+            userEntity user = userRepository.findById(request.getUserId())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            // Verify current password
+            if (!authService.verifyPassword(request.getCurrentPassword(), user.getPassword())) {
+                log.warn("❌ Invalid current password for user: {}", user.getEmail());
+
+                // ✅ Audit log: Failed password change
+                auditLogService.logActionWithIp(
+                        user.getId(),
+                        "Password Change",
+                        "Failed password change attempt - incorrect current password",
+                        httpRequest.getRemoteAddr());
+
+                Map<String, Object> error = new HashMap<>();
+                error.put("success", false);
+                error.put("error", "Current password is incorrect");
+                return ResponseEntity.badRequest().body(error);
+            }
+
+            // Hash and update the new password
+            String hashedPassword = authService.hashPassword(request.getNewPassword());
+            user.setPassword(hashedPassword);
+            userRepository.save(user);
+
+            log.info("✅ Password changed successfully for user: {}", user.getEmail());
+
+            // ✅ Audit log: Successful password change
+            auditLogService.logActionWithIp(
+                    user.getId(),
+                    "Password Change",
+                    "Password changed successfully",
+                    httpRequest.getRemoteAddr());
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Password changed successfully");
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            log.error("❌ Password change failed: {}", e.getMessage());
+
+            // ✅ Audit log: Failed password change
+            auditLogService.createAuditLog(
+                    "Password Change",
+                    "Failed password change - " + e.getMessage(),
+                    null,
+                    "Failed",
+                    httpRequest.getRemoteAddr(),
+                    null, null, null, null);
+
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(error);
+        }
     }
 }

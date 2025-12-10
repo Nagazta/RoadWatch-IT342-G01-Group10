@@ -49,7 +49,7 @@ import ProtectedRoute from './services/security/ProtectedRoute.jsx';
 import UnauthorizedUser from "./pages/UnauthorizedUser/UnauthorizedUser.jsx";
 
 
-function App() { 
+function App() {
   return (
     <BrowserRouter>
       <Routes>
@@ -215,7 +215,9 @@ function App() {
         <Route path="inspector/settings" element={
           <ProtectedRoute allowedRoles={['INSPECTOR']}>
             <InspectorLayout activeMenuItem="settings" pageTitle="Settings">
-              <InspectorSettings />
+              <div style={{ padding: '24px', marginLeft: '250px' }}>
+                <InspectorSettings />
+              </div>
             </InspectorLayout>
           </ProtectedRoute>
         } />

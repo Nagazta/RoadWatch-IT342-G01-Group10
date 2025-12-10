@@ -19,13 +19,14 @@ ChartJS.register(
   Tooltip,
   Legend
 );
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 const ReportsOverTime = () => {
   const [weeklyReports, setWeeklyReports] = useState([0, 0, 0, 0, 0, 0, 0]);
   const [weeklyResolved, setWeeklyResolved] = useState([0, 0, 0, 0, 0, 0, 0]);
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/reports/getAll")
+    fetch(`${API_URL}/api/reports/getAll`)
       .then(res => res.json())
       .then(reports => processWeeklyData(reports))
       .catch(err => console.error("Failed to fetch weekly report data:", err));

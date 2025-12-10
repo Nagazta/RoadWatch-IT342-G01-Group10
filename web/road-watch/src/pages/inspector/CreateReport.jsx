@@ -33,10 +33,60 @@ const CreateReport = () => {
   const [reportList, setReportList] = useState([]);
   const [loadingReports, setLoadingReports] = useState(false);
   const [errorReports, setErrorReports] = useState('');
+  const [selectedImages, setSelectedImages] = useState([]);
+  const [imagePreviewUrls, setImagePreviewUrls] = useState([]);
+  const [uploadError, setUploadError] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+  };
+
+  const handleImageSelect = (e) => {
+    const files = Array.from(e.target.files);
+    setUploadError('');
+
+    // Validation
+    if (files.length > 5) {
+      setUploadError('Maximum 5 images allowed');
+      return;
+    }
+
+    // Validate each file
+    const validFiles = [];
+    const previewUrls = [];
+
+    for (const file of files) {
+      // Check file type
+      if (!file.type.match(/image\/(jpeg|jpg|png)/)) {
+        setUploadError('Only JPEG and PNG images are allowed');
+        continue;
+      }
+
+      // Check file size (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setUploadError(`${file.name} is larger than 5MB`);
+        continue;
+      }
+
+      validFiles.push(file);
+      previewUrls.push(URL.createObjectURL(file));
+    }
+
+    setSelectedImages(validFiles);
+    setImagePreviewUrls(previewUrls);
+  };
+
+  const removeImage = (index) => {
+    const newImages = selectedImages.filter((_, i) => i !== index);
+    const newPreviews = imagePreviewUrls.filter((_, i) => i !== index);
+
+    // Revoke the URL to free memory
+    URL.revokeObjectURL(imagePreviewUrls[index]);
+
+    setSelectedImages(newImages);
+    setImagePreviewUrls(newPreviews);
   };
 
   const handleCancel = () => {
@@ -64,18 +114,46 @@ const CreateReport = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const user = localStorage.getItem('user');
-    const parsedUser = JSON.parse(user);
-    const email = parsedUser.email;
-    const payload = {
-      ...formData,
-      latitude: mapPosition?.lat,
-      longitude: mapPosition?.lng,
-      submittedBy: email
-    };
-    const response = await reportService.createReport(payload, email);
-    if (response.success) {
-      alert('Report submitted!');
+    setIsUploading(true);
+    setUploadError('');
+
+    try {
+      const user = localStorage.getItem('user');
+      const parsedUser = JSON.parse(user);
+      const email = parsedUser.email;
+
+      // Step 1: Create the report
+      const payload = {
+        ...formData,
+        latitude: mapPosition?.lat,
+        longitude: mapPosition?.lng,
+        submittedBy: email
+      };
+
+      const response = await reportService.createReport(payload, email);
+
+      if (!response.success) {
+        setUploadError('Failed to create report');
+        setIsUploading(false);
+        return;
+      }
+
+      // Step 2: Upload images if any were selected
+      if (selectedImages.length > 0) {
+        const reportId = response.data.id;
+        const imageUploadResponse = await reportService.uploadReportImages(reportId, selectedImages);
+
+        if (!imageUploadResponse.success) {
+          setUploadError('Report created but failed to upload images: ' + imageUploadResponse.error);
+          setIsUploading(false);
+          return;
+        }
+      }
+
+      // Success!
+      alert(selectedImages.length > 0 ? 'Report and images submitted successfully!' : 'Report submitted successfully!');
+
+      // Clear form
       setFormData({
         title: '',
         description: '',
@@ -85,7 +163,20 @@ const CreateReport = () => {
         longitude: null
       });
       setMapPosition(null);
+
+      // Clear images
+      imagePreviewUrls.forEach(url => URL.revokeObjectURL(url));
+      setSelectedImages([]);
+      setImagePreviewUrls([]);
+
+      // Refresh report list
       fetchInspectorReports(email);
+
+    } catch (error) {
+      console.error('Submit error:', error);
+      setUploadError('An error occurred during submission');
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -175,12 +266,82 @@ const CreateReport = () => {
         <div className="cs-input">
           <h4> Photos </h4>
           <p> Upload up to 5 photos (JPEG/PNG, max 5MB each) </p>
-          <input type="file" accept="image/*" multiple />
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/jpg"
+            multiple
+            onChange={handleImageSelect}
+          />
+
+          {uploadError && (
+            <div style={{ color: 'red', marginTop: '8px', fontSize: '14px' }}>
+              {uploadError}
+            </div>
+          )}
+
+          {/* Image Previews */}
+          {imagePreviewUrls.length > 0 && (
+            <div style={{ marginTop: '16px' }}>
+              <p style={{ fontWeight: '500', marginBottom: '8px' }}>Selected Images ({selectedImages.length}/5):</p>
+              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                {imagePreviewUrls.map((url, index) => (
+                  <div key={index} style={{ position: 'relative', width: '120px' }}>
+                    <img
+                      src={url}
+                      alt={`Preview ${index + 1}`}
+                      style={{
+                        width: '100%',
+                        height: '120px',
+                        objectFit: 'cover',
+                        borderRadius: '8px',
+                        border: '2px solid #e3e7f1'
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(index)}
+                      style={{
+                        position: 'absolute',
+                        top: '-8px',
+                        right: '-8px',
+                        background: '#ff4444',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: '24px',
+                        height: '24px',
+                        cursor: 'pointer',
+                        fontSize: '16px',
+                        lineHeight: '1',
+                        fontWeight: 'bold'
+                      }}
+                    >
+                      ×
+                    </button>
+                    <p style={{
+                      fontSize: '11px',
+                      marginTop: '4px',
+                      textAlign: 'center',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
+                    }}>
+                      {selectedImages[index].name}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
         {/* Buttons */}
         <div className="cs-buttons">
-          <button type="submit"> Submit </button>
-          <button type="button" onClick={handleCancel}> Cancel </button>
+          <button type="submit" disabled={isUploading}>
+            {isUploading ? 'Submitting...' : 'Submit'}
+          </button>
+          <button type="button" onClick={handleCancel} disabled={isUploading}>
+            Cancel
+          </button>
         </div>
       </form>
       <div style={{ maxWidth: '950px', margin: '32px auto', padding: '0 1vw' }}>

@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import '../citizen/styles/CitizenSettings.css';
 import '../admin/styles/Dashboard.css';
 import './styles/InspectorStyles.css';
 import ToggleSwitch from '../../components/settings/ToggleSwitch';
+import authService from '../../services/api/authService';
 
+const baseURL = `${import.meta.env.VITE_API_URL}/api`;
 const getInitials = (name) =>
   name
     .split(' ')
@@ -27,40 +29,194 @@ const Modal = ({ open, onClose, children }) => {
 };
 
 const Settings = () => {
-  const [name, setName] = useState('Inspector Davis');
-  const [email, setEmail] = useState('inspector.davis@email.com');
-  const [contact, setContact] = useState('09171234567');
-  const [address, setAddress] = useState('IT Park, Cebu City');
-  const [googleAuth, setGoogleAuth] = useState(true);
-  const [editingPassword, setEditingPassword] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [contact, setContact] = useState('');
+  const [address, setAddress] = useState('');
+  const [googleAuth, setGoogleAuth] = useState(false);
+  const [currentPass, setCurrentPass] = useState('');
   const [newPass, setNewPass] = useState('');
+  const [confirmPass, setConfirmPass] = useState('');
   const [editError, setEditError] = useState('');
   const [editSuccess, setEditSuccess] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
+  const [passwordModalOpen, setPasswordModalOpen] = useState(false);
   const [profilePic, setProfilePic] = useState(null);
   const [uploadErr, setUploadErr] = useState('');
+  const [userId, setUserId] = useState(null);
 
-  const handleProfileEdit = (e) => {
+  // Fetch user profile data on component mount
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        setLoading(true);
+
+        // Get current user data from localStorage
+        const currentUser = authService.getCurrentUser();
+        const roleData = authService.getRoleData();
+
+        if (!currentUser || !roleData) {
+          setEditError('Unable to load user data. Please login again.');
+          setLoading(false);
+          return;
+        }
+
+        // Set user ID for updates
+        const userIdValue = currentUser.id;
+        setUserId(userIdValue);
+
+        // Fetch user profile from backend using /api/users/profile
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${baseURL}/users/profile?userId=${userIdValue}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch profile data');
+        }
+
+        const userData = await response.json();
+
+        if (userData) {
+          // Set form data from user profile
+          setName(userData.name || '');
+          setEmail(userData.email || '');
+          setContact(userData.contact || '');
+
+          // For inspector, get area assignment from roleData
+          if (roleData.area_assignment) {
+            setAddress(roleData.area_assignment);
+          }
+
+          // Check if user has google/supabase ID for google auth toggle
+          setGoogleAuth(!!userData.supabaseId);
+        } else {
+          setEditError('Failed to load profile data');
+        }
+      } catch (error) {
+        console.error('Error fetching profile data:', error);
+        setEditError('Failed to load profile data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfileData();
+  }, []);
+
+  const handleProfileEdit = async (e) => {
     e.preventDefault();
-    if (!name || !email || !contact || !address) {
-      setEditError('All fields are required.');
+
+    if (!name || !email || !contact) {
+      setEditError('Name, email and contact are required.');
       setEditSuccess('');
       return;
     }
-    setEditError('');
-    setEditSuccess('Profile successfully saved!');
-    setTimeout(() => setEditSuccess(''), 1500);
+
+    try {
+      setEditError('');
+
+      // Prepare update data
+      const updateData = {
+        id: userId,
+        name: name,
+        email: email,
+        contact: contact,
+      };
+
+      // Call API to update profile using /api/users/profile
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${baseURL}/users/profile?userId=${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update profile');
+      }
+
+      const result = await response.json();
+
+      if (result.success) {
+        setEditSuccess('Profile successfully saved!');
+
+        // Update localStorage user data
+        const currentUser = authService.getCurrentUser();
+        if (currentUser) {
+          currentUser.name = name;
+          currentUser.email = email;
+          localStorage.setItem('user', JSON.stringify(currentUser));
+        }
+
+        setTimeout(() => setEditSuccess(''), 3000);
+      } else {
+        setEditError(result.message || 'Failed to update profile');
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      setEditError('Failed to save profile changes');
+    }
   };
 
-  const handlePasswordSave = () => {
-    if (!newPass.trim()) {
-      setEditError('Password is required');
+  const handlePasswordSave = async () => {
+    // Clear previous errors
+    setEditError('');
+    setEditSuccess('');
+
+    // Validation
+    if (!currentPass.trim()) {
+      setEditError('Current password is required');
       return;
     }
-    setEditError('');
-    setEditSuccess('Password changed!');
-    setEditingPassword(false);
-    setTimeout(() => setEditSuccess(''), 1500);
+
+    if (!newPass.trim()) {
+      setEditError('New password is required');
+      return;
+    }
+
+    if (newPass.length < 6) {
+      setEditError('New password must be at least 6 characters');
+      return;
+    }
+
+    if (newPass !== confirmPass) {
+      setEditError('New passwords do not match');
+      return;
+    }
+
+    if (currentPass === newPass) {
+      setEditError('New password must be different from current password');
+      return;
+    }
+
+    try {
+      // Call API to change password
+      const result = await authService.changePassword(userId, currentPass, newPass);
+
+      if (result.success) {
+        setEditSuccess('Password changed successfully!');
+        setPasswordModalOpen(false);
+        setCurrentPass('');
+        setNewPass('');
+        setConfirmPass('');
+
+        setTimeout(() => setEditSuccess(''), 3000);
+      } else {
+        setEditError(result.error || 'Failed to change password');
+      }
+    } catch (error) {
+      console.error('Error changing password:', error);
+      setEditError('Failed to change password. Please try again.');
+    }
   };
 
   const handleUpload = (e) => {
@@ -76,7 +232,18 @@ const Settings = () => {
     }
     setUploadErr('');
     setProfilePic(URL.createObjectURL(file));
+    // TODO: Implement profile picture upload to backend
   };
+
+  if (loading) {
+    return (
+      <div className="citizen-settings inspector-settings-page">
+        <div className="inspector-settings-card">
+          <p>Loading profile data...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="citizen-settings inspector-settings-page">
@@ -86,7 +253,7 @@ const Settings = () => {
           {profilePic ? (
             <img src={profilePic} alt="Profile" className="inspector-profile-preview" />
           ) : (
-            <div className="inspector-avatar-initials">{getInitials(name)}</div>
+            <div className="inspector-avatar-initials">{getInitials(name || 'IN')}</div>
           )}
           <label htmlFor="profile-upload" className="inspector-btn-secondary" style={{ textAlign: 'center' }}>
             Upload {profilePic ? 'New' : ''} Picture
@@ -99,6 +266,73 @@ const Settings = () => {
         </div>
       </Modal>
 
+      <Modal open={passwordModalOpen} onClose={() => {
+        setPasswordModalOpen(false);
+        setCurrentPass('');
+        setNewPass('');
+        setConfirmPass('');
+        setEditError('');
+      }}>
+        <div className="inspector-modal-content">
+          <h3>Change Password</h3>
+          <p style={{ marginBottom: '20px', color: '#666' }}>Enter your current password and choose a new one</p>
+
+          <label htmlFor="current-password">Current Password</label>
+          <input
+            id="current-password"
+            type="password"
+            value={currentPass}
+            onChange={(e) => setCurrentPass(e.target.value)}
+            placeholder="Enter current password"
+            className="inspector-text-input"
+            style={{ marginBottom: '15px' }}
+          />
+
+          <label htmlFor="new-password">New Password</label>
+          <input
+            id="new-password"
+            type="password"
+            value={newPass}
+            onChange={(e) => setNewPass(e.target.value)}
+            placeholder="Enter new password"
+            className="inspector-text-input"
+            style={{ marginBottom: '15px' }}
+          />
+
+          <label htmlFor="confirm-password">Confirm New Password</label>
+          <input
+            id="confirm-password"
+            type="password"
+            value={confirmPass}
+            onChange={(e) => setConfirmPass(e.target.value)}
+            placeholder="Confirm new password"
+            className="inspector-text-input"
+            style={{ marginBottom: '15px' }}
+          />
+
+          {editError && <div className="inspector-alert inspector-alert--error">{editError}</div>}
+
+          <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+            <button className="inspector-btn-primary" type="button" onClick={handlePasswordSave}>
+              Save Password
+            </button>
+            <button
+              className="inspector-btn-secondary"
+              type="button"
+              onClick={() => {
+                setPasswordModalOpen(false);
+                setCurrentPass('');
+                setNewPass('');
+                setConfirmPass('');
+                setEditError('');
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </Modal>
+
       <div className="profile-info inspector-settings-card">
         <h3>Profile Information</h3>
         <p>Update your personal details and contact information</p>
@@ -106,7 +340,7 @@ const Settings = () => {
           {profilePic ? (
             <img src={profilePic} alt="Profile" className="inspector-profile-preview" />
           ) : (
-            <div className="inspector-avatar-initials">{getInitials(name)}</div>
+            <div className="inspector-avatar-initials">{getInitials(name || 'IN')}</div>
           )}
           <button type="button">Change</button>
         </div>
@@ -139,13 +373,18 @@ const Settings = () => {
             className="inspector-text-input"
           />
 
-          <label htmlFor="address">Address</label>
+          <label htmlFor="address">Assigned Area</label>
           <textarea
             id="address"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
             className="inspector-textarea"
+            placeholder="Your assigned inspection area"
+            disabled
           />
+          <p style={{ fontSize: '12px', color: '#666', marginTop: '-8px' }}>
+            Contact your administrator to change your assigned area
+          </p>
 
           {editError && <div className="inspector-alert inspector-alert--error">{editError}</div>}
           {editSuccess && <div className="inspector-alert inspector-alert--success">{editSuccess}</div>}
@@ -164,42 +403,17 @@ const Settings = () => {
             <h4>Password</h4>
             <p>Keep your account secure with a strong password</p>
           </div>
-          {editingPassword ? (
-            <div className="inspector-password-actions">
-              <input
-                type="password"
-                value={newPass}
-                onChange={(e) => setNewPass(e.target.value)}
-                placeholder="New password..."
-                className="inspector-text-input"
-              />
-              <button type="button" className="inspector-btn-primary" onClick={handlePasswordSave}>
-                Save
-              </button>
-              <button
-                type="button"
-                className="inspector-btn-secondary"
-                onClick={() => {
-                  setEditingPassword(false);
-                  setNewPass('');
-                }}
-              >
-                Cancel
-              </button>
-            </div>
-          ) : (
-            <button type="button" className="inspector-btn-secondary" onClick={() => setEditingPassword(true)}>
-              Change Password
-            </button>
-          )}
+          <button type="button" className="inspector-btn-secondary" onClick={() => setPasswordModalOpen(true)}>
+            Change Password
+          </button>
         </div>
         <hr />
         <div className="toggle-preference">
           <div>
             <h4>Google Sign-In</h4>
-            <p>Connect your Google account for seamless access</p>
+            <p>{googleAuth ? 'Connected to Google account' : 'No Google account linked'}</p>
           </div>
-          <ToggleSwitch checked={googleAuth} onChange={() => setGoogleAuth(!googleAuth)} />
+          <ToggleSwitch checked={googleAuth} onChange={() => setGoogleAuth(!googleAuth)} disabled />
         </div>
       </div>
     </div>

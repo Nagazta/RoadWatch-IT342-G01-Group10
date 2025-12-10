@@ -16,10 +16,10 @@ const ViewHistoryModal = ({ reportId, onClose }) => {
       setLoading(true);
       const token = localStorage.getItem('token');
       const response = await axios.get(
-        `http://localhost:8080/api/reports/${reportId}/history`,
+        `${import.meta.env.VITE_API_URL}/api/reports/${reportId}/history`,
         { headers: { 'Authorization': `Bearer ${token}` } }
       );
-      
+
       console.log('History data:', response.data);
       setHistory(response.data || []);
       setError(null);
@@ -34,7 +34,7 @@ const ViewHistoryModal = ({ reportId, onClose }) => {
 
   const formatDate = (dateString) => {
     if (!dateString) return 'Unknown date';
-    
+
     try {
       return new Date(dateString).toLocaleString('en-US', {
         year: 'numeric',
@@ -51,7 +51,7 @@ const ViewHistoryModal = ({ reportId, onClose }) => {
   // ✅ Use SVG icons instead of emojis
   const getChangeIcon = (action) => {
     const iconStyle = { width: '20px', height: '20px' };
-    
+
     switch (action?.toUpperCase()) {
       case 'CREATED':
         return (
@@ -113,7 +113,7 @@ const ViewHistoryModal = ({ reportId, onClose }) => {
   // ✅ Format field name to be more readable
   const formatFieldName = (fieldName) => {
     if (!fieldName) return '';
-    
+
     const fieldNameMap = {
       'status': 'Status',
       'priority': 'Priority',
@@ -121,7 +121,7 @@ const ViewHistoryModal = ({ reportId, onClose }) => {
       'adminNotes': 'Admin Notes',
       'estimatedCompletionDate': 'Estimated Completion Date'
     };
-    
+
     return fieldNameMap[fieldName] || fieldName;
   };
 
@@ -157,14 +157,14 @@ const ViewHistoryModal = ({ reportId, onClose }) => {
           ) : (
             <div className="history-timeline">
               {history.map((entry, index) => (
-                <div 
-                  key={index} 
+                <div
+                  key={index}
                   className="history-entry"
                   style={{ '--entry-color': getActionColor(entry.action) }}
                 >
-                  <div 
+                  <div
                     className="entry-icon"
-                    style={{ 
+                    style={{
                       borderColor: getActionColor(entry.action),
                       color: getActionColor(entry.action)
                     }}
@@ -173,7 +173,7 @@ const ViewHistoryModal = ({ reportId, onClose }) => {
                   </div>
                   <div className="entry-content">
                     <div className="entry-header">
-                      <span 
+                      <span
                         className="entry-action"
                         style={{ color: getActionColor(entry.action) }}
                       >
@@ -187,26 +187,26 @@ const ViewHistoryModal = ({ reportId, onClose }) => {
                       <p className="entry-user">
                         <strong>By:</strong> {entry.updatedByName || `User #${entry.updatedBy}` || 'Unknown'}
                       </p>
-                      
+
                       {entry.changeReason && (
                         <p className="entry-reason">
                           <strong>Reason:</strong> {entry.changeReason}
                         </p>
                       )}
-                      
+
                       {/* ✅ Updated field change display with template literals */}
                       {entry.fieldName && (
                         <div className="entry-change">
                           <strong>Changed:</strong>
                           <div className="change-detail">
                             <span className="field-name">{formatFieldName(entry.fieldName)}</span>
-                            
+
                             {/* ✅ Handle long text fields differently */}
                             {isLongTextField(entry.fieldName) ? (
                               <div style={{ marginTop: '8px' }}>
-                                <div style={{ 
-                                  padding: '10px', 
-                                  background: '#fff3cd', 
+                                <div style={{
+                                  padding: '10px',
+                                  background: '#fff3cd',
                                   borderRadius: '6px',
                                   marginBottom: '8px',
                                   fontSize: '13px',
@@ -218,9 +218,9 @@ const ViewHistoryModal = ({ reportId, onClose }) => {
                                     {entry.oldValue || '(empty)'}
                                   </div>
                                 </div>
-                                <div style={{ 
-                                  padding: '10px', 
-                                  background: '#d1e7dd', 
+                                <div style={{
+                                  padding: '10px',
+                                  background: '#d1e7dd',
                                   borderRadius: '6px',
                                   fontSize: '13px',
                                   border: '1px solid #28a745',
@@ -235,14 +235,14 @@ const ViewHistoryModal = ({ reportId, onClose }) => {
                             ) : (
                               <div style={{ marginTop: '4px' }}>
                                 <span className="old-value">{`"${entry.oldValue || '(empty)'}"`}</span>
-                                {' → '} 
+                                {' → '}
                                 <span className="new-value">{`"${entry.newValue}"`}</span>
                               </div>
                             )}
                           </div>
                         </div>
                       )}
-                      
+
                       {entry.notes && (
                         <div className="entry-changes">
                           <strong>Changes:</strong>

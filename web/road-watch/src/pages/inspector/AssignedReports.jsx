@@ -9,6 +9,7 @@ import ReportDetailsModal from '../../components/modal/ReportDetailsModal'; // �
 import '../admin/styles/ReportsManagement.css';
 import './styles/InspectorStyles.css';
 
+const baseUrl = `${import.meta.env.VITE_API_URL}/api`;
 const AssignedReports = () => {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -34,14 +35,14 @@ const AssignedReports = () => {
       const token = localStorage.getItem('token');
       const inspectorId = localStorage.getItem('adminId');
       const roleData = JSON.parse(localStorage.getItem('roleData') || '{}');
-      
+
       console.log('🔍 Inspector ID:', inspectorId);
       console.log('🔍 Role Data:', roleData);
 
       const actualInspectorId = roleData.inspector_id || inspectorId;
 
       const response = await axios.get(
-        `http://localhost:8080/api/reports/inspector/${actualInspectorId}`,
+        `${baseUrl}/reports/inspector/${actualInspectorId}`,
         { headers: { 'Authorization': `Bearer ${token}` } }
       );
 
@@ -100,14 +101,14 @@ const AssignedReports = () => {
     try {
       const token = localStorage.getItem('token');
       const userId = localStorage.getItem('adminId');
-      
+
       const payload = {
         ...updateData,
         updatedBy: userId
       };
-      
+
       await axios.put(
-        `http://localhost:8080/api/reports/${reportId}`,
+        `${baseUrl}/reports/${reportId}`,
         payload,
         { headers: { 'Authorization': `Bearer ${token}` } }
       );

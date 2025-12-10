@@ -1,4 +1,4 @@
-package road.watch.it_342_g01.RoadWatch.controller;
+package road.watch.it_342_g01.RoadWatch.Controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ import java.util.Objects; // ✅ Add this import
 
 @Slf4j
 @RestController
-@RequestMapping("api/users")
+@RequestMapping("/api/users")
 @CrossOrigin
 public class userController {
 

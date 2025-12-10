@@ -1,14 +1,38 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MainLayout from './MainLayout';
 import Sidebar from '../common/Sidebar';
 import Header from './Header';
 // Optionally import NotificationsModal if needed for inspector notifications
-// import NotificationsModal from '../modal/NotificationModal';
+// Optionally import NotificationsModal if needed for inspector notifications
+import NotificationsModal from '../modal/NotificationModal';
+import authService from '../../services/api/authService';
 
 const InspectorLayout = ({ children, activeMenuItem, pageTitle }) => {
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
+  const [currentUser, setCurrentUser] = useState({
+    name: 'Inspector User',
+    role: 'Inspector',
+    avatar: 'IN'
+  });
+
+  useEffect(() => {
+    const user = authService.getCurrentUser();
+    if (user) {
+      const getInitials = (name) => {
+        return name
+          ? name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
+          : 'IN';
+      };
+
+      setCurrentUser({
+        name: user.name || 'Inspector User',
+        role: 'Inspector', // Hardcoded as this is inspector layout
+        avatar: getInitials(user.name)
+      });
+    }
+  }, []);
 
   const handleNavigate = (item) => {
     if (item.path) {
@@ -20,6 +44,7 @@ const InspectorLayout = ({ children, activeMenuItem, pageTitle }) => {
     switch (action) {
       case 'profile':
         // Implement inspector profile navigation
+        navigate('/inspector/settings');
         break;
       case 'settings':
         // Consider navigating to inspector settings page
@@ -50,23 +75,23 @@ const InspectorLayout = ({ children, activeMenuItem, pageTitle }) => {
         header={
           <Header
             pageTitle={pageTitle}
-            userName="Inspector User"
-            userRole="Inspector"
-            userAvatar="IN"
+            userName={currentUser.name}
+            userRole={currentUser.role}
+            userAvatar={currentUser.avatar}
             notificationCount={2}
             onProfileClick={handleHeaderAction}
-            onNotificationClick={() => setShowNotifications(true)} 
+            onNotificationClick={() => setShowNotifications(true)}
           />
         }
       >
         {children}
       </MainLayout>
       {/* Implement notification modal as needed */}
-      {/* <NotificationsModal
+      <NotificationsModal
         isOpen={showNotifications}
         onClose={() => setShowNotifications(false)}
         userRole="inspector"
-      /> */}
+      />
     </>
   );
 };

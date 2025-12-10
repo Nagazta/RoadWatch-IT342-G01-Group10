@@ -1,7 +1,7 @@
 // src/services/auditLogService.js
 // API service for audit logs (Vite version)
 
-const API_BASE_URL = import.meta.env.VITE_AUDIT_API_URL || 'http://localhost:8080/api/audit';
+const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api/audit` || 'http://localhost:8080/api/audit';
 
 /**
  * Get auth token from storage
@@ -68,7 +68,7 @@ export const fetchAuditLogs = async ({
   }
 
   const data = await response.json();
-  
+
   if (!data.success) {
     throw new Error(data.error || 'Failed to fetch audit logs');
   }
@@ -208,11 +208,11 @@ export const exportAuditLogsCSV = async ({
   const downloadUrl = window.URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = downloadUrl;
-  
+
   // Generate filename with current date
   const date = new Date().toISOString().split('T')[0];
   link.setAttribute('download', `audit_logs_${date}.csv`);
-  
+
   document.body.appendChild(link);
   link.click();
   link.remove();

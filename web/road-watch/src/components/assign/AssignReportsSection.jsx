@@ -7,16 +7,16 @@ import AssignReportsTable from './AssignReportsTable';
 import '../assign/styles/AssignReportsSection.css';
 
 const AssignReportsSection = ({
-                                  reports,
-                                  inspectors,
-                                  searchQuery,
-                                  onSearchChange,
-                                  selectedCategory,
-                                  onCategoryChange,
-                                  selectedStatus,
-                                  onStatusChange,
-                                  onAssign
-                              }) => {
+    reports,
+    inspectors,
+    searchQuery,
+    onSearchChange,
+    selectedCategory,
+    onCategoryChange,
+    selectedStatus,
+    onStatusChange,
+    onAssign
+}) => {
     // 1. Pagination State
     const [currentPage, setCurrentPage] = useState(1);
     const rowsPerPage = 10; // Change this to 10 if you want more rows
@@ -63,7 +63,7 @@ const AssignReportsSection = ({
             <div className="assign-reports-filters">
                 <SearchBar
                     value={searchQuery}
-                    onChange={(e) => onSearchChange(e.target.value)}
+                    onChange={onSearchChange}
                     placeholder="Search by ID, title, or location..."
                 />
                 <CategoryFilter
@@ -85,15 +85,15 @@ const AssignReportsSection = ({
 
             {/* Footer / Pagination Controls */}
             <div className="assign-reports-footer">
-        <span className="reports-count">
-            {/* Logic to show "Showing 1 to 5 of 20" */}
-            Showing {activeReports.length > 0 ? indexOfFirstRow + 1 : 0} to {Math.min(indexOfLastRow, activeReports.length)} of {activeReports.length} reports
-        </span>
+                <span className="reports-count">
+                    {/* Logic to show "Showing 1 to 5 of 20" */}
+                    Showing {activeReports.length > 0 ? indexOfFirstRow + 1 : 0} to {Math.min(indexOfLastRow, activeReports.length)} of {activeReports.length} reports
+                </span>
 
                 <div className="reports-pagination">
-          <span className="page-info">
-             Page {activeReports.length > 0 ? currentPage : 0} of {totalPages}
-          </span>
+                    <span className="page-info">
+                        Page {activeReports.length > 0 ? currentPage : 0} of {totalPages}
+                    </span>
                     <div className="pagination-controls">
                         <button
                             className="pagination-btn"

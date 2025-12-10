@@ -4,6 +4,7 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import '../dashboard/styles/TopReportedLocations.css';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 const createCustomIcon = (priority) => {
   const colors = {
@@ -40,7 +41,7 @@ const TopReportedLocations = () => {
     const role = parsedUser?.role;
 
     axios
-      .get("http://localhost:8080/api/reports/getAll")
+      .get(`${API_URL}/api/reports/getAll`)
       .then((res) => {
         console.log("Reports fetched:", res.data);
 

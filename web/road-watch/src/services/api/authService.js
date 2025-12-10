@@ -3,7 +3,7 @@
 
 import { supabase } from '../../config/supabaseClient.js';
 
-const API_URL = 'http://localhost:8080/auth';
+const API_URL = `${import.meta.env.VITE_API_URL}/auth`;
 
 const authService = {
     /**
@@ -12,7 +12,7 @@ const authService = {
     async register(userData) {
         try {
             console.log('🔐 Registration attempt:', userData.email);
-            
+
             const response = await fetch(`${API_URL}/register`, {
                 method: 'POST',
                 headers: {
@@ -30,7 +30,7 @@ const authService = {
                 localStorage.setItem('roleData', JSON.stringify(data.roleData));
                 localStorage.setItem('userRole', data.user.role);
                 localStorage.setItem('adminId', data.user.id);
-                
+
                 console.log('✅ Registration successful');
             }
 
@@ -47,7 +47,7 @@ const authService = {
     async login(email, password) {
         try {
             console.log('🔐 Login attempt:', email);
-            
+
             const response = await fetch(`${API_URL}/login`, {
                 method: 'POST',
                 headers: {
@@ -64,7 +64,7 @@ const authService = {
                 localStorage.setItem('roleData', JSON.stringify(data.roleData));
                 localStorage.setItem('userRole', data.user.role);
                 localStorage.setItem('adminId', data.user.id);
-                
+
                 console.log('✅ Login successful');
                 console.log('User role:', data.user.role);
 
@@ -97,7 +97,7 @@ const authService = {
     async loginInspector(email, password) {
         try {
             console.log('🔐 Inspector login attempt:', email);
-            
+
             const response = await fetch(`${API_URL}/login-inspector`, {
                 method: 'POST',
                 headers: {
@@ -114,7 +114,7 @@ const authService = {
                 localStorage.setItem('roleData', JSON.stringify(data.roleData));
                 localStorage.setItem('userRole', data.user.role);
                 localStorage.setItem('adminId', data.user.id);
-                
+
                 console.log('✅ Inspector login successful');
                 console.log('Inspector ID:', data.roleData?.inspector_id);
                 console.log('Area:', data.roleData?.area_assignment);
@@ -133,7 +133,7 @@ const authService = {
     async loginWithGoogle() {
         try {
             console.log('🔐 Starting Google OAuth flow...');
-            
+
             // Step 1: Initiate Google OAuth with Supabase
             const { data, error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
@@ -166,10 +166,10 @@ const authService = {
     async handleOAuthCallback() {
         try {
             console.log('🔄 Handling OAuth callback...');
-            
+
             // Step 1: Get Supabase session
             const { data: { session }, error } = await supabase.auth.getSession();
-            
+
             if (error || !session) {
                 console.error('❌ No session found:', error);
                 return { success: false, error: 'Authentication failed' };
@@ -183,8 +183,8 @@ const authService = {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ 
-                    accessToken: session.access_token 
+                body: JSON.stringify({
+                    accessToken: session.access_token
                 }),
             });
 
@@ -197,7 +197,7 @@ const authService = {
                 localStorage.setItem('roleData', JSON.stringify(data.roleData));
                 localStorage.setItem('userRole', data.user.role);
                 localStorage.setItem('adminId', data.user.id);
-                
+
                 console.log('✅ Google OAuth login successful');
                 console.log('Citizen ID:', data.roleData?.citizen_id);
                 console.log('Google ID:', data.roleData?.google_id);
@@ -231,7 +231,7 @@ const authService = {
     async createInspector(inspectorData, adminId) {
         try {
             const token = localStorage.getItem('token');
-            
+
             const response = await fetch('http://localhost:8080/api/users/add', {
                 method: 'POST',
                 headers: {
@@ -281,12 +281,41 @@ const authService = {
     },
 
     /**
+     * Change user password
+     */
+    async changePassword(userId, currentPassword, newPassword) {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) return { success: false, error: 'No token found' };
+
+            const response = await fetch(`${API_URL}/change-password`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    userId,
+                    currentPassword,
+                    newPassword
+                }),
+            });
+
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('❌ Change password error:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    /**
      * Logout
      */
     async logout() {
         try {
             const token = localStorage.getItem('token');
-            
+
             await fetch(`${API_URL}/logout`, {
                 method: 'POST',
                 headers: {
@@ -302,7 +331,7 @@ const authService = {
             localStorage.removeItem('roleData');
             localStorage.removeItem('userRole');
             localStorage.removeItem('adminId');
-            
+
             console.log('✅ Logged out successfully');
             return { success: true };
         } catch (error) {

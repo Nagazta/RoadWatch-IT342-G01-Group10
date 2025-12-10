@@ -5,8 +5,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-if(!supabaseUrl || !supabaseAnonKey)
-{
+if (!supabaseUrl || !supabaseAnonKey) {
     alert('Configuration Error: Missing Supabase keys. Check console for details.');
 }
 
@@ -14,53 +13,46 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 const reportService =
 {
-    createReport: async(formData, email) =>
-    {
-        try
-        {
+    createReport: async (formData, email) => {
+        try {
             const response = await axios.post
-            (
-                `${API_URL}/api/reports/add2`, formData, { params: {submittedBy: email} }
-            );
+                (
+                    `${API_URL}/api/reports/add2`, formData, { params: { submittedBy: email } }
+                );
 
-            if(response.data)
-            {
+            if (response.data) {
                 // ✅ FIX: Return the created report data including the ID
-                return { 
-                    success: true, 
+                return {
+                    success: true,
                     data: response.data  // This contains the ReportEntity with id
                 };
             }
             else
                 throw new Error('Failed to create report');
         }
-        catch(error)
-        {
+        catch (error) {
             console.error('Create report error:', error);
-            return { 
+            return {
                 success: false,
-                error: error.response?.data?.message || error.message 
+                error: error.response?.data?.message || error.message
             };
         }
     },
 
-    
-    getReportsByEmail: async(email) => 
-    {
-        try 
-        {
+
+    getReportsByEmail: async (email) => {
+        try {
             const response = await axios.get
-            (
-                `${API_URL}/api/reports/getAll/name`, { params: {submittedBy: email} }
-            );
+                (
+                    `${API_URL}/api/reports/getAll/name`, { params: { submittedBy: email } }
+                );
 
             if (response.data)
-                 return { success: true, data: response.data };
+                return { success: true, data: response.data };
             else
                 throw new Error('Failed to fetch reports');
-        } 
-        catch (error) 
-        {
+        }
+        catch (error) {
             console.error('Get reports error:', error);
             return { success: false };
         }
@@ -69,21 +61,54 @@ const reportService =
     getAllReports: async () => {
         try {
             const response = await axios.get(`${API_URL}/api/reports/getAll`);
-            if(response.data && Array.isArray(response.data)) {
+            if (response.data && Array.isArray(response.data)) {
                 // Optionally sort newest to oldest if backend does not
-                return { 
-                    success: true, 
-                    data: response.data.sort((a,b) => 
-                        new Date(b.dateSubmitted || b.createdAt) - 
+                return {
+                    success: true,
+                    data: response.data.sort((a, b) =>
+                        new Date(b.dateSubmitted || b.createdAt) -
                         new Date(a.dateSubmitted || a.createdAt)
-                    ) 
+                    )
                 };
             } else {
                 return { success: false };
             }
-        } catch(error) {
+        } catch (error) {
             console.error('Get all reports error:', error);
             return { success: false };
+        }
+    },
+
+    // Upload images for a specific report
+    uploadReportImages: async (reportId, imageFiles) => {
+        try {
+            const formData = new FormData();
+
+            // Append each image file to formData
+            for (let i = 0; i < imageFiles.length; i++) {
+                formData.append('images', imageFiles[i]);
+            }
+
+            const response = await axios.post(
+                `${API_URL}/api/reports/${reportId}/images`,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }
+            );
+
+            return {
+                success: true,
+                data: response.data
+            };
+        } catch (error) {
+            console.error('Upload images error:', error);
+            return {
+                success: false,
+                error: error.response?.data?.error || error.message
+            };
         }
     },
 
@@ -95,9 +120,33 @@ const reportService =
                 success: true,
                 data: response.data
             };
-        } catch(error) {
+        } catch (error) {
             console.error('Get report images error:', error);
             return { success: false, data: [] };
+        }
+    },
+
+    // ✅ NEW: Update report with history (For Inspector/Admin edits)
+    updateReportWithHistory: async (reportId, updates, userId) => {
+        try {
+            // Include updatedBy in the payload
+            const payload = { ...updates, updatedBy: userId };
+
+            const response = await axios.put(`${API_URL}/api/reports/${reportId}`, payload);
+            if (response.data && response.data.success) {
+                return {
+                    success: true,
+                    data: response.data.data
+                };
+            } else {
+                throw new Error(response.data?.error || 'Failed to update report');
+            }
+        } catch (error) {
+            console.error('Update report error:', error);
+            return {
+                success: false,
+                error: error.response?.data?.error || error.message
+            };
         }
     }
 }

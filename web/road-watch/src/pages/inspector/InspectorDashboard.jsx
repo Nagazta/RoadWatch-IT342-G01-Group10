@@ -5,11 +5,14 @@ import ReportsTable from '../../components/reports/ReportsTable';
 import ReportsPagination from '../../components/reports/ReportsPagination';
 import InspectorDashboardStats from '../../components/dashboard/InspectorDashboardStats';
 import ReportDetailsModal from '../../components/modal/ReportDetailsModal';
+import EditReportModal from '../../components/modal/EditReportModal'; // ✅ Import EditReportModal
 import ViewHistoryModal from '../../components/modal/ViewHistoryModal';  // ✅ Import history modal
 import reportService from '../../services/api/reportService';
 import '../admin/styles/Dashboard.css';
 import '../admin/styles/ReportsManagement.css';
 import './styles/InspectorStyles.css';
+
+const baseUrl = `${import.meta.env.VITE_API_URL}/api`;
 
 const InspectorDashboard = () => {
   const [allReports, setAllReports] = useState([]);
@@ -22,10 +25,11 @@ const InspectorDashboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [fetchErr, setFetchErr] = useState('');
   const [fetching, setFetching] = useState(false);
-  
+
   // Modal state
   const [viewingReport, setViewingReport] = useState(null);
-  
+  const [editingReport, setEditingReport] = useState(null); // ✅ Separate state for editing
+
   // ✅ History Modal state
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [selectedReportId, setSelectedReportId] = useState(null);
@@ -52,11 +56,11 @@ const InspectorDashboard = () => {
       const token = localStorage.getItem('token');
       const inspectorId = localStorage.getItem('adminId');
       const roleData = JSON.parse(localStorage.getItem('roleData') || '{}');
-      
+
       const actualInspectorId = roleData.inspector_id || inspectorId;
 
       const response = await axios.get(
-        `http://localhost:8080/api/reports/inspector/${actualInspectorId}`,
+        `${baseUrl}/reports/inspector/${actualInspectorId}`,
         { headers: { 'Authorization': `Bearer ${token}` } }
       );
 
@@ -112,6 +116,49 @@ const InspectorDashboard = () => {
     }
   };
 
+  // ✅ Handle Edit Action -> Opens EditReportModal
+  const handleEdit = (reportId) => {
+    const report = displayReports.find(r => r.id === reportId);
+    if (report) {
+      console.log('✏️ Editing report:', report);
+      setEditingReport(report); // Open dedicated edit modal
+    }
+  };
+
+  // ✅ Handle Save Changes from EditReportModal
+  const handleSaveEdit = async (reportId, updateData) => {
+    try {
+      console.log('💾 Saving report changes:', reportId, updateData);
+
+      const userId = localStorage.getItem('userId') || localStorage.getItem('adminId');
+
+      // Call service with (id, updates, userId)
+      // updateData already has fields like status, inspectorNotes, priority, etc.
+      const result = await reportService.updateReportWithHistory(
+        reportId,
+        updateData,
+        userId
+      );
+
+      if (result.success) {
+        console.log('✅ Report updated successfully');
+        // Refresh local state without full reload
+        setAllReports(prev => prev.map(r => r.id === result.data.id ? result.data : r));
+        setAssignedReports(prev => prev.map(r => r.id === result.data.id ? result.data : r));
+
+        // Refresh assigned list to be sure
+        fetchAssignedReports();
+      } else {
+        alert(`Failed to update report: ${result.error}`);
+        throw new Error(result.error); // Re-throw to let Modal handle it if needed
+      }
+    } catch (error) {
+      console.error('Save error:', error);
+      alert('An error occurred while saving the report.');
+      throw error;
+    }
+  };
+
   // ✅ History Modal handlers
   const handleViewHistory = (reportId) => {
     console.log('📜 Opening history modal for report ID:', reportId);
@@ -127,8 +174,8 @@ const InspectorDashboard = () => {
 
   return (
     <div className="dashboard-container inspector-page">
-      <InspectorDashboardStats />
-      
+      <InspectorDashboardStats reports={assignedReports} />
+
       <div className="reports-management-container">
         {/* View Mode Toggle Buttons */}
         <div className="view-mode-toggle" style={{
@@ -180,7 +227,7 @@ const InspectorDashboard = () => {
             {viewMode === 'all' ? 'All Reports' : 'My Assigned Reports'}
           </h2>
           <p style={{ fontSize: '14px', color: '#6b7280', marginTop: '4px' }}>
-            {viewMode === 'all' 
+            {viewMode === 'all'
               ? `Viewing all reports in the system (${filteredReports.length} ${filteredReports.length === 1 ? 'report' : 'reports'})`
               : `Viewing your assigned inspection reports (${filteredReports.length} ${filteredReports.length === 1 ? 'report' : 'reports'})`
             }
@@ -196,20 +243,20 @@ const InspectorDashboard = () => {
           selectedStatus={selectedStatus}
           onStatusChange={setSelectedStatus}
         />
-        
+
         {fetching ? (
-          <div style={{ 
-            padding: '40px', 
-            textAlign: 'center', 
+          <div style={{
+            padding: '40px',
+            textAlign: 'center',
             color: '#6b7280',
-            fontSize: '14px' 
+            fontSize: '14px'
           }}>
             Loading reports...
           </div>
         ) : fetchErr ? (
-          <div style={{ 
-            padding: '40px', 
-            textAlign: 'center', 
+          <div style={{
+            padding: '40px',
+            textAlign: 'center',
             color: '#ef4444',
             fontSize: '14px',
             backgroundColor: '#fef2f2',
@@ -219,16 +266,16 @@ const InspectorDashboard = () => {
             {fetchErr}
           </div>
         ) : filteredReports.length === 0 ? (
-          <div style={{ 
-            padding: '40px', 
-            textAlign: 'center', 
+          <div style={{
+            padding: '40px',
+            textAlign: 'center',
             color: '#6b7280',
             fontSize: '14px',
             backgroundColor: '#f9fafb',
             borderRadius: '8px',
             border: '1px solid #e5e7eb'
           }}>
-            {viewMode === 'assigned' 
+            {viewMode === 'assigned'
               ? 'No reports assigned to you yet.'
               : 'No reports found matching your filters.'
             }
@@ -237,12 +284,13 @@ const InspectorDashboard = () => {
           <ReportsTable
             reports={paginatedReports}
             onView={handleView}
+            onEdit={handleEdit}  // ✅ Pass edit handler
             onViewHistory={handleViewHistory}
             userRole="inspector"
-            viewMode={viewMode}  
+            viewMode={viewMode}
           />
         )}
-        
+
         <ReportsPagination
           rowsPerPage={rowsPerPage}
           onRowsPerPageChange={handleRowsPerPageChange}
@@ -251,13 +299,22 @@ const InspectorDashboard = () => {
           onPageChange={setCurrentPage}
         />
 
-        {/* View Modal */}
+        {/* View Modal (Read Only) */}
         {viewingReport && (
           <ReportDetailsModal
             report={viewingReport}
             isOpen={!!viewingReport}
             onClose={() => setViewingReport(null)}
-            mode="view"  // ✅ Inspectors can only view (not edit) from "All Reports"
+            mode="view"
+          />
+        )}
+
+        {/* ✅ Edit Modal */}
+        {editingReport && (
+          <EditReportModal
+            report={editingReport}
+            onClose={() => setEditingReport(null)}
+            onSave={handleSaveEdit}
           />
         )}
 

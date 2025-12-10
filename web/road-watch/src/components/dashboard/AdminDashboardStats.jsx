@@ -8,12 +8,13 @@ import {
   CalendarIcon
 } from '../common/Icons';
 import '../dashboard/styles/DashboardStats.css';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 const AdminDashboardStats = () => {
   const [stats, setStats] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/reports/getAll")
+    fetch(`${API_URL}/api/reports/getAll`)
       .then(res => res.json())
       .then(reports => {
         calculateStats(reports);
@@ -52,8 +53,8 @@ const AdminDashboardStats = () => {
   return (
     <div className="dashboard-stats">
       {statsData.map(stat => (
-        <StatCard 
-          key={stat.id} 
+        <StatCard
+          key={stat.id}
           icon={stat.icon}
           value={stat.value}
           label={stat.label}

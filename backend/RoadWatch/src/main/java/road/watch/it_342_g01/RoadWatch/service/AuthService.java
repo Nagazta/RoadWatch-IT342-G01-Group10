@@ -484,4 +484,18 @@ public class AuthService {
                 .roleData(roleData)
                 .build();
     }
+
+    /**
+     * Verify if a plain password matches a hashed password
+     */
+    public boolean verifyPassword(String plainPassword, String hashedPassword) {
+        return passwordEncoder.matches(plainPassword, hashedPassword);
+    }
+
+    /**
+     * Hash a password
+     */
+    public String hashPassword(String plainPassword) {
+        return passwordEncoder.encode(plainPassword);
+    }
 }

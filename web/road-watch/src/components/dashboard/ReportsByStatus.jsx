@@ -9,6 +9,7 @@ import {
 import '../dashboard/styles/ReportsByStatus.css';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 const ReportsByStatus = () => {
   const [resolved, setResolved] = useState(0);
@@ -16,7 +17,7 @@ const ReportsByStatus = () => {
   const [pending, setPending] = useState(0);
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/reports/getAll")
+    fetch(`${API_URL}/api/reports/getAll`)
       .then(res => res.json())
       .then(reports => {
         setResolved(reports.filter(r => r.status === "Resolved").length);

@@ -7,6 +7,7 @@ import ReportDetailsModal from '../../components/modal/ReportDetailsModal';
 import ConfirmationModal from '../../components/modal/ConfirmationModal';
 import '../admin/styles/ReportsManagement.css';
 
+const baseUrl = `${import.meta.env.VITE_API_URL}/api`;
 const ReportsManagement = () => {
   const [reports, setReports] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -29,7 +30,7 @@ const ReportsManagement = () => {
   // Fetch reports from backend
   const fetchReports = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/reports/getAll');
+      const response = await axios.get(`${baseUrl}/reports/getAll`);
       console.log('API response:', response.data); // should log the JSON array
       const data = Array.isArray(response.data) ? response.data : [];
       // Sort by ID in descending order (highest ID first)
@@ -82,7 +83,7 @@ const ReportsManagement = () => {
 
   const handleSaveReport = async (updatedReport) => {
     try {
-      const response = await axios.put(`http://localhost:8080/api/reports/update/${updatedReport.id}`, updatedReport);
+      const response = await axios.put(`${baseUrl}/reports/update/${updatedReport.id}`, updatedReport);
       setReports(prev => prev.map(r => r.id === updatedReport.id ? response.data : r));
       handleCloseReportModal();
     } catch (error) {
@@ -104,7 +105,7 @@ const ReportsManagement = () => {
   const handleConfirmDelete = async () => {
     try {
       await axios.delete(
-        `http://localhost:8080/api/reports/delete/${deleteConfirmation.reportId}`
+        `${baseUrl}/reports/delete/${deleteConfirmation.reportId}`
       );
       setReports(prev => prev.filter(r => r.id !== deleteConfirmation.reportId));
     } catch (error) {

@@ -6,6 +6,7 @@ import AvailableInspectors from '../../components/assign/AvailableInspectors';
 import AssignReportsSection from '../../components/assign/AssignReportsSection';
 import '../admin/styles/AssignInspector.css';
 
+const baseUrl = `${import.meta.env.VITE_API_URL}/api`;
 const AssignInspector = () => {
     const [reports, setReports] = useState([]);
     const [inspectors, setInspectors] = useState([]);
@@ -20,30 +21,30 @@ const AssignInspector = () => {
     const fetchData = async () => {
         try {
             setLoading(true);
-            
+
             // 🔍 DEBUG: Check what tokens exist
             const token1 = localStorage.getItem('token');
             const token2 = localStorage.getItem('accessToken');
             const userRole = localStorage.getItem('userRole');
-            
+
             console.log('🔍 DEBUG TOKEN CHECK:');
             console.log('token:', token1 ? '✅ EXISTS' : '❌ MISSING');
             console.log('accessToken:', token2 ? '✅ EXISTS' : '❌ MISSING');
             console.log('userRole:', userRole);
-            
+
             // Use the correct token
             const token = token1 || token2; // Try both
-            
+
             if (!token) {
                 console.error('❌ NO TOKEN FOUND!');
                 return;
             }
-            
+
             const config = { headers: { 'Authorization': `Bearer ${token}` } };
 
             const [reportsRes, inspectorsRes] = await Promise.all([
-                axios.get('http://localhost:8080/api/reports/getAll', config),
-                axios.get('http://localhost:8080/api/inspector/getAll', config)
+                axios.get(`${baseUrl}/reports/getAll`, config),
+                axios.get(`${baseUrl}/inspector/getAll`, config)
             ]);
 
             setReports(reportsRes.data);
@@ -92,7 +93,7 @@ const AssignInspector = () => {
             const config = { headers: { 'Authorization': `Bearer ${token}` } };
 
             await axios.put(
-                `http://localhost:8080/api/reports/${reportId}/assign/${inspectorId}`,
+                `${baseUrl}/reports/${reportId}/assign/${inspectorId}`,
                 {},
                 config
             );
@@ -124,7 +125,9 @@ const AssignInspector = () => {
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery} // Note: You need to pass the setter if the search bar is inside the child
                 selectedCategory={selectedCategory}
+                onCategoryChange={setSelectedCategory}
                 selectedStatus={selectedStatus}
+                onStatusChange={setSelectedStatus}
                 onAssign={handleAssign}
             />
         </div>

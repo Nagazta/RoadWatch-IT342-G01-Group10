@@ -19,7 +19,7 @@ const ReportDetailsModal = ({ report, isOpen, onClose, onSave, mode = 'view' }) 
         status: report.status,
         adminNotes: report.adminNotes || ''
       });
-      
+
       // Fetch images when modal opens
       fetchImages();
     }
@@ -27,7 +27,7 @@ const ReportDetailsModal = ({ report, isOpen, onClose, onSave, mode = 'view' }) 
 
   const fetchImages = async () => {
     if (!report?.id) return;
-    
+
     setLoadingImages(true);
     try {
       const response = await reportService.getReportImages(report.id);
@@ -70,7 +70,7 @@ const ReportDetailsModal = ({ report, isOpen, onClose, onSave, mode = 'view' }) 
         {/* Modal Header */}
         <div className="modal-header">
           <h2 className="modal-title">
-            {isEditing ? `Report ID` : `Report Details - ${report.id}`}
+            {isEditing ? `Report ID` : `Report Details - ${report.title}`}
           </h2>
           <button className="modal-close-btn" onClick={handleClose}>
             <XIcon />
@@ -131,15 +131,15 @@ const ReportDetailsModal = ({ report, isOpen, onClose, onSave, mode = 'view' }) 
             ) : images.length > 0 ? (
               <div className="report-photos-grid">
                 {images.map((image) => (
-                  <div key={image.id} style={{ 
-                    width: '150px', 
-                    height: '150px', 
-                    border: '1px solid #ddd', 
+                  <div key={image.id} style={{
+                    width: '150px',
+                    height: '150px',
+                    border: '1px solid #ddd',
                     borderRadius: '8px',
                     overflow: 'hidden'
                   }}>
-                    <img 
-                      src={`${API_URL}${image.imageUrl}`} 
+                    <img
+                      src={`${API_URL}${image.imageUrl}`}
                       alt={`Report ${report.id} - Image ${image.id}`}
                       style={{
                         width: '100%',
@@ -156,10 +156,10 @@ const ReportDetailsModal = ({ report, isOpen, onClose, onSave, mode = 'view' }) 
                 ))}
               </div>
             ) : (
-              <div style={{ 
-                padding: '40px', 
-                textAlign: 'center', 
-                background: '#f9f9f9', 
+              <div style={{
+                padding: '40px',
+                textAlign: 'center',
+                background: '#f9f9f9',
                 borderRadius: '8px',
                 color: '#999'
               }}>
@@ -178,7 +178,7 @@ const ReportDetailsModal = ({ report, isOpen, onClose, onSave, mode = 'view' }) 
               Status {isEditing && <span className="required-asterisk">*</span>}
             </label>
             {isEditing ? (
-              <select 
+              <select
                 className="modal-select"
                 value={formData.status}
                 onChange={handleStatusChange}
@@ -213,7 +213,7 @@ const ReportDetailsModal = ({ report, isOpen, onClose, onSave, mode = 'view' }) 
         </div>
 
         {/* Modal Footer */}
-       <div className="modal-footer">
+        <div className="modal-footer">
           {isEditing ? (
             <div className="modal-actions-right" style={{ marginLeft: 'auto' }}>
               <button className="modal-btn close-btn" onClick={handleClose}>
