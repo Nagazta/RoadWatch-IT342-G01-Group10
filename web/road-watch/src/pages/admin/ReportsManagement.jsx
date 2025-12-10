@@ -29,7 +29,7 @@ const ReportsManagement = () => {
   // Fetch reports from backend
   const fetchReports = async () => {
     try {
-      const response = await axios.get('${import.meta.env.VITE_API_BASE_URL}/api/reports/getAll');
+const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/reports/getAll`);
       console.log('API response:', response.data); // should log the JSON array
       const data = Array.isArray(response.data) ? response.data : [];
       // Sort by ID in descending order (highest ID first)
