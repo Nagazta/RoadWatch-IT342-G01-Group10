@@ -8,7 +8,7 @@ import ViewHistoryModal from '../../components/modal/ViewHistoryModal';  // ✅ 
 import axios from 'axios';
 import '../admin/styles/ReportsManagement.css';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const API_URL = import.meta.env.VITE_API_BASE_URL;
 
 const CitizenReports = () => {
   const [searchQuery, setSearchQuery] = useState('');

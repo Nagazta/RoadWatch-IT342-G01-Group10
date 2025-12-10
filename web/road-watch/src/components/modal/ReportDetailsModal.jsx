@@ -3,7 +3,7 @@ import { XIcon, ImageIcon } from '../common/Icons';
 import reportService from '../../services/api/reportService';
 import '../modal/styles/ReportDetailsModal.css';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const API_URL = import.meta.env.VITE_API_BASE_URL;
 
 const ReportDetailsModal = ({ report, isOpen, onClose, onSave, mode = 'view' }) => {
   const [formData, setFormData] = useState({
