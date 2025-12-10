@@ -5,7 +5,7 @@ const FeedbackStatusFilter = ({ value, onChange }) => {
   const statuses = [
     'All Status',
     'Pending',
-    'In Progress',
+    'In-Progress',
     'Resolved'
   ];
 

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 const categories = ['Pothole', 'Crack', 'Debris', 'Flooding', 'Other'];
-const statusList = ['Pending','Under Review','Approved','In Progress','Resolved','Rejected'];
+const statusList = ['Pending','Under Review','Approved','In-Progress','Resolved','Rejected'];
 const ReportFilterPanel = ({ onFilterChange }) => {
   const [filters, setFilters] = useState({ status: '', category: '', from: '', to: '', location: '', reporter: '', title:'' });
   const update = (field, value) => {
