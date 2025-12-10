@@ -83,6 +83,7 @@ public class SecurityConfig {
                 "http://localhost:3000",
                 "http://localhost:5173",
                 "https://roadwatchph.com",
+                "https://roadwatchph.netlify.app",
                 "http://localhost:4200"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
