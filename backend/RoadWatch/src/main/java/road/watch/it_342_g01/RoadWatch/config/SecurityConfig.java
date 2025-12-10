@@ -40,6 +40,7 @@ public class SecurityConfig {
                                 "/auth/local-login",
                                 "/api/test/**",
                                 "/api/users/add",
+                                "/api/users/profile",
                                 "/api/users/test",
                                 "/api/users/getAll", // ✅ Public - read all users
                                 "/api/users/db-test",
