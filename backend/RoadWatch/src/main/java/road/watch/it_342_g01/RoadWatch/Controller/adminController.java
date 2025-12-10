@@ -12,7 +12,7 @@ import java.util.Objects; // ✅ Add this import
 
 @RestController
 @RequestMapping("/api/admin")
-@CrossOrigin
+
 public class adminController {
 
     @Autowired

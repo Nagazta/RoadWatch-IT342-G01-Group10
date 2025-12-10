@@ -22,7 +22,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/audit")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
+
 public class AuditLogController {
 
     private final AuditLogService auditLogService;

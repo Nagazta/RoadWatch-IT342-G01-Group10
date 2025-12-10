@@ -11,7 +11,7 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/inspector")
-@CrossOrigin
+
 public class inspectorController {
 
         @Autowired

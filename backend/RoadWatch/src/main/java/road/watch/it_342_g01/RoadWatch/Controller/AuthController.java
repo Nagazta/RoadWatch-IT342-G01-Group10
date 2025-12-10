@@ -18,7 +18,7 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin
+
 @RequiredArgsConstructor
 public class AuthController {
 

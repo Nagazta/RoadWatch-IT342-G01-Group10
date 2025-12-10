@@ -17,7 +17,7 @@ import java.util.Objects; // ✅ Add this import
 @Slf4j
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin
+
 public class userController {
 
     @Autowired

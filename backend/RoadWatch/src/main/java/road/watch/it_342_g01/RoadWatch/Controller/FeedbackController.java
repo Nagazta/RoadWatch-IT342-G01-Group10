@@ -19,7 +19,7 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/api/feedback")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
+
 public class FeedbackController {
 
     private final FeedbackService feedbackService;
