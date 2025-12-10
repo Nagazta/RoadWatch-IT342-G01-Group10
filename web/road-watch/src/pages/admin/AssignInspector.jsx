@@ -42,8 +42,8 @@ const AssignInspector = () => {
             const config = { headers: { 'Authorization': `Bearer ${token}` } };
 
             const [reportsRes, inspectorsRes] = await Promise.all([
-                axios.get('http://localhost:8080/api/reports/getAll', config),
-                axios.get('http://localhost:8080/api/inspector/getAll', config)
+                axios.get('${import.meta.env.VITE_API_BASE_URL}/api/reports/getAll', config),
+                axios.get('${import.meta.env.VITE_API_BASE_URL}/api/inspector/getAll', config)
             ]);
 
             setReports(reportsRes.data);
@@ -92,7 +92,7 @@ const AssignInspector = () => {
             const config = { headers: { 'Authorization': `Bearer ${token}` } };
 
             await axios.put(
-                `http://localhost:8080/api/reports/${reportId}/assign/${inspectorId}`,
+                `${import.meta.env.VITE_API_BASE_URL}/api/reports/${reportId}/assign/${inspectorId}`,
                 {},
                 config
             );

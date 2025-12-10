@@ -41,7 +41,7 @@ const AssignedReports = () => {
       const actualInspectorId = roleData.inspector_id || inspectorId;
 
       const response = await axios.get(
-        `http://localhost:8080/api/reports/inspector/${actualInspectorId}`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/reports/inspector/${actualInspectorId}`,
         { headers: { 'Authorization': `Bearer ${token}` } }
       );
 
@@ -107,7 +107,7 @@ const AssignedReports = () => {
       };
       
       await axios.put(
-        `http://localhost:8080/api/reports/${reportId}`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/reports/${reportId}`,
         payload,
         { headers: { 'Authorization': `Bearer ${token}` } }
       );

@@ -13,7 +13,9 @@ const AdminDashboardStats = () => {
   const [stats, setStats] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/reports/getAll")
+    const apiUrl = import.meta.env.VITE_REPORTS_API_URL || import.meta.env.VITE_API_BASE_URL + '/api/reports';
+    
+    fetch(`${apiUrl}/getAll`)
       .then(res => res.json())
       .then(reports => {
         calculateStats(reports);
@@ -47,7 +49,8 @@ const AdminDashboardStats = () => {
     { id: 'pending', icon: <AlertIcon />, value: stats.pending, label: 'Pending Reports', iconColor: '#f57f17' },
     { id: 'in-progress', icon: <ClockIcon />, value: stats.inProgress, label: 'In Progress', iconColor: '#1565c0' },
     { id: 'resolved', icon: <CheckCircleIcon />, value: stats.resolved, label: 'Resolved Reports', iconColor: '#2e7d32' },
-    { id: 'avg-time', icon: <CalendarIcon />, value: stats.avgTime, label: 'Avg. Resolution Time', iconColor: '#512da8' },];
+    { id: 'avg-time', icon: <CalendarIcon />, value: stats.avgTime, label: 'Avg. Resolution Time', iconColor: '#512da8' },
+  ];
 
   return (
     <div className="dashboard-stats">

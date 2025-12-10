@@ -20,7 +20,7 @@ const SystemSettings = () => {
     // Fetch profile on mount
     const fetchProfile = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/api/users/profile', {
+        const response = await axios.get('${import.meta.env.VITE_API_BASE_URL}/api/users/profile', {
           params: { userId: 1 } // Replace with authenticated user's ID
         });
         setAccountData({
@@ -51,7 +51,7 @@ const SystemSettings = () => {
         name: adminName,
         email
       };
-      const response = await axios.put('http://localhost:8080/api/users/profile', payload, {
+      const response = await axios.put('${import.meta.env.VITE_API_BASE_URL}/api/users/profile', payload, {
         params: { userId: 1 } // Replace with authenticated user's ID
       });
       console.log('Profile updated:', response.data);
