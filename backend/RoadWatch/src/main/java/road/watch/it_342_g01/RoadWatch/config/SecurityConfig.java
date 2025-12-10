@@ -31,46 +31,63 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints - MOST SPECIFIC FIRST!
+                        // ========================================
+                        // PUBLIC ENDPOINTS - Authentication/Login
+                        // ========================================
                         .requestMatchers(
                                 "/error",
                                 "/uploads/**",
-                                "/auth/**",
-                                "/auth/login",
-                                "/auth/local-login",
-                                "/api/test/**",
-                                "/api/users/add",
-                                "/api/users/profile",
-                                "/api/users/test",
-                                "/api/users/getAll", // ✅ Public - read all users
-                                "/api/users/db-test",
-                                "/api/admin/add",
-                                "/api/citizen/add",
-                                "/api/inspector/add",
-                                "/api/reports/**", // ✅ All report endpoints including image uploads
-                                "/api/reports/*/images", // ✅ Explicit image upload endpoint
-                                "/api/reports/images/*", // ✅ Explicit image operations
-                                "/api/feedback/submit", // ✅ Public feedback submission
+                                "/api/auth/**", // ✅ Changed from /auth/** to /api/auth/**
+                                "/api/auth/login", // ✅ Explicit login endpoint
+                                "/api/auth/register", // ✅ Explicit registration endpoint
+                                "/api/auth/google", // ✅ OAuth callback endpoint
                                 "/actuator/**")
                         .permitAll()
 
-                        // ✅ Admin-only endpoints - MUST come AFTER public endpoints
-                        .requestMatchers("/api/users/updateBy/**").hasRole("ADMIN") // Update user
-                        .requestMatchers("/api/users/deleteBy/**").hasRole("ADMIN") // Delete user
-                        .requestMatchers("/api/feedback/all").hasRole("ADMIN") // Get all feedback
-                        .requestMatchers("/api/feedback/stats").hasRole("ADMIN") // Get feedback stats
-                        .requestMatchers("/api/feedback/*/status").hasRole("ADMIN") // Update feedback status
+                        // ========================================
+                        // PUBLIC ENDPOINTS - User Operations
+                        // ========================================
+                        .requestMatchers(
+                                "/api/test/**",
+                                "/api/users/add",
+                                "/api/users/test",
+                                "/api/users/getAll",
+                                "/api/users/db-test",
+                                "/api/admin/add",
+                                "/api/citizen/add",
+                                "/api/inspector/add")
+                        .permitAll()
 
-                        // ✅ AUDIT LOGS - Admin only (ADD THIS!)
+                        // ========================================
+                        // PUBLIC ENDPOINTS - Reports and Feedback
+                        // ========================================
+                        .requestMatchers(
+                                "/api/reports/**",
+                                "/api/reports/*/images",
+                                "/api/reports/images/*",
+                                "/api/feedback/submit")
+                        .permitAll()
+
+                        // ========================================
+                        // ADMIN-ONLY ENDPOINTS
+                        // ========================================
+                        .requestMatchers("/api/users/updateBy/**").hasRole("ADMIN")
+                        .requestMatchers("/api/users/deleteBy/**").hasRole("ADMIN")
+                        .requestMatchers("/api/feedback/all").hasRole("ADMIN")
+                        .requestMatchers("/api/feedback/stats").hasRole("ADMIN")
+                        .requestMatchers("/api/feedback/*/status").hasRole("ADMIN")
                         .requestMatchers("/api/audit/**").hasRole("ADMIN")
 
-                        .requestMatchers("/api/users/profile").authenticated() // Profile (any authenticated user)
-
-                        // Authenticated endpoints
-                        .requestMatchers("/api/feedback/my-feedback").authenticated() // User's own feedback
+                        // ========================================
+                        // AUTHENTICATED ENDPOINTS (Any logged-in user)
+                        // ========================================
+                        .requestMatchers("/api/users/profile").authenticated()
+                        .requestMatchers("/api/feedback/my-feedback").authenticated()
                         .requestMatchers("/api/**").authenticated()
 
-                        // Fallback
+                        // ========================================
+                        // FALLBACK - Require authentication
+                        // ========================================
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -80,15 +97,27 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
+
+        // ✅ Allow frontend origins
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:3000",
                 "http://localhost:5173",
                 "http://localhost:4200",
-                "https://roadwatch-it342-g01-group10-1.onrender.com"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+                "https://roadwatch-it342-g01-group10-1.onrender.com" // ✅ Production frontend
+        ));
+
+        // ✅ Allow HTTP methods
+        configuration.setAllowedMethods(Arrays.asList(
+                "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+
+        // ✅ Allow all headers
         configuration.setAllowedHeaders(Arrays.asList("*"));
+
+        // ✅ Allow credentials (cookies, authorization headers)
         configuration.setAllowCredentials(true);
-        configuration.setExposedHeaders(Arrays.asList("Authorization")); // ✅ Expose auth headers
+
+        // ✅ Expose authorization header in responses
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
