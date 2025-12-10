@@ -46,7 +46,7 @@ const TopReportedLocations = () => {
 
         // Filter reports for non-admin users
         let reports = res.data;
-        if (role !== 'admin') {
+        if (role !== 'ADMIN') {
           reports = reports.filter(r => r.submittedBy === userEmail);
         }
 
