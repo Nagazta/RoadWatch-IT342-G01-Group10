@@ -49,15 +49,20 @@ public class SecurityConfig {
                                 "/api/reports/**", // ✅ All report endpoints including image uploads
                                 "/api/reports/*/images", // ✅ Explicit image upload endpoint
                                 "/api/reports/images/*", // ✅ Explicit image operations
+                                "/api/feedback/submit", // ✅ Public feedback submission
                                 "/actuator/**")
                         .permitAll()
 
-                        // ✅ Admin-only endpoints - MUST come AFTER public /api/users/getAll
+                        // ✅ Admin-only endpoints - MUST come AFTER public endpoints
                         .requestMatchers("/api/users/updateBy/**").hasRole("ADMIN") // Update user
                         .requestMatchers("/api/users/deleteBy/**").hasRole("ADMIN") // Delete user
+                        .requestMatchers("/api/feedback/all").hasRole("ADMIN") // Get all feedback
+                        .requestMatchers("/api/feedback/stats").hasRole("ADMIN") // Get feedback stats
+                        .requestMatchers("/api/feedback/*/status").hasRole("ADMIN") // Update feedback status
                         .requestMatchers("/api/users/profile").authenticated() // Profile (any authenticated user)
 
                         // Authenticated endpoints
+                        .requestMatchers("/api/feedback/my-feedback").authenticated() // User's own feedback
                         .requestMatchers("/api/**").authenticated()
 
                         // Fallback
