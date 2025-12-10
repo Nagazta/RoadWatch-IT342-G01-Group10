@@ -115,7 +115,7 @@ const FeedbackDetailsModal = ({ feedback, isOpen, onClose, onSave, mode = 'view'
                 onChange={handleStatusChange}
               >
                 <option value="Pending">Pending</option>
-                <option value="In Progress">In Progress</option>
+                <option value="In-Progress">In Progress</option>
                 <option value="Resolved">Resolved</option>
               </select>
             ) : (

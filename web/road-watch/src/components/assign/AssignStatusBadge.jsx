@@ -8,7 +8,7 @@ const AssignStatusBadge = ({ status }) => {
         return 'assign-status-unassigned';
       case 'Assigned':
         return 'assign-status-assigned';
-      case 'In Progress':
+      case 'In-Progress':
         return 'assign-status-in-progress';
       case 'Resolved':
         return 'assign-status-resolved';
