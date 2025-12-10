@@ -89,7 +89,7 @@ const EditReportModal = ({ report, onClose, onSave }) => {
                   required
                 >
                   <option value="Pending">Pending</option>
-                  <option value="In Progress">In Progress</option>
+                  <option value="In-Progress">In Progress</option>
                   <option value="Resolved">Resolved</option>
                   <option value="Rejected">Rejected</option>
                 </select>

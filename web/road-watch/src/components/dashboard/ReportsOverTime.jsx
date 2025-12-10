@@ -25,7 +25,7 @@ const ReportsOverTime = () => {
   const [weeklyResolved, setWeeklyResolved] = useState([0, 0, 0, 0, 0, 0, 0]);
 
   useEffect(() => {
-    fetch("${import.meta.env.VITE_API_BASE_URL}/api/reports/getAll")
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/api/reports/getAll`)
       .then(res => res.json())
       .then(reports => processWeeklyData(reports))
       .catch(err => console.error("Failed to fetch weekly report data:", err));
