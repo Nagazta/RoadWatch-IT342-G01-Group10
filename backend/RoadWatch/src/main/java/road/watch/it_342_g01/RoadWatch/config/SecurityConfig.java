@@ -22,110 +22,105 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+        private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        // ========================================
-                        // PUBLIC ENDPOINTS - Authentication/Login
-                        // ========================================
-                        .requestMatchers(
-                                "/error",
-                                "/uploads/**",
-                                "/api/auth/**", // ✅ Changed from /auth/** to /api/auth/**
-                                "/api/auth/login", // ✅ Explicit login endpoint
-                                "/api/auth/register", // ✅ Explicit registration endpoint
-                                "/api/auth/google", // ✅ OAuth callback endpoint
-                                "/actuator/**")
-                        .permitAll()
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+                http
+                                .csrf(csrf -> csrf.disable())
+                                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                                .sessionManagement(session -> session
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                .authorizeHttpRequests(auth -> auth
+                                                // ========================================
+                                                // PUBLIC ENDPOINTS - Authentication/Login
+                                                // ========================================
+                                                .requestMatchers(
+                                                                "/error",
+                                                                "/uploads/**",
+                                                                "/api/auth/**",
+                                                                "/api/auth/login",
+                                                                "/api/auth/register",
+                                                                "/api/auth/google",
+                                                                "/actuator/**")
+                                                .permitAll()
 
-                        // ========================================
-                        // PUBLIC ENDPOINTS - User Operations
-                        // ========================================
-                        .requestMatchers(
-                                "/api/test/**",
-                                "/api/users/add",
-                                "/api/users/test",
-                                "/api/users/getAll",
-                                "/api/users/db-test",
-                                "/api/admin/add",
-                                "/api/citizen/add",
-                                "/api/inspector/add")
-                        .permitAll()
+                                                // ========================================
+                                                // PUBLIC ENDPOINTS - User Operations
+                                                // ========================================
+                                                .requestMatchers(
+                                                                "/api/test/**",
+                                                                "/api/users/add",
+                                                                "/api/users/test",
+                                                                "/api/users/getAll",
+                                                                "/api/users/db-test",
+                                                                "/api/admin/add",
+                                                                "/api/citizen/add",
+                                                                "/api/inspector/add")
+                                                .permitAll()
 
-                        // ========================================
-                        // PUBLIC ENDPOINTS - Reports and Feedback
-                        // ========================================
-                        .requestMatchers(
-                                "/api/reports/**",
-                                "/api/reports/*/images",
-                                "/api/reports/images/*",
-                                "/api/feedback/submit")
-                        .permitAll()
+                                                // ========================================
+                                                // PUBLIC ENDPOINTS - Reports and Feedback
+                                                // ========================================
+                                                .requestMatchers(
+                                                                "/api/reports/**",
+                                                                "/api/reports/*/images",
+                                                                "/api/reports/images/*",
+                                                                "/api/feedback/submit")
+                                                .permitAll()
 
-                        // ========================================
-                        // ADMIN-ONLY ENDPOINTS
-                        // ========================================
-                        .requestMatchers("/api/users/updateBy/**").hasRole("ADMIN")
-                        .requestMatchers("/api/users/deleteBy/**").hasRole("ADMIN")
-                        .requestMatchers("/api/feedback/all").hasRole("ADMIN")
-                        .requestMatchers("/api/feedback/stats").hasRole("ADMIN")
-                        .requestMatchers("/api/feedback/*/status").hasRole("ADMIN")
-                        .requestMatchers("/api/audit/**").hasRole("ADMIN")
+                                                // ========================================
+                                                // ADMIN-ONLY ENDPOINTS
+                                                // ========================================
+                                                .requestMatchers("/api/users/deleteBy/**").hasRole("ADMIN")
+                                                .requestMatchers("/api/feedback/all").hasRole("ADMIN")
+                                                .requestMatchers("/api/feedback/stats").hasRole("ADMIN")
+                                                .requestMatchers("/api/feedback/*/status").hasRole("ADMIN")
+                                                .requestMatchers("/api/audit/**").hasRole("ADMIN")
 
-                        // ========================================
-                        // AUTHENTICATED ENDPOINTS (Any logged-in user)
-                        // ========================================
-                        .requestMatchers("/api/users/profile").authenticated()
-                        .requestMatchers("/api/feedback/my-feedback").authenticated()
-                        .requestMatchers("/api/**").authenticated()
+                                                // ========================================
+                                                // AUTHENTICATED ENDPOINTS (Any logged-in user)
+                                                // ========================================
+                                                .requestMatchers("/api/users/profile").authenticated() // ✅ Profile
+                                                                                                       // access
+                                                .requestMatchers("/api/users/updateBy/**").authenticated() // ✅ Allow
+                                                                                                           // self-update
+                                                .requestMatchers("/api/feedback/my-feedback").authenticated()
+                                                .requestMatchers("/api/**").authenticated()
 
-                        // ========================================
-                        // FALLBACK - Require authentication
-                        // ========================================
-                        .anyRequest().authenticated())
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                                                // ========================================
+                                                // FALLBACK - Require authentication
+                                                // ========================================
+                                                .anyRequest().authenticated())
+                                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
-    }
+                return http.build();
+        }
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
+        @Bean
+        public CorsConfigurationSource corsConfigurationSource() {
+                CorsConfiguration configuration = new CorsConfiguration();
 
-        // ✅ Allow frontend origins
-        configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:3000",
-                "http://localhost:5173",
-                "http://localhost:4200",
-                "https://roadwatch-it342-g01-group10-1.onrender.com" // ✅ Production frontend
-        ));
+                configuration.setAllowedOrigins(Arrays.asList(
+                                "http://localhost:3000",
+                                "http://localhost:5173",
+                                "http://localhost:4200",
+                                "https://roadwatch-it342-g01-group10-1.onrender.com"));
 
-        // ✅ Allow HTTP methods
-        configuration.setAllowedMethods(Arrays.asList(
-                "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+                configuration.setAllowedMethods(Arrays.asList(
+                                "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
 
-        // ✅ Allow all headers
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+                configuration.setAllowedHeaders(Arrays.asList("*"));
+                configuration.setAllowCredentials(true);
+                configuration.setExposedHeaders(Arrays.asList("Authorization"));
 
-        // ✅ Allow credentials (cookies, authorization headers)
-        configuration.setAllowCredentials(true);
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                source.registerCorsConfiguration("/**", configuration);
+                return source;
+        }
 
-        // ✅ Expose authorization header in responses
-        configuration.setExposedHeaders(Arrays.asList("Authorization"));
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+                return new BCryptPasswordEncoder();
+        }
 }
